@@ -15,6 +15,9 @@
 
 namespace HPHP {
 
+#define DEFAULT_SLASH_CHAR '/'
+#define DEFAULT_SLASH_STR "/"
+
 class YafExtension : public Extension {
 public:
     YafExtension():Extension("yaf"){}
@@ -103,8 +106,10 @@ public:
 
         virtual void requestShutdown() {
         }
+        virtual ~YafRequestData(){}
 };
 
+DECLARE_EXTERN_REQUEST_LOCAL(YafRequestData, g_yaf_local_data);
 
 }
 

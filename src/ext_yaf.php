@@ -8,6 +8,17 @@ class calc {
 
 abstract class Yaf_Controller {
 
+    public    $actions      = NULL;
+    protected $_module      = NULL;
+    protected $_name        = NULL;
+    protected $_request     = NULL;
+    protected $_response    = NULL;
+    protected $_invoke_args = NULL;
+    protected $_view        = NULL;
+
+    <<__Native>>
+    protected function render(string $tpl, ?array $parameters = NULL):mixed;
+
     <<__Native>>
     public function test():mixed;
 }

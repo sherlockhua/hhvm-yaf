@@ -14,8 +14,9 @@
 
 namespace HPHP { 
 
+
 IMPLEMENT_REQUEST_LOCAL(YafRequestData,
-                        g_yaf_local_data);
+                      g_yaf_local_data);
 
 void YafExtension::moduleInit()
 {
