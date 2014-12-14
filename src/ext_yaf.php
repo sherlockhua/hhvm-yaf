@@ -6,7 +6,7 @@ class calc {
      public function add(int $a, int $b):int;
 }
 
-class Yaf_Controller {
+abstract class Yaf_Controller {
 
     <<__Native>>
     public function test():mixed;
@@ -14,7 +14,7 @@ class Yaf_Controller {
 
 abstract class Yaf_Action_Abstract extends Yaf_Controller{
 
-    protected  $_controller = null;
+    protected  $_controller = NULL;
 
     public function __construct(){}
 

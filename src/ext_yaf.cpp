@@ -14,53 +14,35 @@
 
 namespace HPHP { 
 
-static int64_t HHVM_METHOD(calc, add, int64_t a, int64_t b)
+IMPLEMENT_REQUEST_LOCAL(YafRequestData,
+                        g_yaf_local_data);
+
+void YafExtension::moduleInit()
 {
-    return a + b;
+    _initYafActionClass();
+    _initYafControllerClass();
+    loadSystemlib();
 }
 
-static void HHVM_METHOD(calc, __construct)
+
+void YafExtension::_loadYafConf(Hdf conf)
 {
 
 }
 
-static void HHVM_METHOD(Yaf_Action_Abstract, __construct)
+void YafExtension::moduleLoad(Hdf config)
 {
-
+    Hdf conf = config["ext_conf"]["yaf"];
+    _loadYafConf(conf);
 }
 
-static Variant HHVM_METHOD(Yaf_Action_Abstract, getController)
+void YafExtension::moduleLoad(const IniSetting::Map& ini, Hdf config)
 {
-    return 100033;
+    Hdf conf = config["ext_conf"]["xm_rpc"];
+    _loadYafConf(conf);
 }
 
-static Variant HHVM_METHOD(Yaf_Action_Abstract, execute)
-{
-    return false;
-}
-
-static Variant HHVM_METHOD(Yaf_Controller, test)
-{
-    return String("this is in cpp");
-}
-
-class yafExtension : public Extension {
-public:
-    yafExtension():Extension("yaf"){}
-
-    virtual void moduleInit()
-    {
-        HHVM_ME(calc, add);
-        HHVM_ME(calc, __construct);
-
-        //HHVM_ME(Yaf_Action_Abstract, execute);
-        HHVM_ME(Yaf_Action_Abstract, getController);
-        HHVM_ME(Yaf_Action_Abstract, __construct);
-
-        HHVM_ME(Yaf_Controller, test);
-        loadSystemlib();
-    }
-} s_yaf_extension;
-
+YafExtension s_yaf_extension;
 HHVM_GET_MODULE(yaf);
+
 }
