@@ -27,6 +27,23 @@ void YafExtension::moduleInit()
 
 void YafExtension::_loadYafConf(Hdf conf)
 {
+    g_yaf_local_data.get()->global_library = conf["library"].configGetString("");
+    g_yaf_local_data.get()->action_prefer = conf["action_prefer"].configGetBool(false);
+    g_yaf_local_data.get()->lowcase_path = conf["lowcase_path"].configGetBool(false);
+    g_yaf_local_data.get()->use_spl_autoload = conf["use_spl_autoload"].configGetBool(false);
+    g_yaf_local_data.get()->forward_limit = conf["forward_limit"].configGetInt32(5);
+    g_yaf_local_data.get()->name_suffix = conf["name_suffix"].configGetBool(true);
+    g_yaf_local_data.get()->name_separator = conf["name_separator"].configGetString("");
+    g_yaf_local_data.get()->cache_config = conf["cache_config"].configGetBool(false);
+    g_yaf_local_data.get()->st_compatible = conf["st_compatible"].configGetBool(false);
+/* {{{ This only effects internally */
+    g_yaf_local_data.get()->st_compatible = conf["st_compatible"].configGetBool(false);
+/* }}} */
+    g_yaf_local_data.get()->environ = conf["environ"].configGetString("product");
+
+#ifdef YAF_HAVE_NAMESPACE
+    g_yaf_local_data.get()->use_namespace = conf["use_namespace"].configGetBool(false);
+#endif
 
 }
 

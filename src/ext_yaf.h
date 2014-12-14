@@ -11,6 +11,8 @@
 #ifndef _EXT_EXAMPLE_H_
 #define _EXT_EXAMPLE_H_
 
+#include <string>
+
 namespace HPHP {
 
 class YafExtension : public Extension {
@@ -31,20 +33,20 @@ private:
 class YafRequestData: public RequestEventHandler {
 
 public: 
-    char        *ext; 
-    char        *base_uri;
-    char        *environ;
-    char        *directory;
-    char        *local_library;
-    char        *local_namespaces;
-    char        *global_library;
-    char        *view_directory;
-    char        *view_ext;
-    char        *default_module;
-    char        *default_controller;
-    char        *default_action;
-    char        *bootstrap;
-    char        *name_separator;
+    std::string ext; 
+    std::string base_uri;
+    std::string environ;
+    std::string directory;
+    std::string local_library;
+    std::string local_namespaces;
+    std::string global_library;
+    std::string view_directory;
+    std::string view_ext;
+    std::string default_module;
+    std::string default_controller;
+    std::string default_action;
+    std::string bootstrap;
+    std::string name_separator;
     long        name_separator_len;
     bool   lowcase_path;
     bool   use_spl_autoload;
@@ -73,7 +75,9 @@ public:
     Variant     *active_ini_file_section;
     Variant     *ini_wanted_section;
     int         parsing_flag;
+#ifdef YAF_HAVE_NAMESPACE
     bool        use_namespace;
+#endif
 
 public:
         virtual void requestInit() {
@@ -81,13 +85,13 @@ public:
             this->in_exception     = 0;
             this->throw_exception  = 1;
             this->catch_exception  = 0;
-            this->directory        = NULL;
-            this->bootstrap        = NULL;
-            this->local_library    = NULL;
-            this->local_namespaces = NULL;
+            //this->directory        = NULL;
+            //this->bootstrap        = NULL;
+            //this->local_library    = NULL;
+            //this->local_namespaces = NULL;
             this->modules          = NULL;
-            this->base_uri         = NULL;
-            this->view_directory   = NULL;
+            //this->base_uri         = NULL;
+            //this->view_directory   = NULL;
 /*
 #if ((PHP_MAJOR_VERSION == 5) && (PHP_MINOR_VERSION < 4))
             this->buffer           = NULL;
