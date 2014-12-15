@@ -26,7 +26,7 @@ static Variant HHVM_METHOD(Yaf_Controller_Abstract, test)
 }
 
 static Variant HHVM_METHOD(Yaf_Controller_Abstract, render, const String& tpl, 
-        const Array& parameters)
+        const Variant& parameters)
 {
     /*
     public    $actions      = NULL;
