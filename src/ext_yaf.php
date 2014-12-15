@@ -16,31 +16,31 @@ abstract class Yaf_Controller_Abstract {
     <<__Native>>
     public function test():mixed;
 
-/*
     <<__Native>>
-    protected function display();
+    protected function display(string $tpl, ?array $parameters = NULL):mixed;
 
     <<__Native>>
-    public function getRequest();
+    public function getRequest():mixed;
     
     <<__Native>>
-    public function getResponse();
+    public function getResponse():mixed;
 
     <<__Native>>
-    public function getModuleName();
+    public function getModuleName():mixed;
 
     <<__Native>>
-    public function getView();
+    public function getView():mixed;
 
     <<__Native>>
-    public function initView();
+    public function initView(?array $options = NULL):mixed;
 
     <<__Native>>
-    public function setViewpath();
+    public function setViewpath(string $view_directory):bool;
 
     <<__Native>>
-    public function getViewpath();
+    public function getViewpath():mixed;
 
+/*
     <<__Native>>
     public function forward();
     
