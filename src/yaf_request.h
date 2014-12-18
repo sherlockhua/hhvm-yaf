@@ -11,6 +11,8 @@
 #ifndef _YAF_REQUEST_H_
 #define _YAF_REQUEST_H_
 
+#include "ext_yaf.h"
+
 namespace HPHP {
 
 #define YAF_REQUEST_PROPERTY_NAME_MODULE        "module"
@@ -25,7 +27,7 @@ namespace HPHP {
 #define YAF_REQUEST_PROPERTY_NAME_BASE      "_base_uri"
 #define YAF_REQUEST_PROPERTY_NAME_EXCEPTION  "_exception"
 
-extern void yaf_request_set_dispatched(Variant request, int flag);
+extern int yaf_request_set_dispatched(Object request, int flag);
 
 
 

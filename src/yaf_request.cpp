@@ -9,11 +9,19 @@
 *
 =============================================*/
 #include "yaf_request.h"
+#include "hphp/runtime/base/base-includes.h"
 
 
-void yaf_request_set_dispatched(Variant request, int flag)
+namespace HPHP{
+
+int yaf_request_set_dispatched(Object request, int flag)
 {
     auto var_flag = request->o_realProp(YAF_REQUEST_PROPERTY_NAME_STATE, 
             ObjectData::RealPropUnchecked, "Yaf_Request_Abstract");
     *var_flag = Variant(flag);
+
+    return 0;
+}
+
+
 }

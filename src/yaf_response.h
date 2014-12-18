@@ -11,6 +11,7 @@
 #ifndef _YAF_RESPONSE_H_
 #define _YAF_RESPONSE_H_
 
+#include "ext_yaf.h"
 namespace HPHP {
 
 extern int yaf_response_set_redirect(Variant response, const String& location);

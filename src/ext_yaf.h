@@ -12,6 +12,8 @@
 #define _EXT_EXAMPLE_H_
 
 #include <string>
+#include "hphp/runtime/base/base-includes.h"
+#include "hphp/runtime/ext/extension.h"
 
 namespace HPHP {
 
