@@ -40,13 +40,14 @@ abstract class Yaf_Controller_Abstract {
     <<__Native>>
     public function getViewpath():mixed;
 
-/*
     <<__Native>>
-    public function forward();
+    public function forward(mixed $module, ?mixed $controller = NULL, 
+        ?mixed $action = NULL, ?mixed $paramters = NULL):mixed;
     
     <<__Native>>
-    public function redirect();
+    public function redirect(string $url):mixed;
 
+/*
     <<__Native>>
     public function getInvokeArgs();
 

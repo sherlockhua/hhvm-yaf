@@ -16,6 +16,9 @@
 #include "hphp/runtime/base/base-includes.h"
 #include "hphp/runtime/ext/extension.h"
 #include "ext_yaf.h"
+#include "yaf_request.h"
+#include "yaf_response.h"
+#include "yaf_controller.h"
 
 namespace HPHP { 
 
@@ -248,6 +251,116 @@ static Variant HHVM_METHOD(Yaf_Controller_Abstract, getViewpath,
     return output;
 }
 
+static Variant HHVM_METHOD(Yaf_Controller_Abstract, forward,  
+        const Variant& module, const Variant& controller, 
+        const Variant& action, const Variant& parameters)
+{
+    auto tmp = this_->o_realProp("_request", 
+            ObjectData::RealPropUnchecked, "Yaf_Controller_Abstract");
+    if (tmp->isNull()) {
+        return false;
+    }
+
+    auto request = tmp->toObject();
+    if (!request->o_instanceof(String("Yaf_Request_Abstract"))) {
+        return false;
+    }
+    
+    if (!module.isString()) {
+        raise_error("Expect a string action name");
+        return false;
+    }
+
+    if (parameters.isArray()) {
+        auto var_params = request->o_realProp("params", 
+                ObjectData::RealPropUnchecked, "Yaf_Request_Abstract");
+        *var_params = parameters;
+
+
+        auto var_module = request->o_realProp("module", 
+                ObjectData::RealPropUnchecked, "Yaf_Request_Abstract");
+        *var_module = module;
+
+        auto var_controller = request->o_realProp("controller", 
+                ObjectData::RealPropUnchecked, "Yaf_Request_Abstract");
+        *var_controller = controller;
+
+        auto var_action = request->o_realProp("action", 
+                ObjectData::RealPropUnchecked, "Yaf_Request_Abstract");
+        *var_action = action;
+    } else if (!parameters.isNull()){
+        raise_error("parameters must be array");
+        return false;
+    } else if (action.isArray()) {
+        auto var_params = request->o_realProp("params", 
+                ObjectData::RealPropUnchecked, "Yaf_Request_Abstract");
+        *var_params = action;
+
+        auto var_controller = request->o_realProp("controller", 
+                ObjectData::RealPropUnchecked, "Yaf_Request_Abstract");
+        *var_controller = module;
+
+        auto var_action = request->o_realProp("action", 
+                ObjectData::RealPropUnchecked, "Yaf_Request_Abstract");
+        *var_action = controller;
+    } else if (action.isString()) {
+         auto var_module = request->o_realProp("module", 
+                ObjectData::RealPropUnchecked, "Yaf_Request_Abstract");
+        *var_module = module;
+
+        auto var_controller = request->o_realProp("controller", 
+                ObjectData::RealPropUnchecked, "Yaf_Request_Abstract");
+        *var_controller = controller;
+
+        auto var_action = request->o_realProp("action", 
+                ObjectData::RealPropUnchecked, "Yaf_Request_Abstract");
+        *var_action = action;
+    } else if (!action.isNull()) {
+        return false;
+    } else if (controller.isArray()) {
+        auto var_params = request->o_realProp("params", 
+                ObjectData::RealPropUnchecked, "Yaf_Request_Abstract");
+        *var_params = controller;
+
+        auto var_action = request->o_realProp("action", 
+                ObjectData::RealPropUnchecked, "Yaf_Request_Abstract");
+        *var_action = module;
+    } else if (controller.isString()) {
+        auto var_controller = request->o_realProp("controller", 
+                ObjectData::RealPropUnchecked, "Yaf_Request_Abstract");
+        *var_controller = module;
+
+        auto var_action = request->o_realProp("action", 
+                ObjectData::RealPropUnchecked, "Yaf_Request_Abstract");
+        *var_action = controller;
+    } else if (!controller.isNull()) {
+        return false;
+    } else if (module.isString()){
+        auto var_action = request->o_realProp("action", 
+                ObjectData::RealPropUnchecked, "Yaf_Request_Abstract");
+        *var_action = module;
+    } else {
+        raise_error("module must be string");
+        return false;
+    }
+
+    yaf_request_set_dispatched(request, 0);
+    return true;
+}
+
+static Variant HHVM_METHOD(Yaf_Controller_Abstract, redirect,  
+        const String& location)
+{
+    auto tmp = this_->o_realProp(YAF_CONTROLLER_PROPERTY_NAME_RESPONSE, 
+            ObjectData::RealPropUnchecked, "Yaf_Controller_Abstract");
+    if (tmp->isNull()) {
+        return false;
+    }
+
+    auto response = tmp->toObject();
+    (void)yaf_response_set_redirect(response, location);
+    return true;
+}
 
 
 
@@ -262,6 +375,8 @@ void YafExtension::_initYafControllerClass()
     HHVM_ME(Yaf_Controller_Abstract, initView);
     HHVM_ME(Yaf_Controller_Abstract, setViewpath);
     HHVM_ME(Yaf_Controller_Abstract, getViewpath);
+    HHVM_ME(Yaf_Controller_Abstract, forward);
+    HHVM_ME(Yaf_Controller_Abstract, redirect);
     HHVM_ME(Yaf_Controller_Abstract, test);
 }
 
