@@ -362,6 +362,75 @@ static Variant HHVM_METHOD(Yaf_Controller_Abstract, redirect,
     return true;
 }
 
+static Variant HHVM_METHOD(Yaf_Controller_Abstract, getInvokeArgs)
+{
+    auto tmp = this_->o_realProp(YAF_CONTROLLER_PROPERTY_NAME_ARGS, 
+            ObjectData::RealPropUnchecked, "Yaf_Controller_Abstract");
+    return *tmp;
+}
+
+static Variant HHVM_METHOD(Yaf_Controller_Abstract, getInvokeArg, const String& name)
+{
+    if (name.length() == 0) {
+        return Variant(Variant::NullInit());
+    }
+
+    auto tmp = this_->o_realProp(YAF_CONTROLLER_PROPERTY_NAME_ARGS, 
+            ObjectData::RealPropUnchecked, "Yaf_Controller_Abstract");
+    if (tmp->isNull()) {
+        return Variant(Variant::NullInit());
+    }
+
+    if (tmp->isArray()) {
+        auto array = tmp->toArray();
+        if (array.exists(name)) {
+            return array[name];
+        }
+    }
+
+    return Variant(Variant::NullInit());
+}
+
+static Variant HHVM_METHOD(Yaf_Controller_Abstract, __construct, 
+        const Object& request, const Object& response,
+        const Object& view, const Variant& invokeArgs)
+{
+
+    if (!invokeArgs.isNull()) {
+        auto var_params = this_->o_realProp(YAF_CONTROLLER_PROPERTY_NAME_ARGS, 
+                ObjectData::RealPropUnchecked, "Yaf_Request_Abstract");
+        *var_params = invokeArgs;
+    }
+
+    auto var_request = this_->o_realProp(YAF_CONTROLLER_PROPERTY_NAME_REQUEST, 
+            ObjectData::RealPropUnchecked, "Yaf_Controller_Abstract");
+    *var_request = request;
+
+    auto var_response = this_->o_realProp(YAF_CONTROLLER_PROPERTY_NAME_RESPONSE, 
+            ObjectData::RealPropUnchecked, "Yaf_Controller_Abstract");
+    *var_response = response;
+
+    auto var_view = this_->o_realProp(YAF_CONTROLLER_PROPERTY_NAME_VIEW, 
+            ObjectData::RealPropUnchecked, "Yaf_Controller_Abstract");
+    *var_view = view;
+
+    auto module = request.o_realProp(YAF_REQUEST_PROPERTY_NAME_MODULE, 
+            ObjectData::RealPropUnchecked, "Yaf_Request_Abstract");
+
+    auto var_module = this_->o_realProp(YAF_CONTROLLER_PROPERTY_NAME_REQUEST, 
+            ObjectData::RealPropUnchecked, "Yaf_Controller_Abstract");
+    *var_module = *module;
+
+    if (!this_->o_instanceof("Yaf_Action_Abstract")) {
+        Array func = Array::Create();
+        func.append(this_);
+        func.append(String("init"));
+
+        Array params = Array::Create();
+        vm_call_user_func(func, params);
+    }
+}
+
 
 
 void YafExtension::_initYafControllerClass()
@@ -377,6 +446,9 @@ void YafExtension::_initYafControllerClass()
     HHVM_ME(Yaf_Controller_Abstract, getViewpath);
     HHVM_ME(Yaf_Controller_Abstract, forward);
     HHVM_ME(Yaf_Controller_Abstract, redirect);
+    HHVM_ME(Yaf_Controller_Abstract, getInvokeArgs);
+    HHVM_ME(Yaf_Controller_Abstract, getInvokeArg);
+    HHVM_ME(Yaf_Controller_Abstract, __construct);
     HHVM_ME(Yaf_Controller_Abstract, test);
 }
 

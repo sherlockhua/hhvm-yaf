@@ -47,19 +47,17 @@ abstract class Yaf_Controller_Abstract {
     <<__Native>>
     public function redirect(string $url):mixed;
 
-/*
     <<__Native>>
-    public function getInvokeArgs();
+    public function getInvokeArgs():mixed;
 
     <<__Native>>
-    public function getInvokeArg();
+    public function getInvokeArg(string $name):mixed;
 
     <<__Native>>
-    final public function __construct();
+    final public function __construct(object $request, object $response, 
+        object view, ?array $invokeArgs = NULL);
 
-    <<__Native>>
-    final private function __clone();
-*/
+    final private function __clone(){};
 }
 
 class yaf_view {
