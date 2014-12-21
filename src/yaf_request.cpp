@@ -9,6 +9,7 @@
 *
 =============================================*/
 #include "yaf_request.h"
+#include "ext_yaf.h"
 #include "hphp/runtime/base/base-includes.h"
 
 
@@ -23,5 +24,12 @@ int yaf_request_set_dispatched(Object request, int flag)
     return 0;
 }
 
+
+void YafExtension::_initYafRequestClass()
+{
+
+    _initYafRequestHttpClass();
+    _initYafRequestSimpleClass();
+}
 
 }

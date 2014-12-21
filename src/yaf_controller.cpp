@@ -414,7 +414,7 @@ static Variant HHVM_METHOD(Yaf_Controller_Abstract, __construct,
             ObjectData::RealPropUnchecked, "Yaf_Controller_Abstract");
     *var_view = view;
 
-    auto module = request.o_realProp(YAF_REQUEST_PROPERTY_NAME_MODULE, 
+    auto module = request->o_realProp(YAF_REQUEST_PROPERTY_NAME_MODULE, 
             ObjectData::RealPropUnchecked, "Yaf_Request_Abstract");
 
     auto var_module = this_->o_realProp(YAF_CONTROLLER_PROPERTY_NAME_REQUEST, 

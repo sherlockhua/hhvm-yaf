@@ -22,6 +22,8 @@ void YafExtension::moduleInit()
 {
     _initYafActionClass();
     _initYafControllerClass();
+    _initYafRequestClass();
+
     loadSystemlib();
 }
 

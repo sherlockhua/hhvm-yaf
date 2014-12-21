@@ -31,6 +31,11 @@ private:
     void _loadYafConf(Hdf conf);
     void _initYafActionClass();
     void _initYafControllerClass();
+    //初始化request相关class
+    void _initYafRequestClass();
+    void _initYafRequestHttpClass();
+    void _initYafRequestSimpleClass();
+
 
 
 }; 

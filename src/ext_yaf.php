@@ -60,6 +60,49 @@ abstract class Yaf_Controller_Abstract {
     final private function __clone(){};
 }
 
+abstract class Yaf_Request_Abstract  {
+    public $module = null;
+    public $controller = null;
+    public $action = null;
+    public $method = null;
+    protected $params = null;
+    protected $language = null;
+    protected $_exception = null;
+
+    protected $_base_uri = '';
+    protected $_uri = '';
+    protected $dispatched = false;
+    protected $routed = false;
+
+     <<__Native>>
+    public function isGet():mixed;
+
+     <<__Native>>
+    public function isPost():mixed;
+
+     <<__Native>>
+    public function isPut();
+
+     <<__Native>>
+    public function isHead();
+
+     <<__Native>>
+    public function isOptions();
+
+     <<__Native>>
+     public function isCli();
+
+     <<__Native>>
+     public function isXmlHttpRequest());
+
+     <<__Native>>
+     public function getServer();
+
+     <<__Native>>
+    public function getEnv();
+
+}
+
 class yaf_view {
     public function render($path, $params)
     {
