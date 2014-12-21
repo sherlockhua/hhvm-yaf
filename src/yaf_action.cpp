@@ -27,11 +27,14 @@ static Variant HHVM_METHOD(Yaf_Action_Abstract, getController)
 }
 
 
+static void HHVM_METHOD(Yaf_Action_Abstract, __construct)
+{}
+
 
 void YafExtension::_initYafActionClass()
 {
     HHVM_ME(Yaf_Action_Abstract, getController);
-    //HHVM_ME(Yaf_Action_Abstract, __construct);
+    HHVM_ME(Yaf_Action_Abstract, __construct);
 }
 
 }

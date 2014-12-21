@@ -55,9 +55,10 @@ abstract class Yaf_Controller_Abstract {
 
     <<__Native>>
     final public function __construct(object $request, object $response, 
-        object view, ?array $invokeArgs = NULL);
+        object $view, ?array $invokeArgs = NULL):void;
 
-    final private function __clone(){};
+    <<__Native>>
+    final private function __clone():void;
 }
 
 abstract class Yaf_Request_Abstract  {
@@ -75,8 +76,9 @@ abstract class Yaf_Request_Abstract  {
     protected $routed = false;
 
      <<__Native>>
-    public function isGet():mixed;
+    public function isGet():bool;
 
+/*
      <<__Native>>
     public function isPost():mixed;
 
@@ -101,6 +103,66 @@ abstract class Yaf_Request_Abstract  {
      <<__Native>>
     public function getEnv();
 
+     <<__Native>>
+     public function setParam();
+
+     <<__Native>>
+     public function getParam();
+
+     <<__Native>>
+     public function getParams();
+
+     <<__Native>>
+     public function getException();
+
+     <<__Native>>
+     public function getModuleName();
+
+     <<__Native>>
+     public function getControllerName();
+
+     <<__Native>>
+     public function getActionName();
+
+     <<__Native>>
+     public function setModuleName();
+
+     <<__Native>>
+     public function setControllerName();
+
+     <<__Native>>
+     public function setActionName();
+
+     <<__Native>>
+     public function getMethod();
+
+     <<__Native>>
+     public function getLanguage();
+
+     <<__Native>>
+     public function setBaseUri();
+
+     <<__Native>>
+     public function getBaseUri();
+
+     <<__Native>>
+     public function getRequestUri();
+
+     <<__Native>>
+     public function setRequestUri();
+
+     <<__Native>>
+     public function isDispatched();
+
+     <<__Native>>
+     public function setDispatched();
+
+     <<__Native>>
+     public function isRouted();
+
+     <<__Native>>
+     public function setRouted();
+ */
 }
 
 class yaf_view {
@@ -116,7 +178,8 @@ abstract class Yaf_Action_Abstract extends Yaf_Controller_Abstract{
 
     protected  $_controller = NULL;
 
-    public function __construct(){}
+    // <<__Native>>
+    //final public function __construct():void;
 
      <<__Native>>
     public function getController():mixed;

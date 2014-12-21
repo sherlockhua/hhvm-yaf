@@ -5,8 +5,8 @@ include_directories("./src/")
 
 
 
-file(GLOB CXX_SOURCES "./src/*.cpp" "./src/response/*.cpp")
-#file(GLOB PHP_SOURCES "./src/*.php")
+#file(GLOB CXX_SOURCES "./src/*.cpp" "./src/response/*.cpp")
+file(GLOB CXX_SOURCES "./src/*.cpp" "./src/response/*.cpp" "./src/requests/*.cpp")
 
 
 

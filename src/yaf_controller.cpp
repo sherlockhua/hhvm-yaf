@@ -391,11 +391,10 @@ static Variant HHVM_METHOD(Yaf_Controller_Abstract, getInvokeArg, const String& 
     return Variant(Variant::NullInit());
 }
 
-static Variant HHVM_METHOD(Yaf_Controller_Abstract, __construct, 
+static void HHVM_METHOD(Yaf_Controller_Abstract, __construct, 
         const Object& request, const Object& response,
         const Object& view, const Variant& invokeArgs)
 {
-
     if (!invokeArgs.isNull()) {
         auto var_params = this_->o_realProp(YAF_CONTROLLER_PROPERTY_NAME_ARGS, 
                 ObjectData::RealPropUnchecked, "Yaf_Request_Abstract");
@@ -432,6 +431,8 @@ static Variant HHVM_METHOD(Yaf_Controller_Abstract, __construct,
 }
 
 
+static void HHVM_METHOD(Yaf_Controller_Abstract, __clone)
+{}
 
 void YafExtension::_initYafControllerClass()
 {
@@ -449,6 +450,7 @@ void YafExtension::_initYafControllerClass()
     HHVM_ME(Yaf_Controller_Abstract, getInvokeArgs);
     HHVM_ME(Yaf_Controller_Abstract, getInvokeArg);
     HHVM_ME(Yaf_Controller_Abstract, __construct);
+    HHVM_ME(Yaf_Controller_Abstract, __clone);
     HHVM_ME(Yaf_Controller_Abstract, test);
 }
 
