@@ -78,28 +78,28 @@ abstract class Yaf_Request_Abstract  {
      <<__Native>>
     public function isGet():bool;
 
+     <<__Native>>
+    public function isPost():bool;
+
+     <<__Native>>
+    public function isPut():bool;
+
+     <<__Native>>
+    public function isHead():bool;
+
+     <<__Native>>
+    public function isOptions():bool;
+
+     <<__Native>>
+     public function isCli():bool;
+
+     <<__Native>>
+     public function isXmlHttpRequest():bool;
+
+     <<__Native>>
+     public function getServer(mixed $name, ?mixed $default = NULL):mixed;
+
 /*
-     <<__Native>>
-    public function isPost():mixed;
-
-     <<__Native>>
-    public function isPut();
-
-     <<__Native>>
-    public function isHead();
-
-     <<__Native>>
-    public function isOptions();
-
-     <<__Native>>
-     public function isCli();
-
-     <<__Native>>
-     public function isXmlHttpRequest());
-
-     <<__Native>>
-     public function getServer();
-
      <<__Native>>
     public function getEnv();
 
