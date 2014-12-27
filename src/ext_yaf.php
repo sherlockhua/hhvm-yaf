@@ -99,34 +99,34 @@ abstract class Yaf_Request_Abstract  {
      <<__Native>>
      public function getServer(mixed $name, ?mixed $default = NULL):mixed;
 
+     <<__Native>>
+    public function getEnv(mixed $name, ?mixed $default=NULL):mixed;
+
+     <<__Native>>
+     public function setParam(mixed $name, ?mixed $value = NULL):mixed;
+
+     <<__Native>>
+     public function getParam(string $name, ?mixed $default = NULL):mixed;
+
+     <<__Native>>
+     public function getParams():mixed;
+
+     <<__Native>>
+     public function getException():mixed;
+
+     <<__Native>>
+     public function getModuleName():mixed;
+
+     <<__Native>>
+     public function getControllerName():mixed;
+
+     <<__Native>>
+     public function getActionName():mixed;
+
+     <<__Native>>
+     public function setModuleName(mixed $module):mixed;
+
 /*
-     <<__Native>>
-    public function getEnv();
-
-     <<__Native>>
-     public function setParam();
-
-     <<__Native>>
-     public function getParam();
-
-     <<__Native>>
-     public function getParams();
-
-     <<__Native>>
-     public function getException();
-
-     <<__Native>>
-     public function getModuleName();
-
-     <<__Native>>
-     public function getControllerName();
-
-     <<__Native>>
-     public function getActionName();
-
-     <<__Native>>
-     public function setModuleName();
-
      <<__Native>>
      public function setControllerName();
 
