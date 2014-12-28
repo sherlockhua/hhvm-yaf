@@ -62,6 +62,9 @@ abstract class Yaf_Controller_Abstract {
 }
 
 abstract class Yaf_Request_Abstract  {
+    const SCHEME_HTTP = http;
+    const SCHEME_HTTPS = https;
+
     public $module = null;
     public $controller = null;
     public $action = null;
@@ -170,6 +173,36 @@ class yaf_view {
         print_r($path);
         print_r($params);
     }
+}
+
+class Yaf_Request_Http extends Yaf_Request_Abstract  {
+
+     <<__Native>>
+    public function getQuery(string $name, mixed $def = NULL):mixed;
+
+     <<__Native>>
+    public function getRequest(string $name, mixed $def = NULL):mixed;
+
+    <<__Native>>
+    public function getPost(string $name, mixed $def = NULL):mixed;
+
+    <<__Native>>
+    public function getCookie(string $name, mixed $def = NULL):mixed;
+
+    <<__Native>>
+    public function getFiles(string $name, mixed $def = NULL):mixed;
+
+    <<__Native>>
+    public function get(string $name, mixed $def = NULL):mixed;
+
+    <<__Native>>
+    public function isXmlHttpRequest():bool;
+
+    <<__Native>>
+    public function __construct(?mixed $request_uri = NULL, ?mixed $base_uri = NULL):void;
+
+    <<__Native>>
+    final private function __clone():void;
 }
 
 abstract class Yaf_Action_Abstract extends Yaf_Controller_Abstract{
