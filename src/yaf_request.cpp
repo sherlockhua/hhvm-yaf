@@ -236,13 +236,191 @@ static Variant HHVM_METHOD(Yaf_Request_Abstract, getActionName)
 static Variant HHVM_METHOD(Yaf_Request_Abstract, setModuleName, 
         const Variant& module)
 {
+    if (!module.isString()) {
+        return false;
+    }
     auto tmp = this_->o_realProp(YAF_REQUEST_PROPERTY_NAME_MODULE, 
             ObjectData::RealPropUnchecked, "Yaf_Request_Abstract");
     *tmp = module;
     return true;
 }
 
+static Variant HHVM_METHOD(Yaf_Request_Abstract, setControllerName, 
+        const Variant& module)
+{
+    if (!module.isString()) {
+        return false;
+    }
 
+    auto tmp = this_->o_realProp(YAF_REQUEST_PROPERTY_NAME_CONTROLLER, 
+            ObjectData::RealPropUnchecked, "Yaf_Request_Abstract");
+    *tmp = module;
+    return true;
+}
+
+static Variant HHVM_METHOD(Yaf_Request_Abstract, setActionName, 
+        const Variant& module)
+{
+    if (!module.isString()) {
+        return false;
+    }
+
+    auto tmp = this_->o_realProp(YAF_REQUEST_PROPERTY_NAME_ACTION, 
+            ObjectData::RealPropUnchecked, "Yaf_Request_Abstract");
+    *tmp = module;
+    return true;
+}
+
+static Variant HHVM_METHOD(Yaf_Request_Abstract, getMethod)
+{
+    auto tmp = this_->o_realProp(YAF_REQUEST_PROPERTY_NAME_METHOD, 
+            ObjectData::RealPropUnchecked, "Yaf_Request_Abstract");
+    if (tmp->isNull()) {
+        return *tmp;
+    }
+
+    return tmp->toString();
+}
+
+static Variant yaf_request_get_language()
+{
+    Variant lang = php_global(S_SERVER).toArray()[String("HTTP_ACCEPT_LANGUAGE")];
+    if (!lang.isString()) {
+        return lang;
+    }
+
+    char* str_lang = strdup(lang.toString().toCppString().c_str());
+    std::string prefer;
+
+    double max_qvalue = 0;
+    char* save_ptr = NULL;
+
+    char* one_ptr = strtok_r(str_lang, ",", &save_ptr);
+    while (one_ptr) {
+        char* qvalue = NULL;
+        while (*one_ptr == ' ') one_ptr++;
+        if ((qvalue = strstr(one_ptr, "q="))) {
+            float qval = atof(qvalue + 2);
+            if (qval > max_qvalue) {
+                max_qvalue = qval;
+                prefer = std::string(one_ptr, (qvalue - one_ptr - 1));
+            }
+        } else {
+            if (max_qvalue < 1) {
+                max_qvalue = 1;
+                prefer = std::string(one_ptr, strlen(one_ptr));
+            }
+        }
+        one_ptr = strtok_r(NULL, ",", &save_ptr);
+    }
+    
+    free(str_lang);
+    return String(prefer.c_str());
+}
+
+static Variant HHVM_METHOD(Yaf_Request_Abstract, getLanguage)
+{
+    auto tmp = this_->o_realProp(YAF_REQUEST_PROPERTY_NAME_LANG, 
+            ObjectData::RealPropUnchecked, "Yaf_Request_Abstract");
+
+    if (tmp->isString()) {
+        return tmp->toString();
+    }
+
+    Variant lang = yaf_request_get_language();
+    *tmp = lang;
+    return lang;
+}
+
+static bool HHVM_METHOD(Yaf_Request_Abstract, setBaseUri, const Variant& uri)
+{
+    if (!uri.isString()) {
+        return false;
+    }
+
+    auto tmp = this_->o_realProp(YAF_REQUEST_PROPERTY_NAME_BASE, 
+            ObjectData::RealPropUnchecked, "Yaf_Request_Abstract");
+
+    *tmp = uri;
+    return true; 
+}
+
+static Variant HHVM_METHOD(Yaf_Request_Abstract, getBaseUri)
+{
+    auto tmp = this_->o_realProp(YAF_REQUEST_PROPERTY_NAME_BASE, 
+            ObjectData::RealPropUnchecked, "Yaf_Request_Abstract");
+    if (tmp->isNull()) {
+        return *tmp;
+    }
+
+    return tmp->toString();
+}
+
+static Variant HHVM_METHOD(Yaf_Request_Abstract, getRequestUri)
+{
+    auto tmp = this_->o_realProp(YAF_REQUEST_PROPERTY_NAME_URI, 
+            ObjectData::RealPropUnchecked, "Yaf_Request_Abstract");
+    if (tmp->isNull()) {
+        return *tmp;
+    }
+
+    return tmp->toString();
+}
+
+static bool HHVM_METHOD(Yaf_Request_Abstract, setRequestUri, const Variant& uri)
+{
+    if (!uri.isString()) {
+        return false;
+    }
+
+    auto tmp = this_->o_realProp(YAF_REQUEST_PROPERTY_NAME_URI, 
+            ObjectData::RealPropUnchecked, "Yaf_Request_Abstract");
+
+    *tmp = uri;
+    return true; 
+}
+
+static bool HHVM_METHOD(Yaf_Request_Abstract, isDispatched)
+{
+    auto tmp = this_->o_realProp(YAF_REQUEST_PROPERTY_NAME_STATE, 
+            ObjectData::RealPropUnchecked, "Yaf_Request_Abstract");
+
+    if (tmp->isNull()) {
+        return false;
+    }
+
+    return tmp->toBoolean(); 
+}
+
+static bool HHVM_METHOD(Yaf_Request_Abstract, setDispatched, const bool& dispathed)
+{
+    auto tmp = this_->o_realProp(YAF_REQUEST_PROPERTY_NAME_STATE, 
+            ObjectData::RealPropUnchecked, "Yaf_Request_Abstract");
+
+    *tmp = dispathed;
+    return true; 
+}
+
+static bool HHVM_METHOD(Yaf_Request_Abstract, isRouted)
+{
+    auto tmp = this_->o_realProp(YAF_REQUEST_PROPERTY_NAME_ROUTED, 
+            ObjectData::RealPropUnchecked, "Yaf_Request_Abstract");
+
+    if (tmp->isNull()) {
+        return false;
+    }
+
+    return tmp->toBoolean(); 
+}
+
+static bool HHVM_METHOD(Yaf_Request_Abstract, setRouted, const bool& routed)
+{
+    auto tmp = this_->o_realProp(YAF_REQUEST_PROPERTY_NAME_ROUTED, 
+            ObjectData::RealPropUnchecked, "Yaf_Request_Abstract");
+
+    *tmp = routed;
+    return true; 
+}
 
 void YafExtension::_initYafRequestClass()
 {
@@ -263,6 +441,19 @@ void YafExtension::_initYafRequestClass()
     HHVM_ME(Yaf_Request_Abstract, getControllerName);
     HHVM_ME(Yaf_Request_Abstract, getActionName);
     HHVM_ME(Yaf_Request_Abstract, setModuleName);
+    HHVM_ME(Yaf_Request_Abstract, setControllerName);
+    HHVM_ME(Yaf_Request_Abstract, setActionName);
+    HHVM_ME(Yaf_Request_Abstract, getMethod);
+    HHVM_ME(Yaf_Request_Abstract, getLanguage);
+    HHVM_ME(Yaf_Request_Abstract, setBaseUri);
+    HHVM_ME(Yaf_Request_Abstract, getBaseUri);
+    HHVM_ME(Yaf_Request_Abstract, getRequestUri);
+    HHVM_ME(Yaf_Request_Abstract, setRequestUri);
+
+    HHVM_ME(Yaf_Request_Abstract, isDispatched);
+    HHVM_ME(Yaf_Request_Abstract, setDispatched);
+    HHVM_ME(Yaf_Request_Abstract, isRouted);
+    HHVM_ME(Yaf_Request_Abstract, setRouted);
 
     _initYafRequestHttpClass();
     _initYafRequestSimpleClass();

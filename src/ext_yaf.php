@@ -126,43 +126,41 @@ abstract class Yaf_Request_Abstract  {
      <<__Native>>
      public function setModuleName(mixed $module):mixed;
 
-/*
      <<__Native>>
-     public function setControllerName();
+     public function setControllerName(mixed $name):mixed;
 
      <<__Native>>
-     public function setActionName();
+     public function setActionName(mixed $name):mixed;
 
      <<__Native>>
-     public function getMethod();
+     public function getMethod():mixed;
 
      <<__Native>>
-     public function getLanguage();
+     public function getLanguage():mixed;
 
      <<__Native>>
-     public function setBaseUri();
+     public function setBaseUri(mixed $uri):bool;
 
      <<__Native>>
-     public function getBaseUri();
+     public function getBaseUri():mixed;
 
      <<__Native>>
-     public function getRequestUri();
+     public function getRequestUri():mixed;
 
      <<__Native>>
-     public function setRequestUri();
+     public function setRequestUri(mixed $uri):bool;
 
      <<__Native>>
-     public function isDispatched();
+     public function isDispatched():bool;
 
      <<__Native>>
-     public function setDispatched();
+     public function setDispatched(bool $dispathed):bool;
 
      <<__Native>>
-     public function isRouted();
+     public function isRouted():bool;
 
      <<__Native>>
-     public function setRouted();
- */
+     public function setRouted(bool $routed):bool;
 }
 
 class yaf_view {
