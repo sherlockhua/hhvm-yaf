@@ -2,11 +2,12 @@
 
 include_directories(".")
 include_directories("./src/")
+include_directories("./src/util/")
 
 
 
 #file(GLOB CXX_SOURCES "./src/*.cpp" "./src/response/*.cpp")
-file(GLOB CXX_SOURCES "./src/*.cpp" "./src/response/*.cpp" "./src/requests/*.cpp")
+file(GLOB CXX_SOURCES "./src/*.cpp" "./src/response/*.cpp" "./src/requests/*.cpp" "./src/util/*.cpp")
 
 
 

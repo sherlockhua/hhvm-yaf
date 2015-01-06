@@ -12,6 +12,7 @@
 #include "ext_yaf.h"
 #include "hphp/runtime/base/base-includes.h"
 #include "yaf_request.h"
+#include "url.h"
 #include "hphp/runtime/base/php-globals.h"
 
 namespace HPHP{
@@ -169,6 +170,7 @@ static void HHVM_METHOD(Yaf_Request_Http, __construct,
                 std::string str_tmp = tmp.toString().toCppString();
                 if (strncasecmp(str_tmp.c_str(), "http", 4) == 0) {
                     //TODO use php_url_parse to get path
+                    php_url_parse(str_tmp.c_str());
                 } else {
                     const char* pos = strstr(str_tmp.c_str(), "?");
                     if (pos) {
