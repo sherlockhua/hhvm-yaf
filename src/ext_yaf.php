@@ -176,6 +176,8 @@ class yaf_view {
 }
 
 class Yaf_Request_Http extends Yaf_Request_Abstract  {
+    const SCHEME_HTTP = http;
+    const SCHEME_HTTPS = https;
 
      <<__Native>>
     public function getQuery(string $name, mixed $def = NULL):mixed;
@@ -229,7 +231,8 @@ class Yaf_Request_Simple extends Yaf_Request_Abstract  {
     public function isXmlHttpRequest():bool;
 
     <<__Native>>
-    public function __construct(?mixed $request_uri = NULL, ?mixed $base_uri = NULL):void;
+    public function __construct(?mixed $method = NULL, ?mixed $module = NULL,
+        ?mixed controller = NULL, ?mixed action = NULL, ?mixed $params = NULL):void;
 
     <<__Native>>
     final private function __clone():void;
