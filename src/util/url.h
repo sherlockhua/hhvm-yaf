@@ -15,7 +15,7 @@
 #include <stdlib.h>
 #include <ctype.h>
 
-#define STR_FREE
+#define STR_FREE(ptr) if (ptr) { free(ptr); }  
 
 typedef struct php_url {
     char *scheme;
@@ -32,8 +32,7 @@ typedef struct php_url {
 extern php_url *php_url_parse(char const *str);
 extern php_url *php_url_parse_ex(char const *str, int length);
 extern char *php_replace_controlchars_ex(char *str, int len);
-
-
+extern void php_url_free(php_url *theurl);
 
 
 #endif //_URL_H

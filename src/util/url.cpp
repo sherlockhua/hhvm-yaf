@@ -1,6 +1,29 @@
 #include "url.h"
 
 
+void php_url_free(php_url *theurl)
+{
+    if (theurl == NULL) {
+        return;
+    }
+
+    if (theurl->scheme)
+        free(theurl->scheme);
+    if (theurl->user)
+        free(theurl->user);
+    if (theurl->pass)
+        free(theurl->pass);
+    if (theurl->host)
+        free(theurl->host);
+    if (theurl->path)
+        free(theurl->path);
+    if (theurl->query)
+        free(theurl->query);
+    if (theurl->fragment)
+        free(theurl->fragment);
+    free(theurl);
+}
+
 char *php_replace_controlchars_ex(char *str, int len)
 {
     unsigned char *s = (unsigned char *)str;

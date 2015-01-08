@@ -153,6 +153,7 @@ static void HHVM_METHOD(Yaf_Request_Http, __construct,
             ObjectData::RealPropUnchecked, "Yaf_Request_Abstract");
         *tmp = request_method;
     }
+
     //TODO php client mode, the request method may be 'Cli'
     std::string uri;
     if (request_uri.isString()) {
@@ -170,7 +171,11 @@ static void HHVM_METHOD(Yaf_Request_Http, __construct,
                 std::string str_tmp = tmp.toString().toCppString();
                 if (strncasecmp(str_tmp.c_str(), "http", 4) == 0) {
                     //TODO use php_url_parse to get path
-                    php_url_parse(str_tmp.c_str());
+                    php_url* url_info = php_url_parse(str_tmp.c_str());
+                    if (url_info && url_info->path) {
+                        uri = std::string(url_info->path);
+                    }
+                    php_url_free(url_info);
                 } else {
                     const char* pos = strstr(str_tmp.c_str(), "?");
                     if (pos) {
@@ -202,6 +207,10 @@ done:
                 ObjectData::RealPropUnchecked, "Yaf_Request_Http");
 
         *ptr_uri = String(uri.c_str());
+
+        auto ptr_base_uri = this_->o_realProp(YAF_REQUEST_PROPERTY_NAME_BASE, 
+                ObjectData::RealPropUnchecked, "Yaf_Request_Http");
+        *ptr_base_uri = base_uri;
     }
 
     auto ptr_params = this_->o_realProp(YAF_REQUEST_PROPERTY_NAME_PARAMS, 

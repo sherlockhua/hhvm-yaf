@@ -17,6 +17,16 @@ namespace HPHP{
 
 void YafExtension::_initYafRequestSimpleClass()
 {
+    HHVM_ME(Yaf_Request_Simple, getQuery);
+    HHVM_ME(Yaf_Request_Simple, getRequest);
+    HHVM_ME(Yaf_Request_Simple, getPost);
+    HHVM_ME(Yaf_Request_Simple, getCookie);
+    HHVM_ME(Yaf_Request_Simple, getFiles);
+    HHVM_ME(Yaf_Request_Simple, get);
+    HHVM_ME(Yaf_Request_Simple, isXmlHttpRequest);
+    HHVM_ME(Yaf_Request_Simple, __construct);
+    HHVM_ME(Yaf_Request_Simple, __clone);
+
 }
 
 }
