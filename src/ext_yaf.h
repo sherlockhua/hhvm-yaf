@@ -35,7 +35,11 @@ private:
     void _initYafRequestClass();
     void _initYafRequestHttpClass();
     void _initYafRequestSimpleClass();
+    //初始化response相关class
 
+    void _initYafResponseClass();
+    void _initYafResponseHttpClass();
+    void _initYafResponseClientClass();
 
 
 }; 

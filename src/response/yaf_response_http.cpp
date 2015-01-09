@@ -9,6 +9,7 @@
 *
 =============================================*/
 #include "yaf_response.h"
+#include "ext_yaf.h"
 
 namespace HPHP {
 
@@ -20,6 +21,23 @@ int yaf_response_set_redirect(Variant response, const String& location)
     }
 
     return 0;
+}
+
+static void HHVM_METHOD(Yaf_Response_Http, __clone)
+{
+}
+
+static void HHVM_METHOD(Yaf_Response_Http, __construct)
+{
+
+}
+
+
+
+void YafExtension::_initYafResponseHttpClass()
+{
+    HHVM_ME(Yaf_Response_Http, __construct);
+    HHVM_ME(Yaf_Response_Http, __clone);
 }
 
 }

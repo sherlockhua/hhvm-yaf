@@ -251,3 +251,56 @@ abstract class Yaf_Action_Abstract extends Yaf_Controller_Abstract{
     abstract public function execute();
 }
  
+abstract class Yaf_Response_Abstract {
+    protected $_header = NULL;
+    protected $_body = NULL;
+    protected bool $_sendheader = false;
+    const DEFAULT_BODY = content;
+
+    <<__Native>>
+    final private function __clone():void;
+
+    <<__Native>>
+    public function __construct():void;
+
+    <<__Native>>
+    public function __destruct():void;
+
+    <<__Native>>
+    public function __toString():void;
+
+    <<__Native>>
+    public function setBody():void;
+
+    <<__Native>>
+    public function appendBody():void;
+
+    <<__Native>>
+    public function prependBody():void;
+
+    <<__Native>>
+    public function clearBody():void;
+
+    <<__Native>>
+    public function getBody():void;
+
+    <<__Native>>
+    public function setHeader():void;
+
+    <<__Native>>
+    public function setAllHeaders():void;
+
+    <<__Native>>
+    public function getHeader():void;
+
+    <<__Native>>
+    public function clearHeaders():void;
+
+    <<__Native>>
+    public function setRedirect():void;
+
+    <<__Native>>
+    public function response():void;
+}
+
+
