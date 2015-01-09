@@ -150,7 +150,7 @@ static void HHVM_METHOD(Yaf_Request_Http, __construct,
     if (php_global(S_SERVER).toArray().exists(String("HTTP_REQUEST_METHOD"))) {
         Variant request_method = php_global(S_SERVER).toArray()[String("HTTP_REQUEST_METHOD")];
         auto tmp = this_->o_realProp(YAF_REQUEST_PROPERTY_NAME_METHOD, 
-            ObjectData::RealPropUnchecked, "Yaf_Request_Abstract");
+            ObjectData::RealPropUnchecked, "Yaf_Request_Http");
         *tmp = request_method;
     }
 

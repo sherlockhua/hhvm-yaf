@@ -10,12 +10,14 @@
 =============================================*/
 #include "yaf_request_simple.h"
 #include "ext_yaf.h"
+#include "yaf_request.h"
 #include "hphp/runtime/base/base-includes.h"
+#include "hphp/runtime/base/php-globals.h"
 
 
 namespace HPHP{
 
-static Variant HHVM_METHOD(Yaf_Request_Http, getQuery, const Variant& name,
+static Variant HHVM_METHOD(Yaf_Request_Simple, getQuery, const Variant& name,
         const Variant& def) 
 {
     if (name.isNull()) {
@@ -29,7 +31,7 @@ static Variant HHVM_METHOD(Yaf_Request_Http, getQuery, const Variant& name,
     return php_global(S_GET).toArray()[name];
 }
 
-static Variant HHVM_METHOD(Yaf_Request_Http, getRequest, const Variant& name,
+static Variant HHVM_METHOD(Yaf_Request_Simple, getRequest, const Variant& name,
         const Variant& def) 
 {
     if (name.isNull()) {
@@ -43,7 +45,7 @@ static Variant HHVM_METHOD(Yaf_Request_Http, getRequest, const Variant& name,
     return php_global(S_REQUEST).toArray()[name];
 }
 
-static Variant HHVM_METHOD(Yaf_Request_Http, getPost, const Variant& name,
+static Variant HHVM_METHOD(Yaf_Request_Simple, getPost, const Variant& name,
         const Variant& def) 
 {
     if (name.isNull()) {
@@ -57,7 +59,7 @@ static Variant HHVM_METHOD(Yaf_Request_Http, getPost, const Variant& name,
     return php_global(S_POST).toArray()[name];
 }
  
-static Variant HHVM_METHOD(Yaf_Request_Http, getCookie, const Variant& name,
+static Variant HHVM_METHOD(Yaf_Request_Simple, getCookie, const Variant& name,
         const Variant& def) 
 {
     if (name.isNull()) {
@@ -71,7 +73,7 @@ static Variant HHVM_METHOD(Yaf_Request_Http, getCookie, const Variant& name,
     return php_global(S_COOKIE).toArray()[name];
 }
 
-static Variant HHVM_METHOD(Yaf_Request_Http, getFiles, const Variant& name,
+static Variant HHVM_METHOD(Yaf_Request_Simple, getFiles, const Variant& name,
         const Variant& def) 
 {
     if (name.isNull()) {
@@ -85,7 +87,7 @@ static Variant HHVM_METHOD(Yaf_Request_Http, getFiles, const Variant& name,
     return php_global(S_FILES).toArray()[name];
 }
 
-static Variant HHVM_METHOD(Yaf_Request_Http, get, const Variant& name,
+static Variant HHVM_METHOD(Yaf_Request_Simple, get, const Variant& name,
         const Variant& def) 
 {
     if (name.isNull()) {
@@ -93,7 +95,7 @@ static Variant HHVM_METHOD(Yaf_Request_Http, get, const Variant& name,
     }
 
     auto paramsTmp = this_->o_realProp(YAF_REQUEST_PROPERTY_NAME_PARAMS, 
-            ObjectData::RealPropUnchecked, "Yaf_Request_Http");
+            ObjectData::RealPropUnchecked, "Yaf_Request_Simple");
 
     if (paramsTmp->isNull()) {
         return def;
@@ -123,7 +125,7 @@ static Variant HHVM_METHOD(Yaf_Request_Http, get, const Variant& name,
     return def;
 }
  
-static bool HHVM_METHOD(Yaf_Request_Http, isXmlHttpRequest)
+static bool HHVM_METHOD(Yaf_Request_Simple, isXmlHttpRequest)
 {
     if (!php_global(S_SERVER).toArray().exists(String("HTTP_X_REQUESTED_WITH"))) {
         return false;
@@ -142,7 +144,7 @@ static bool HHVM_METHOD(Yaf_Request_Http, isXmlHttpRequest)
     return true;
 }
 
-static void HHVM_METHOD(Yaf_Request_Http, __construct, 
+static void HHVM_METHOD(Yaf_Request_Simple, __construct, 
         const Variant& method, const Variant& module,
         const Variant& controller, const Variant& action,
         const Variant& params)
@@ -152,79 +154,97 @@ static void HHVM_METHOD(Yaf_Request_Http, __construct,
         return;
     } 
 
+    auto ptr_method = this_->o_realProp(YAF_REQUEST_PROPERTY_NAME_METHOD, 
+            ObjectData::RealPropUnchecked, "Yaf_Request_Simple");
+
+    auto ptr_module = this_->o_realProp(YAF_REQUEST_PROPERTY_NAME_MODULE, 
+            ObjectData::RealPropUnchecked, "Yaf_Request_Simple");
+
+    auto ptr_controller = this_->o_realProp(YAF_REQUEST_PROPERTY_NAME_CONTROLLER, 
+            ObjectData::RealPropUnchecked, "Yaf_Request_Simple");
+
+    auto ptr_action = this_->o_realProp(YAF_REQUEST_PROPERTY_NAME_ACTION, 
+            ObjectData::RealPropUnchecked, "Yaf_Request_Simple");
+
+    auto ptr_routed = this_->o_realProp(YAF_REQUEST_PROPERTY_NAME_ROUTED, 
+            ObjectData::RealPropUnchecked, "Yaf_Request_Simple");
     //TODO not finished
-    if (php_global(S_SERVER).toArray().exists(String("HTTP_REQUEST_METHOD"))) {
-        Variant request_method = php_global(S_SERVER).toArray()[String("HTTP_REQUEST_METHOD")];
-        auto tmp = this_->o_realProp(YAF_REQUEST_PROPERTY_NAME_METHOD, 
-            ObjectData::RealPropUnchecked, "Yaf_Request_Abstract");
-        *tmp = request_method;
+    if (method.isNull() || !method.isString()) {
+        if (php_global(S_SERVER).toArray().exists(String("HTTP_REQUEST_METHOD"))) {
+            Variant request_method = php_global(S_SERVER).toArray()[String("HTTP_REQUEST_METHOD")];
+            *ptr_method = request_method;
+        }
+    } else {
+        *ptr_method = method;
     }
 
     //TODO php client mode, the request method may be 'Cli'
-    std::string uri;
-    if (request_uri.isString()) {
-        uri = request_uri.toString().toCppString();
-    } else {
-        Variant tmp;
-        if (php_global(S_SERVER).toArray().exists(String("PATH_INFO"))) {
-            uri = php_global(S_SERVER).toArray()[String("PATH_INFO")].toString().toCppString();
-            goto done;
+    if (!module.isNull() || !controller.isNull() || !action.isNull()) {
+        if (module.isNull() || !module.isString()) {
+            *ptr_module = String(g_yaf_local_data.get()->default_module.c_str()); 
+        } else {
+            *ptr_module = module;
         }
 
-        if (php_global(S_SERVER).toArray().exists(String("REQUEST_URI"))) {
-            tmp = php_global(S_SERVER).toArray()[String("REQUEST_URI")];
-            if (tmp.isString()) {
-                std::string str_tmp = tmp.toString().toCppString();
-                if (strncasecmp(str_tmp.c_str(), "http", 4) == 0) {
-                    //TODO use php_url_parse to get path
-                    php_url* url_info = php_url_parse(str_tmp.c_str());
-                    if (url_info && url_info->path) {
-                        uri = std::string(url_info->path);
+        if (controller.isNull() || !controller.isString()) {
+            *ptr_controller = String(g_yaf_local_data.get()->default_controller.c_str());
+        } else {
+            *ptr_controller = controller;
+        }
+
+        if (action.isNull() || !action.isString()) {
+            *ptr_action = String(g_yaf_local_data.get()->default_action.c_str());
+        } else {
+            *ptr_action = action;
+        }
+        *ptr_routed = Variant(true);
+    } else {
+        std::string str_query;
+        if (php_global(S_SERVER).toArray().exists(String("argv"))) {
+            Variant argv = php_global(S_SERVER).toArray()[String("argv")];
+            if (argv.isArray()) {
+                const Array argv_array = argv.toCArrRef();
+                ArrayIter iter = argv_array.begin();
+                while (!iter.end()) {
+                    Variant key = iter.first();
+                    if (!key.isString()) {
+                        iter.next();
+                        continue;
                     }
-                    php_url_free(url_info);
-                } else {
-                    const char* pos = strstr(str_tmp.c_str(), "?");
-                    if (pos) {
-                        uri = std::string(str_tmp.c_str(), pos - str_tmp.length());
-                    } else {
-                        uri = str_tmp;
+
+                    std::string str_key = key.toString().toCppString();
+                    if (strncasecmp(str_key.c_str(), YAF_REQUEST_SERVER_URI, sizeof(YAF_REQUEST_SERVER_URI) - 1)) {
+                        iter.next();
+                        continue;
                     }
+
+                    str_query = std::string(iter.second().toString().toCppString(), sizeof(YAF_REQUEST_SERVER_URI));
+                    break;
                 }
             }
-
-            goto done;
         }
 
-        if (php_global(S_SERVER).toArray().exists(String("ORIG_PATH_INFO"))) {
-            uri = php_global(S_SERVER).toArray()[String("ORIG_PATH_INFO")].toString().toCppString();
-            goto done;
-        } 
-    }
-
-done:
-    if (uri.length()) {
-        const char* p = uri.c_str();
-        while (*p == '/' && *(p+1) == '/') {
-            p++;
-        }
-
-        uri = std::string(p);
         auto ptr_uri = this_->o_realProp(YAF_REQUEST_PROPERTY_NAME_URI, 
-                ObjectData::RealPropUnchecked, "Yaf_Request_Http");
+            ObjectData::RealPropUnchecked, "Yaf_Request_Simple");
 
-        *ptr_uri = String(uri.c_str());
-
-        auto ptr_base_uri = this_->o_realProp(YAF_REQUEST_PROPERTY_NAME_BASE, 
-                ObjectData::RealPropUnchecked, "Yaf_Request_Http");
-        *ptr_base_uri = base_uri;
+        if (!str_query.length()) {
+            *ptr_uri = String("");
+        } else {
+            *ptr_uri = String(str_query.c_str());
+        }
     }
 
     auto ptr_params = this_->o_realProp(YAF_REQUEST_PROPERTY_NAME_PARAMS, 
             ObjectData::RealPropUnchecked, "Yaf_Request_Http");
-    *ptr_params = Array::Create();
+
+    if (params.isNull() || !params.isArray()) {
+        *ptr_params = Array::Create();
+    } else {
+        *ptr_params = params;
+    }
 }
 
-static void HHVM_METHOD(Yaf_Request_Http, __clone)
+static void HHVM_METHOD(Yaf_Request_Simple, __clone)
 {
 }
 

@@ -27,6 +27,7 @@ namespace HPHP {
 #define YAF_REQUEST_PROPERTY_NAME_BASE      "_base_uri"
 #define YAF_REQUEST_PROPERTY_NAME_EXCEPTION  "_exception"
 
+#define YAF_REQUEST_SERVER_URI "request_uri="
 const StaticString  
     S_HTTP_USER_AGENT("HTTP_USER_AGENT"),
     S_ENV("_ENV"),
