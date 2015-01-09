@@ -232,13 +232,11 @@ class Yaf_Request_Simple extends Yaf_Request_Abstract  {
 
     <<__Native>>
     public function __construct(?mixed $method = NULL, ?mixed $module = NULL,
-        ?mixed controller = NULL, ?mixed action = NULL, ?mixed $params = NULL):void;
+        ?mixed $controller = NULL, ?mixed $action = NULL, ?mixed $params = NULL):void;
 
     <<__Native>>
     final private function __clone():void;
 }
-
-
 
 abstract class Yaf_Action_Abstract extends Yaf_Controller_Abstract{
 

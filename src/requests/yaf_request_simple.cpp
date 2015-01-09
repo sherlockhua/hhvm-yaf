@@ -206,19 +206,19 @@ static void HHVM_METHOD(Yaf_Request_Simple, __construct,
                 const Array argv_array = argv.toCArrRef();
                 ArrayIter iter = argv_array.begin();
                 while (!iter.end()) {
-                    Variant key = iter.first();
-                    if (!key.isString()) {
+                    Variant value = iter.second();
+                    if (!value.isString()) {
                         iter.next();
                         continue;
                     }
 
-                    std::string str_key = key.toString().toCppString();
-                    if (strncasecmp(str_key.c_str(), YAF_REQUEST_SERVER_URI, sizeof(YAF_REQUEST_SERVER_URI) - 1)) {
+                    std::string str_value = value.toString().toCppString();
+                    if (strncasecmp(str_value.c_str(), YAF_REQUEST_SERVER_URI, sizeof(YAF_REQUEST_SERVER_URI) - 1)) {
                         iter.next();
                         continue;
                     }
 
-                    str_query = std::string(iter.second().toString().toCppString(), sizeof(YAF_REQUEST_SERVER_URI));
+                    str_query = std::string(str_value, sizeof(YAF_REQUEST_SERVER_URI));
                     break;
                 }
             }
