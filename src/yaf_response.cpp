@@ -22,13 +22,30 @@ static void HHVM_METHOD(Yaf_Response_Abstract, __clone)
 
 static void HHVM_METHOD(Yaf_Response_Abstract, __construct)
 {
+    
+}
 
+static void HHVM_METHOD(Yaf_Response_Abstract, __destruct)
+{
+    
+}
+
+static Variant HHVM_METHOD(Yaf_Response_Abstract, __toString)
+{
+    auto ptr_body = request->o_realProp(YAF_RESPONSE_PROPERTY_NAME_BODY, 
+            ObjectData::RealPropUnchecked, "Yaf_Request_Abstract");
+
+    String str();
+    php_implode();
+    return str;`
 }
 
 void YafExtension::_initYafRequestClass()
 {
     HHVM_ME(Yaf_Response_Abstract, __clone);
     HHVM_ME(Yaf_Response_Abstract, __construct);
+    HHVM_ME(Yaf_Response_Abstract, __destruct);
+    HHVM_ME(Yaf_Response_Abstract, __toString);
 
     _initYafResponseHttpClass();
     _initYafResponseClientClass();

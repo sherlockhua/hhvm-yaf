@@ -267,7 +267,7 @@ abstract class Yaf_Response_Abstract {
     public function __destruct():void;
 
     <<__Native>>
-    public function __toString():void;
+    public function __toString():mixed;
 
     <<__Native>>
     public function setBody():void;
