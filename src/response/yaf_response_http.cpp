@@ -13,16 +13,6 @@
 
 namespace HPHP {
 
-int yaf_response_set_redirect(Variant response, const String& location)
-{
-    Transport *transport = g_context->getTransport();
-    if (transport) {
-        transport->replaceHeader("Location", location.toCppString().c_str());
-    }
-
-    return 0;
-}
-
 static void HHVM_METHOD(Yaf_Response_Http, __clone)
 {
 }

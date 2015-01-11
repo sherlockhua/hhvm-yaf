@@ -270,37 +270,37 @@ abstract class Yaf_Response_Abstract {
     public function __toString():string;
 
     <<__Native>>
-    public function setBody(string $body, ?mixed $name = NULL):bool;
+    public function setBody(string $body, ?mixed $name = NULL):mixed;
 
     <<__Native>>
-    public function appendBody():bool;
+    public function appendBody(string $body, ?mixed $name=NULL):mixed;
 
     <<__Native>>
-    public function prependBody():void;
+    public function prependBody(string $body, ?mixed $name = NULL):mixed;
 
     <<__Native>>
-    public function clearBody():void;
+    public function clearBody(?mixed $name=NULL):mixed;
 
     <<__Native>>
-    public function getBody():mixed;
+    public function getBody(?mixed $name = NULL):mixed;
 
     <<__Native>>
-    public function setHeader():void;
+    public function setHeader():mixed;
 
     <<__Native>>
-    public function setAllHeaders():void;
+    public function setAllHeaders():mixed;
 
     <<__Native>>
-    public function getHeader():void;
+    public function getHeader():mixed;
 
     <<__Native>>
-    public function clearHeaders():void;
+    public function clearHeaders():mixed;
 
     <<__Native>>
-    public function setRedirect():void;
+    public function setRedirect(string $url):bool;
 
     <<__Native>>
-    public function response():void;
+    public function response():mixed;
 }
 
 
