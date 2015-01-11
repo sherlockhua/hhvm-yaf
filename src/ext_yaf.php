@@ -267,13 +267,13 @@ abstract class Yaf_Response_Abstract {
     public function __destruct():void;
 
     <<__Native>>
-    public function __toString():mixed;
+    public function __toString():string;
 
     <<__Native>>
-    public function setBody():void;
+    public function setBody(string $body, ?mixed $name = NULL):bool;
 
     <<__Native>>
-    public function appendBody():void;
+    public function appendBody():bool;
 
     <<__Native>>
     public function prependBody():void;
@@ -282,7 +282,7 @@ abstract class Yaf_Response_Abstract {
     public function clearBody():void;
 
     <<__Native>>
-    public function getBody():void;
+    public function getBody():mixed;
 
     <<__Native>>
     public function setHeader():void;
