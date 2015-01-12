@@ -39,8 +39,6 @@ static int yaf_response_send(ObjectData* object)
     return 0;
 }
 
-
-
 int yaf_response_set_redirect(ObjectData* response, const String& location)
 {
     Transport *transport = g_context->getTransport();
@@ -131,8 +129,6 @@ static Variant yaf_response_get_body(ObjectData* object, const Variant& name)
 
     return init_null_variant;
 }
-
-
 
 static void HHVM_METHOD(Yaf_Response_Abstract, __clone)
 {

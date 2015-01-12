@@ -13,21 +13,13 @@
 
 namespace HPHP {
 
-static void HHVM_METHOD(Yaf_Response_Http, __clone)
-{
-}
-
 static void HHVM_METHOD(Yaf_Response_Http, __construct)
 {
-
 }
-
-
 
 void YafExtension::_initYafResponseHttpClass()
 {
     HHVM_ME(Yaf_Response_Http, __construct);
-    HHVM_ME(Yaf_Response_Http, __clone);
 }
 
 }

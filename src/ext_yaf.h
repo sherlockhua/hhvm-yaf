@@ -41,6 +41,14 @@ private:
     void _initYafResponseHttpClass();
     void _initYafResponseClientClass();
 
+    void _initYafApplicationClass();
+    void _initYafDispatcherClass();
+
+    void _initYafViewClass();
+    void _initYafViewInterfaceClass();
+    void _initYafViewSimpleClass();
+
+
 
 }; 
 

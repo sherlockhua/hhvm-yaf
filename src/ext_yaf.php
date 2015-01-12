@@ -303,4 +303,168 @@ abstract class Yaf_Response_Abstract {
     public function response():mixed;
 }
 
+abstract class Yaf_Response_Http extends Yaf_Response_Abstract {
+    protected bool $_sendheader = true;
+    protected int  $_response_code = 200;
+
+    <<__Native>>
+    public function __construct():void;
+}
+
+abstract class Yaf_Response_Cli extends Yaf_Response_Abstract {
+
+    <<__Native>>
+    public function __construct():void;
+}
+
+final class Yaf_Application {
+
+    protected        $config = NULL;
+    protected        $dispatcher = NULL;
+    static protected $_app = NULL;
+    protected        $_modules = NULL;
+    protected bool   $_running = false;
+
+    //TODO need set default value for _environ
+    protected string $_environ = NULL;
+    protected int    $_err_no = 0;
+    protected string $_err_msg = '';
+
+    <<__Native>>
+    public function __construct():void;
+
+    <<__Native>>
+    public function run():mixed;
+
+    <<__Native>>
+    public function execute():mixed;
+
+    //TODO yaf_application_environ::environ method not finished
+    <<__Native>>
+    public function bootstrap():mixed;
+
+    <<__Native>>
+    public function getConfig():mixed;
+
+    <<__Native>>
+    public function getModules():mixed;
+
+    <<__Native>>
+    public function getDispatcher():mixed;
+
+    <<__Native>>
+    public function setAppDirectory():mixed;
+
+    <<__Native>>
+    public function getAppDirectory():mixed;
+
+    <<__Native>>
+    public function getLastErrorNo():mixed;
+
+    <<__Native>>
+    public function getLastErrorMsg():mixed;
+
+    <<__Native>>
+    public function clearLastError():mixed;
+
+    <<__Native>>
+    public function __destruct():mixed;
+
+    <<__Native>>
+    private function __clone():void;
+
+    <<__Native>>
+    private function __sleep():void;
+    
+    <<__Native>>
+    private function __wakeup():void;
+}
+
+final class Yaf_Dispatcher {
+    protected $_router = NULL;
+    protected $_view = NULL;
+    protected $_request = NULL;
+    protected $_plugins = NULL;
+    static protected $_instance = NULL; 
+
+    protected bool $_auto_render = true;
+    protected bool $_return_response = false;
+    protected bool $_instantly_flush = false;
+
+    protected $_default_module = NULL;
+    protected $_default_controller = NULL;
+    protected $_default_action = NULL;
+
+    <<__Native>>
+    private function __construct():void;
+
+    <<__Native>>
+    private function __clone():void;
+
+    <<__Native>>
+    private function __sleep():void;
+
+    <<__Native>>
+    private function __wakeup():void;
+
+    <<__Native>>
+    public function enableView():mixed;
+
+    <<__Native>>
+    public function disableView():mixed;
+
+    <<__Native>>
+    public function initView(mixed $tpl_dir, ?mixed $options):mixed;
+
+    <<__Native>>
+    public function setView():void;
+
+    <<__Native>>
+    public function setRequest():void;
+
+    <<__Native>>
+    public function getApplication():void;
+
+    <<__Native>>
+    public function getRouter():void;
+
+    <<__Native>>
+    public function getRequest():void;
+
+    <<__Native>>
+    public function setErrorHandler():void;
+
+    <<__Native>>
+    public function setDefaultModule():void;
+
+    <<__Native>>
+    public function setDefaultController():void;
+
+    <<__Native>>
+    public function setDefaultAction():void;
+
+    <<__Native>>
+    public function returnResponse():void;
+
+    <<__Native>>
+    public function autoRender():void;
+
+    <<__Native>>
+    public function flushInstantly():void;
+
+    <<__Native>>
+    static public function getInstance():void;
+
+    <<__Native>>
+    public function dispatch():void;
+
+    <<__Native>>
+    public function throwException():void;
+
+    <<__Native>>
+    public function catchException():void;
+
+    <<__Native>>
+    public function registerPlugin():void;
+}
 
