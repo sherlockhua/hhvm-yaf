@@ -468,3 +468,38 @@ final class Yaf_Dispatcher {
     public function registerPlugin():void;
 }
 
+abstract class Yaf_View_Interface {
+    <<__Native>>
+    abstract public function assign(mixed $name, ?mixed $value=NULL):mixed;
+
+    <<__Native>>
+    abstract public function display():void;
+
+    <<__Native>>
+    abstract public function render():void;
+
+    <<__Native>>
+    abstract public function setScriptPath():void;
+
+    <<__Native>>
+    abstract public function getScriptPath():void;
+}
+
+class Yaf_View_Simple extends Yaf_View_Interface {
+    protected $_tpl_vars = NULL;
+    protected $_tpl_dir = NULL;
+    protected $_options = NULL;
+
+    <<__Native>>
+    public function __construct(mixed $tpl_dir, ?mixed options = NULL):void;
+
+    <<__Native>>
+    public function __isset(string $name):bool;
+
+    <<__Native>>
+    public function get(?mixed $name):mixed;
+
+    <<__Native>>
+    public function assign(mixed $name, ?mixed $value=NULL):mixed;
+}
+

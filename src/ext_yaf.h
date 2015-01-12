@@ -20,6 +20,13 @@ namespace HPHP {
 #define DEFAULT_SLASH_CHAR '/'
 #define DEFAULT_SLASH_STR "/"
 
+#define IS_SLASH(c) ((c) == '/' || (c) == '\\') 
+
+#define IS_ABSOLUTE_PATH(x) \
+    ((x).length() && IS_SLASH((x)[0]))
+
+        
+
 class YafExtension : public Extension {
 public:
     YafExtension():Extension("yaf"){}
