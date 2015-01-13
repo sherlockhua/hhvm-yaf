@@ -96,12 +96,18 @@ static Variant HHVM_METHOD(Yaf_View_Simple, assign, const Variant& name, const V
     return false;
 }
 
+static Variant HHVM_METHOD(Yaf_View_Simple, render, const Variant& tpl, const Variant& vars)
+{
+    return true;
+}
+
 void YafExtension::_initYafViewSimpleClass()
 {
     HHVM_ME(Yaf_View_Simple, __construct);
     HHVM_ME(Yaf_View_Simple, __isset);
     HHVM_ME(Yaf_View_Simple, get);
     HHVM_ME(Yaf_View_Simple, assign);
+    HHVM_ME(Yaf_View_Simple, render);
 
 }
 

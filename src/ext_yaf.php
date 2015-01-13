@@ -501,5 +501,8 @@ class Yaf_View_Simple extends Yaf_View_Interface {
 
     <<__Native>>
     public function assign(mixed $name, ?mixed $value=NULL):mixed;
+
+    <<__Native>>
+    public function render(mixed $tpl, ?mixed vars = NULL):mixed;
 }
 
