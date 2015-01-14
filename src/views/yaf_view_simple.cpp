@@ -14,6 +14,91 @@
 
 namespace HPHP {
 
+
+static int yaf_view_simple_valid_var_name(const char *var_name, int len) /* {{{ */
+{
+    int i, ch;
+
+    if (!var_name)
+        return 0;
+
+    /* These are allowed as first char: [a-zA-Z_\x7f-\xff] */
+    ch = (int)((unsigned char *)var_name)[0];
+    if (var_name[0] != '_' &&
+            (ch < 65  /* A    */ || /* Z    */ ch > 90)  &&
+            (ch < 97  /* a    */ || /* z    */ ch > 122) &&
+            (ch < 127 /* 0x7f */ || /* 0xff */ ch > 255)
+       ) {
+        return 0;
+    }
+
+    /* And these as the rest: [a-zA-Z0-9_\x7f-\xff] */
+    if (len > 1) {
+        for (i = 1; i < len; i++) {
+            ch = (int)((unsigned char *)var_name)[i];
+            if (var_name[i] != '_' &&
+                    (ch < 48  /* 0    */ || /* 9    */ ch > 57)  &&
+                    (ch < 65  /* A    */ || /* Z    */ ch > 90)  &&
+                    (ch < 97  /* a    */ || /* z    */ ch > 122) &&
+                    (ch < 127 /* 0x7f */ || /* 0xff */ ch > 255)
+               ) {
+                return 0;
+            }
+        }
+    }
+    return 1;
+}
+
+static int yaf_view_simple_extract_array(const Variant& vars)
+{
+    int count = 0;
+    if (!vars.isArray()) {
+        return count;
+    }
+
+    const Array& var_array = vars.toCArrRef();
+    for (ArrayIter iter(var_array); iter; ++iter) {
+        std::string name = iter.first().toString().toCppString();
+
+          /* GLOBALS protection */
+        if (name.length() == sizeof("GLOBALS") && !strcmp(name.c_str(), "GLOBALS")) {
+            continue;
+        }   
+                    
+        if (name.length() == sizeof("this")  && !strcmp(name.c_str(), "this")) {
+            continue;
+        }   
+
+        if (!yaf_view_simple_valid_var_name(name.c_str(), name.length())) {
+                continue;
+        }
+
+        g_context->setVar(iter.first().toString().get(), iter.secondRef().asTypedValue());
+        ++count;
+    }
+
+    return count;
+}
+
+static int yaf_view_simple_extract(const Variant& tpl_vars, const Variant& vars)
+{
+    return yaf_view_simple_extract_array(tpl_vars) + yaf_view_simple_extract_array(vars);
+}
+
+static Variant yaf_view_simple_render(ObjectData* object, 
+        const Variant& tpl, const Variant& vars)
+{
+    if (!tpl.isString()) {
+        return Variant(false);
+    }
+
+    auto ptr_tplvars = object->o_realProp(YAF_VIEW_PROPERTY_NAME_TPLVARS, 
+            ObjectData::RealPropUnchecked, "Yaf_View_Simple");
+
+    yaf_view_simple_extract(*ptr_tplvars, vars);
+    return Variant(true);
+}
+
 static void yaf_view_simple_instance(ObjectData* object, const Variant& tpl_dir,
         const Variant& options)
 {
@@ -98,7 +183,7 @@ static Variant HHVM_METHOD(Yaf_View_Simple, assign, const Variant& name, const V
 
 static Variant HHVM_METHOD(Yaf_View_Simple, render, const Variant& tpl, const Variant& vars)
 {
-    return true;
+    return yaf_view_simple_render(this_, tpl, vars);
 }
 
 void YafExtension::_initYafViewSimpleClass()

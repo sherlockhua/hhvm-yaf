@@ -303,7 +303,7 @@ abstract class Yaf_Response_Abstract {
     public function response():mixed;
 }
 
-abstract class Yaf_Response_Http extends Yaf_Response_Abstract {
+class Yaf_Response_Http extends Yaf_Response_Abstract {
     protected bool $_sendheader = true;
     protected int  $_response_code = 200;
 
@@ -311,7 +311,7 @@ abstract class Yaf_Response_Http extends Yaf_Response_Abstract {
     public function __construct():void;
 }
 
-abstract class Yaf_Response_Cli extends Yaf_Response_Abstract {
+class Yaf_Response_Cli extends Yaf_Response_Abstract {
 
     <<__Native>>
     public function __construct():void;
@@ -468,7 +468,7 @@ final class Yaf_Dispatcher {
     public function registerPlugin():void;
 }
 
-abstract class Yaf_View_Interface {
+class Yaf_View_Interface {
     <<__Native>>
     abstract public function assign(mixed $name, ?mixed $value=NULL):mixed;
 
@@ -476,7 +476,7 @@ abstract class Yaf_View_Interface {
     abstract public function display():void;
 
     <<__Native>>
-    abstract public function render():void;
+    abstract public function render(mixed $tpl, ?mixed $vars = NULL):mixed;
 
     <<__Native>>
     abstract public function setScriptPath():void;
@@ -485,24 +485,25 @@ abstract class Yaf_View_Interface {
     abstract public function getScriptPath():void;
 }
 
+/*
 class Yaf_View_Simple extends Yaf_View_Interface {
     protected $_tpl_vars = NULL;
     protected $_tpl_dir = NULL;
     protected $_options = NULL;
 
     <<__Native>>
-    public function __construct(mixed $tpl_dir, ?mixed options = NULL):void;
+    public function __construct(mixed $tpl_dir, ?mixed $options = NULL):void;
 
     <<__Native>>
     public function __isset(string $name):bool;
 
     <<__Native>>
-    public function get(?mixed $name):mixed;
+    public function get(?mixed $name = NULL):mixed;
 
     <<__Native>>
     public function assign(mixed $name, ?mixed $value=NULL):mixed;
 
     <<__Native>>
-    public function render(mixed $tpl, ?mixed vars = NULL):mixed;
+    public function render(mixed $tpl, ?mixed $vars = NULL):mixed;
 }
-
+ */
