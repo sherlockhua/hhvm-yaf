@@ -28,7 +28,7 @@ const int64_t k_PHP_OUTPUT_HANDLER_FLUSHABLE = 32;
 const int64_t k_PHP_OUTPUT_HANDLER_REMOVABLE = 64;
 const int64_t k_PHP_OUTPUT_HANDLER_STDFLAGS =
       k_PHP_OUTPUT_HANDLER_CLEANABLE | k_PHP_OUTPUT_HANDLER_FLUSHABLE |
-        k_PHP_OUTPUT_HANDLER_REMOVABLE;
+      k_PHP_OUTPUT_HANDLER_REMOVABLE;
 
 static bool yaf_ob_start();
 static bool yaf_ob_end_clean();
@@ -51,11 +51,23 @@ static bool yaf_ob_end_clean()
 static Variant yaf_ob_get_content()
 {
     if (g_context->obGetLevel() == false) {
+        raise_warning("get level failed");
         return false;
     }
 
     return g_context->obCopyContents();
 }
+
+Variant yaf_ob_get_clean()
+{
+  String output = yaf_ob_get_content();
+  if (!yaf_ob_end_clean()) {
+    return false;
+  }
+
+  return output;
+}
+
 
 static int yaf_view_simple_valid_var_name(const char *var_name, int len) /* {{{ */
 {
@@ -115,7 +127,8 @@ static int yaf_view_simple_extract_array(const Variant& vars)
                 continue;
         }
 
-        g_context->setVar(iter.first().toString().get(), iter.secondRef().asTypedValue());
+        g_context->m_globalVarEnv->set(iter.first().toString().get(), iter.secondRef().asTypedValue());
+        //g_context->setVar(iter.first().toString().get(), iter.secondRef().asTypedValue());
         ++count;
     }
 
@@ -160,12 +173,14 @@ static Variant yaf_view_simple_render(ObjectData* object,
         }
     }
 
-    if (yaf_loader_import(script_path.c_str(), script_path.length(), 0)) {
-        raise_error("Failed opening template %s: %d", script_path.c_str(), errno); 
-    }
+    yaf_loader_import(script_path.c_str(), script_path.length(), 0);
+    //if (yaf_loader_import(script_path.c_str(), script_path.length(), 0)) {
+    //    raise_error("Failed opening template %s: %d", script_path.c_str(), errno); 
+    //}
 
-    yaf_ob_end_clean();
-    return true;
+    //yaf_ob_end_clean();
+
+    return yaf_ob_get_clean();
 }
 
 static void yaf_view_simple_instance(ObjectData* object, const Variant& tpl_dir,
@@ -255,6 +270,15 @@ static Variant HHVM_METHOD(Yaf_View_Simple, render, const Variant& tpl, const Va
     return yaf_view_simple_render(this_, tpl, vars);
 }
 
+const StaticString s_GLOBALS("GLOBALS");
+
+static Variant HHVM_METHOD(Yaf_View_Simple, test)
+{
+    Array ret = g_context->m_globalVarEnv->getDefinedVariables();
+    ret.remove(s_GLOBALS);
+    return ret;
+}
+
 void YafExtension::_initYafViewSimpleClass()
 {
     HHVM_ME(Yaf_View_Simple, __construct);
@@ -262,6 +286,7 @@ void YafExtension::_initYafViewSimpleClass()
     HHVM_ME(Yaf_View_Simple, get);
     HHVM_ME(Yaf_View_Simple, assign);
     HHVM_ME(Yaf_View_Simple, render);
+    HHVM_ME(Yaf_View_Simple, test);
 
 }
 

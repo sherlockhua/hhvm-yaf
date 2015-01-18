@@ -504,4 +504,15 @@ class Yaf_View_Simple extends Yaf_View_Interface {
 
     <<__Native>>
     public function render(mixed $tpl, ?mixed $vars = NULL):mixed;
+
+    <<__Native>>
+    public function test():mixed;
+}
+
+function yaf_loader_import(string $path)
+{
+    if ( file_exists($path) ) { 
+        extract($GLOBALS);
+        require_once $path;
+    } 
 }

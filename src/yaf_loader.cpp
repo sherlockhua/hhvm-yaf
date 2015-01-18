@@ -9,8 +9,19 @@
 *
 =============================================*/
 #include "yaf_loader.h"
+#include "ext_yaf.h"
 
-int yaf_loader_import(const char *path, int len, int use_path)
+namespace HPHP {
+
+Variant yaf_loader_import(const char *path, int len, int use_path)
 { 
-    return 0;
+    //return require(String(path), true, g_context->getCwd().data(), true);
+    
+    String func("yaf_loader_import");
+
+    Array params = Array::Create();
+    params.append(String(path));
+    return vm_call_user_func(func, params);
+}
+
 }

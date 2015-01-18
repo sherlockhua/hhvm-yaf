@@ -11,10 +11,14 @@
 #ifndef _YAF_LOADER_H_
 #define _YAF_LOADER_H_
 
+#include "ext_yaf.h"
 
-extern int yaf_loader_import(const char *path, int len, int use_path);
+namespace HPHP {
+
+extern Variant yaf_loader_import(const char *path, int len, int use_path);
 
 
+}
 
 
 
