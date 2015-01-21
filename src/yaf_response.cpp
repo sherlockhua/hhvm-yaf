@@ -16,9 +16,12 @@
 
 namespace HPHP{
 
+#ifdef HHVM_VERSION_3_2_NEW
 static int yaf_response_send(ObjectData* object)
+#else
+static int yaf_response_send(Object object)
+#endif
 {
-
     auto ptr_body = object->o_realProp(YAF_RESPONSE_PROPERTY_NAME_BODY, 
             ObjectData::RealPropUnchecked, "Yaf_Response_Abstract");
 
@@ -27,7 +30,6 @@ static int yaf_response_send(ObjectData* object)
     }
 
     Array& body_array = ptr_body->toArrRef();
-
     ArrayIter iter = body_array.begin();
     while (!iter.end()) {
         Variant value = iter.second();
@@ -49,7 +51,11 @@ int yaf_response_set_redirect(ObjectData* response, const String& location)
     return 0;
 }
 
+#ifdef HHVM_VERSION_3_2_NEW
 static int yaf_response_alter_body(ObjectData* object, 
+#else
+static int yaf_response_alter_body(Object object, 
+#endif
         const Variant& name, const String& body, int flag)
 {
     if (!body.length()) {
@@ -90,7 +96,11 @@ static int yaf_response_alter_body(ObjectData* object,
     return 0;
 }
 
+#ifdef HHVM_VERSION_3_2_NEW
 static int yaf_response_clear_body(ObjectData* object, const Variant& name)
+#else
+static int yaf_response_clear_body(Object object, const Variant& name)
+#endif
 {
 
     auto ptr_body = object->o_realProp(YAF_RESPONSE_PROPERTY_NAME_BODY, 
@@ -109,7 +119,11 @@ static int yaf_response_clear_body(ObjectData* object, const Variant& name)
     return 0;
 }
 
+#ifdef HHVM_VERSION_3_2_NEW
 static Variant yaf_response_get_body(ObjectData* object, const Variant& name)
+#else
+static Variant yaf_response_get_body(Object object, const Variant& name)
+#endif
 {
 
     auto ptr_body = object->o_realProp(YAF_RESPONSE_PROPERTY_NAME_BODY, 

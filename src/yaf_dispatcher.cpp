@@ -13,8 +13,11 @@
 
 namespace HPHP {
 
-
+#ifdef HHVM_VERSION_3_2_NEW
 static Variant* yaf_dispatcher_init_view(ObjectData* object, 
+#else
+static Variant* yaf_dispatcher_init_view(Object object, 
+#endif
         const Variant& tpl_dir, const Variant& options)
 {
     return NULL;

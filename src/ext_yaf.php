@@ -508,8 +508,8 @@ class Yaf_View_Simple extends Yaf_View_Interface {
     <<__Native>>
     public function test():mixed;
 
-    //<<__Native>>
-    //public function eval(mixed $tpl, ?mixed $vars = NULL):mixed;
+    <<__Native>>
+    public function evaler(mixed $tpl, ?mixed $vars = NULL):mixed;
 }
 
 function yaf_loader_import(string $path)
