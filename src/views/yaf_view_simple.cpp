@@ -147,6 +147,54 @@ static int yaf_view_simple_extract(const Variant& tpl_vars, const Variant& vars)
 }
 
 #ifdef HHVM_VERSION_3_2_NEW
+static Variant yaf_view_simple_display(ObjectData* object, 
+#else
+static Variant yaf_view_simple_display(Object object, 
+#endif
+        const Variant& tpl, const Variant& vars)
+{
+    if (!tpl.isString()) {
+        return false;
+    }
+
+    auto ptr_tplvars = object->o_realProp(YAF_VIEW_PROPERTY_NAME_TPLVARS, 
+            ObjectData::RealPropUnchecked, "Yaf_View_Simple");
+
+    yaf_view_simple_extract(*ptr_tplvars, vars);
+
+    std::string script_path;
+    const String& str_tpl = tpl.toCStrRef();
+    if (IS_ABSOLUTE_PATH(str_tpl)) {
+        script_path  = str_tpl.toCppString();
+    } else {
+        auto ptr_tpldir = object->o_realProp(YAF_VIEW_PROPERTY_NAME_TPLDIR, 
+                ObjectData::RealPropUnchecked, "Yaf_View_Simple");
+        if (!ptr_tpldir->isString()) {
+            if (!g_yaf_local_data.get()->view_directory.length()) {
+                raise_error("Could not determine the view script path, "\
+                        "you should call Yaf_View_Simple:setScriptPath to specific it");
+                return false;
+            }
+            script_path = g_yaf_local_data.get()->view_directory + DEFAULT_SLASH_STR + str_tpl.toCppString(); 
+        } else {
+            script_path = ptr_tpldir->toString().toCppString() + DEFAULT_SLASH_STR + str_tpl.toCppString(); 
+        }
+    }
+
+    yaf_loader_import(script_path.c_str(), script_path.length(), 0);
+    //if (yaf_loader_import(script_path.c_str(), script_path.length(), 0)) {
+    //    raise_error("Failed opening template %s: %d", script_path.c_str(), errno); 
+    //}
+
+    //yaf_ob_end_clean();
+
+    return true;
+}
+
+
+
+
+#ifdef HHVM_VERSION_3_2_NEW
 static Variant yaf_view_simple_render(ObjectData* object, 
 #else
 static Variant yaf_view_simple_render(Object object, 
@@ -214,6 +262,7 @@ static Variant yaf_view_simple_eval(Object object,
 
     Variant v;
     g_context->invokeFunc((TypedValue*)&v, unit->getMain(),                                                                                                             
+                          //init_null_variant, nullptr, nullptr, g_context->m_globalVarEnv, nullptr,
                           init_null_variant, nullptr, nullptr, nullptr, nullptr,
                           ExecutionContext::InvokePseudoMain);
 
@@ -332,6 +381,25 @@ static Variant HHVM_METHOD(Yaf_View_Simple, evaler, const Variant& tpl, const Va
     return yaf_view_simple_eval(this_, tpl, vars);
 }
 
+static Variant HHVM_METHOD(Yaf_View_Simple, display, const Variant& tpl, const Variant& vars)
+{
+    return yaf_view_simple_display(this_, tpl, vars);
+}
+
+static Variant HHVM_METHOD(Yaf_View_Simple, assignRef, const String& name, Variant& value)
+{
+    auto ptr_tplvars = this_->o_realProp(YAF_VIEW_PROPERTY_NAME_TPLVARS, 
+            ObjectData::RealPropUnchecked, "Yaf_View_Simple");
+    if (!ptr_tplvars->isArray()) {
+        *ptr_tplvars = Array::Create();
+    }
+
+    Array& tplvars = ptr_tplvars->toArrRef();
+    tplvars.setRef(name, value, true);
+
+    return true;
+}
+
 void YafExtension::_initYafViewSimpleClass()
 {
     HHVM_ME(Yaf_View_Simple, __construct);
@@ -341,6 +409,8 @@ void YafExtension::_initYafViewSimpleClass()
     HHVM_ME(Yaf_View_Simple, render);
     HHVM_ME(Yaf_View_Simple, test);
     HHVM_ME(Yaf_View_Simple, evaler);
+    HHVM_ME(Yaf_View_Simple, display);
+    HHVM_ME(Yaf_View_Simple, assignRef);
 }
 
 

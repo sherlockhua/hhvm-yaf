@@ -473,7 +473,7 @@ abstract class Yaf_View_Interface {
     public function assign(mixed $name, ?mixed $value=NULL):mixed;
 
     <<__Native>>
-    public function display():void;
+    public function display(mixed $tpl, ?mixed $vars = NULL):mixed;
 
     <<__Native>>
     public function render(mixed $tpl, ?mixed $vars = NULL):mixed;
@@ -510,6 +510,12 @@ class Yaf_View_Simple extends Yaf_View_Interface {
 
     <<__Native>>
     public function evaler(mixed $tpl, ?mixed $vars = NULL):mixed;
+
+    <<__Native>>
+    public function display(mixed $tpl, ?mixed $vars = NULL):mixed;
+
+    <<__Native>>
+    public function assignRef(string $name, mixed& $value):mixed;
 }
 
 function yaf_loader_import(string $path)
