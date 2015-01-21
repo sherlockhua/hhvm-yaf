@@ -516,6 +516,21 @@ class Yaf_View_Simple extends Yaf_View_Interface {
 
     <<__Native>>
     public function assignRef(string $name, mixed& $value):mixed;
+
+    <<__Native>>
+    public function clear(?mixed $name = NULL):mixed;
+
+    <<__Native>>
+    public function setScriptPath(mixed $tpl_dir):mixed;
+
+    <<__Native>>
+    public function getScriptPath():mixed;
+
+    <<__Native>>
+    public function __get(?mixed $name = NULL):mixed;
+
+    <<__Native>>
+    public function __set(mixed $name, ?mixed $value=NULL):mixed;
 }
 
 function yaf_loader_import(string $path)

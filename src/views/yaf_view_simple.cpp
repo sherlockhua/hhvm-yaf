@@ -147,6 +147,28 @@ static int yaf_view_simple_extract(const Variant& tpl_vars, const Variant& vars)
 }
 
 #ifdef HHVM_VERSION_3_2_NEW
+static int yaf_view_simple_clear_assign(ObjectData* object, const String &name)
+#else
+static int yaf_view_simple_clear_assign(Object object, const String &name)
+#endif
+{
+    auto ptr_tplvars = object->o_realProp(YAF_VIEW_PROPERTY_NAME_TPLVARS, 
+            ObjectData::RealPropUnchecked, "Yaf_View_Simple");
+    if (!ptr_tplvars->isArray()) {
+        return -1;
+    }
+
+    Array& tplvars = ptr_tplvars->toArrRef();
+    if (name.length()) {
+        tplvars.remove(name, true);
+    } else {
+        tplvars.clear();
+    }
+
+    return 0;
+}
+
+#ifdef HHVM_VERSION_3_2_NEW
 static Variant yaf_view_simple_display(ObjectData* object, 
 #else
 static Variant yaf_view_simple_display(Object object, 
@@ -400,6 +422,80 @@ static Variant HHVM_METHOD(Yaf_View_Simple, assignRef, const String& name, Varia
     return true;
 }
 
+static Variant HHVM_METHOD(Yaf_View_Simple, clear, const String& name)
+{
+    yaf_view_simple_clear_assign(this_, name);
+    return this_;
+}
+
+static Variant HHVM_METHOD(Yaf_View_Simple, setScriptPath, const Variant& tpl_dir)
+{
+    if (!tpl_dir.isString()) {
+        return false;
+    }
+
+    if (!IS_ABSOLUTE_PATH(tpl_dir.toString())) {
+        return false;
+    }
+
+    auto ptr_tpldir = this_->o_realProp(YAF_VIEW_PROPERTY_NAME_TPLDIR, 
+            ObjectData::RealPropUnchecked, "Yaf_View_Simple");
+
+    *ptr_tpldir = tpl_dir;
+    return this_;
+}
+
+static Variant HHVM_METHOD(Yaf_View_Simple, getScriptPath)
+{
+    auto ptr_tpldir = this_->o_realProp(YAF_VIEW_PROPERTY_NAME_TPLDIR, 
+            ObjectData::RealPropUnchecked, "Yaf_View_Simple");
+    if (ptr_tpldir->isString()) {
+        return ptr_tpldir->toString();
+    }
+
+    if (g_yaf_local_data.get()->view_directory.length()) {
+        return String(g_yaf_local_data.get()->view_directory.c_str());
+    }
+
+    return *ptr_tpldir;
+}
+
+static Variant HHVM_METHOD(Yaf_View_Simple, __set, const Variant& name, const Variant& value)
+{
+    auto ptr_tplvars = this_->o_realProp(YAF_VIEW_PROPERTY_NAME_TPLVARS, 
+            ObjectData::RealPropUnchecked, "Yaf_View_Simple");
+
+    if (name.isString()) {
+        ptr_tplvars->toArrRef().set(name, value);
+        return true;
+    } else if(name.isArray()){
+        ptr_tplvars->toArrRef().merge(name.toArray());
+        return true;
+    }
+
+    return false;
+}
+
+static Variant HHVM_METHOD(Yaf_View_Simple, __get, const Variant& name)
+{
+    auto ptr_tplvars = this_->o_realProp(YAF_VIEW_PROPERTY_NAME_TPLVARS, 
+            ObjectData::RealPropUnchecked, "Yaf_View_Simple");
+    if (!ptr_tplvars->isArray()) {
+        return init_null_variant;
+    }
+
+    if (name.isString() && name.toCStrRef().length()) {
+        const String& str_name = name.toCStrRef();
+        if (ptr_tplvars->toArrRef().exists(str_name)) {
+            return ptr_tplvars->toArrRef()[str_name];
+        } 
+    } else {
+        return *ptr_tplvars; 
+    }
+
+    return init_null_variant;
+}
+
 void YafExtension::_initYafViewSimpleClass()
 {
     HHVM_ME(Yaf_View_Simple, __construct);
@@ -411,6 +507,12 @@ void YafExtension::_initYafViewSimpleClass()
     HHVM_ME(Yaf_View_Simple, evaler);
     HHVM_ME(Yaf_View_Simple, display);
     HHVM_ME(Yaf_View_Simple, assignRef);
+    HHVM_ME(Yaf_View_Simple, clear);
+    HHVM_ME(Yaf_View_Simple, setScriptPath);
+    HHVM_ME(Yaf_View_Simple, getScriptPath);
+
+    HHVM_ME(Yaf_View_Simple, __set);
+    HHVM_ME(Yaf_View_Simple, __get);
 }
 
 
