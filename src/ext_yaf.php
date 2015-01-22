@@ -331,7 +331,7 @@ final class Yaf_Application {
     protected string $_err_msg = '';
 
     <<__Native>>
-    public function __construct():void;
+    public function __construct(mixed $config, ?mixed $section = NULL):void;
 
     <<__Native>>
     public function run():mixed;
@@ -540,3 +540,73 @@ function yaf_loader_import(string $path)
         require_once $path;
     } 
 }
+
+abstract class Yaf_Config_Abstract {
+    protected $_config = NULL;
+    protected bool $_readonly = true;
+
+    <<__Native>>
+    public function __construct():void;
+
+    abstract public function get(?mixed $name):mixed;
+    abstract public function set(string $name, mixed $value):mixed;
+    abstract public function readonly():mixed;
+    abstract public function toArray():mixed;
+}
+
+class Yaf_Config_Simple extends Yaf_Config_Abstract {
+    protected bool $_readonly = false;
+    private $_cursor = NULL;
+
+    <<__Native>>
+    public function __construct(mixed $config, ?mixed $readonly = NULL):void;
+
+    <<__Native>>
+    public function __isset(string $name):bool;
+
+    <<__Native>>
+    public function get(?mixed $name):mixed;
+
+    <<__Native>>
+    public function set(string $name, mixed $value):mixed;
+
+    <<__Native>>
+    public function count():mixed;
+
+    <<__Native>>
+    public function offsetUnset(string $name):mixed;
+
+    <<__Native>>
+    public function rewind():mixed;
+
+    <<__Native>>
+    public function current():mixed;
+
+    <<__Native>>
+    public function next():mixed;
+
+    <<__Native>>
+    public function valid():mixed;
+
+    <<__Native>>
+    public function readonly():mixed;
+
+    <<__Native>>
+    public function toArray():mixed;
+
+    <<__Native>>
+    public function __set(string $name, mixed $value):mixed;
+
+    <<__Native>>
+    public function __get(?mixed $name):mixed;
+
+    <<__Native>>
+    public function offsetGet(?mixed $name):mixed;
+
+    <<__Native>>
+    public function offsetExists(string $name):bool;
+
+    <<__Native>>
+    public function offsetSet(string $name, mixed $value):mixed;
+}
+

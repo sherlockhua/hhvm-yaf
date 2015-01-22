@@ -26,6 +26,7 @@ namespace HPHP {
     ((x).length() && IS_SLASH((x)[0]))
 
         
+extern Object createObject(const String& obj_typename, Array args);
 
 class YafExtension : public Extension {
 public:
@@ -55,8 +56,8 @@ private:
     void _initYafViewInterfaceClass();
     void _initYafViewSimpleClass();
 
-
-
+    void _initYafConfigClass();
+    void _initYafConfigSimpleClass();
 }; 
 
 class YafRequestData: public RequestEventHandler {

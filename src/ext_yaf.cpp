@@ -9,6 +9,7 @@
 *
 =============================================*/
 #include "hphp/runtime/base/base-includes.h"
+#include "hphp/runtime/ext/std/ext_std_classobj.h"
 #include "hphp/runtime/ext/extension.h"
 #include "ext_yaf.h"
 
@@ -17,6 +18,17 @@ namespace HPHP {
 
 IMPLEMENT_REQUEST_LOCAL(YafRequestData,
                       g_yaf_local_data);
+
+Object createObject(const String& obj_typename, Array args) {
+
+    if (!HHVM_FN(class_exists)(obj_typename)) {
+        raise_warning("runtime/ext_thrift: Class %s does not exist",
+                  obj_typename.data());
+        return Object();
+    }
+
+    return create_object(obj_typename, args);
+}
 
 void YafExtension::moduleInit()
 {
