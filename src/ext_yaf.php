@@ -589,6 +589,9 @@ class Yaf_Config_Simple extends Yaf_Config_Abstract {
     public function valid():mixed;
 
     <<__Native>>
+    public function key():mixed;
+
+    <<__Native>>
     public function readonly():mixed;
 
     <<__Native>>
@@ -608,5 +611,11 @@ class Yaf_Config_Simple extends Yaf_Config_Abstract {
 
     <<__Native>>
     public function offsetSet(string $name, mixed $value):mixed;
+}
+
+class Yaf_Config_Ini extends Yaf_Config_Abstract 
+{
+    <<__Native>>
+    public function __construct(string $filename, ?mixed $section = NULL):void;
 }
 

@@ -58,6 +58,7 @@ private:
 
     void _initYafConfigClass();
     void _initYafConfigSimpleClass();
+    void _initYafConfigIniClass();
 }; 
 
 class YafRequestData: public RequestEventHandler {

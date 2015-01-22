@@ -24,6 +24,7 @@ void YafExtension::_initYafConfigClass()
     HHVM_ME(Yaf_Config_Abstract, __construct);
 
     _initYafConfigSimpleClass();
+    _initYafConfigIniClass();
 }
 
 
