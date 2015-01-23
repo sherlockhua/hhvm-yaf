@@ -35,20 +35,25 @@ static Variant yaf_config_ini_instance(Object* object,
         o = *object;
     }
 
-    if (config.isArray()) {
+    if (filename.isArray()) {
         auto ptr_config = o->o_realProp(YAF_CONFIG_PROPERT_NAME, 
                 ObjectData::RealPropUnchecked, "Yaf_Config_Ini");
-        *ptr_config = config;
+        *ptr_config = filename;
         if (readonly.isBoolean()) {
             auto ptr_readonly = o->o_realProp(YAF_CONFIG_PROPERT_NAME_READONLY, 
                     ObjectData::RealPropUnchecked, "Yaf_Config_Ini");
             *ptr_readonly = readonly.toBoolean();
         } 
-    } else {
-        raise_error("config expect is array");
-        return false;
-    }
 
+        return o;
+    }
+    
+    if(!filename.isString()) {
+        yaf_trigger_error(YAF_ERR_TYPE_ERROR, "invalid parameter provider, expect a ini filename or array");
+        return NULL;
+    } 
+
+    //parse ini file
     return o;
 }
 

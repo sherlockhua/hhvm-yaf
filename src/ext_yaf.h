@@ -14,6 +14,8 @@
 #include <string>
 #include "hphp/runtime/base/base-includes.h"
 #include "hphp/runtime/ext/extension.h"
+#include "yaf_exception.h"
+
 
 namespace HPHP {
 
