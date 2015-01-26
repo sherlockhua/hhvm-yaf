@@ -601,10 +601,10 @@ class Yaf_Config_Simple extends Yaf_Config_Abstract {
     public function __set(string $name, mixed $value):mixed;
 
     <<__Native>>
-    public function __get(?mixed $name):mixed;
+    public function __get(?mixed $name = NULL):mixed;
 
     <<__Native>>
-    public function offsetGet(?mixed $name):mixed;
+    public function offsetGet(?mixed $name = NULL):mixed;
 
     <<__Native>>
     public function offsetExists(string $name):bool;
@@ -616,7 +616,7 @@ class Yaf_Config_Simple extends Yaf_Config_Abstract {
 class Yaf_Config_Ini extends Yaf_Config_Abstract 
 {
     <<__Native>>
-    public function __construct(string $filename, ?mixed $section = NULL):void;
+    public function __construct(mixed $filename, ?mixed $section = NULL):void;
 
     <<__Native>>
     public function get(?mixed $name):mixed;

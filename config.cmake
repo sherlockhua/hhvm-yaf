@@ -7,7 +7,7 @@ include_directories("./src/util/")
 
 
 #file(GLOB CXX_SOURCES "./src/*.cpp" "./src/response/*.cpp")
-file(GLOB CXX_SOURCES "./src/*.cpp" "./src/response/*.cpp" "./src/requests/*.cpp" "./src/util/*.cpp" "./src/views/*.cpp")
+file(GLOB CXX_SOURCES "./src/*.cpp" "./src/response/*.cpp" "./src/requests/*.cpp" "./src/util/*.cpp" "./src/views/*.cpp" "./src/configs/*.cpp")
 
 
 
