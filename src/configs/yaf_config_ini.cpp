@@ -93,6 +93,36 @@ static char* trim(char* line)
     return line;
 }
 
+static int build_array(Array& arr, std::vector<std::string>& vec,
+        const std::string& value)
+{
+    if (vec.size() == 0) {
+        return 0;
+    }
+
+    std::string section = *vec.begin();
+    vec.erase(vec.begin());
+
+    if (arr.exists(String(section))) {
+        Variant& cur_var = arr.lvalAt(String(section));
+        Array& cur = cur_var.toArrRef();
+
+        build_array(cur, vec, value);
+    } else {
+        if (vec.size() == 0) {
+            arr.set(String(section), value);
+        } else {
+            arr.set(String(section), Array::Create());
+
+            Variant& cur_var = arr.lvalAt(String(section));
+            Array& cur = cur_var.toArrRef();
+            return build_array(cur, vec, value);
+        }
+    }
+
+    return 0;
+}
+
 static int parse_field(char* field, Array& config, const char* cur_section, const char* filename)
 {
     if (field == NULL || filename == NULL || cur_section == NULL) {
@@ -102,13 +132,17 @@ static int parse_field(char* field, Array& config, const char* cur_section, cons
         return -1;
     }
 
-    if (!config.exists(String(cur_section))) {
-        Array tmp = Array::Create();
-        config.set(String(cur_section), tmp);
-    } 
+    Array* ptr_array = &config;
+    if (strlen(cur_section)) {
+        if (!config.exists(String(cur_section))) {
+            Array tmp = Array::Create();
+            config.set(String(cur_section), tmp);
+        } 
 
-    Variant& cur_var = config.lvalAt(String(cur_section));
-    Array& cur = cur_var.toArrRef();
+        ptr_array = &(config.lvalAt(String(cur_section)).toArrRef());
+    }
+
+    //Array& cur = cur_var.toArrRef();
 
     char* ptr = field;
     trim(ptr);
@@ -142,19 +176,9 @@ static int parse_field(char* field, Array& config, const char* cur_section, cons
 
     vec = split(key, '.');
     if (vec.size() == 1) {
-        cur.set(String(key), String(value));
+        ptr_array->set(String(key), String(value));
     } else {
-        Array* last = &cur;
-        for (size_t i = 0; i < vec.size() - 1; i++) {
-            if (last->exists(String(vec[i].c_str()))) {
-                last = &(last->lvalAt(String(vec[i])).toArrRef());
-            } else {
-                Array new_arr = Array::Create();
-                last->set(String(vec[i].c_str()), new_arr);
-                last  = &(last->lvalAt(String(vec[i])).toArrRef());
-            }
-        }
-        last->set(String(vec[vec.size()- 1]), String(value));
+        build_array(*ptr_array, vec, std::string(value));
     }
 
     return 0;
@@ -403,14 +427,15 @@ static Variant HHVM_METHOD(Yaf_Config_Ini, get, const Variant& name)
         return false;
     } 
 
-    return ptr_config->toArray();
     Array& arr = ptr_config->toArrRef();
     if (!arr.exists(name.toString())) {
         return false;
     }
 
     Variant value = arr[name.toString()];
-    /*if (value.isArray()) {
+    return value;
+    /*
+    if (value.isArray()) {
         Variant instance = yaf_config_simple_format(&this_, value);
         return instance;
     }*/
