@@ -615,6 +615,7 @@ class Yaf_Config_Simple extends Yaf_Config_Abstract {
 
 class Yaf_Config_Ini extends Yaf_Config_Abstract 
 {
+    private $_cursor = NULL;
     <<__Native>>
     public function __construct(mixed $filename, ?mixed $section = NULL):void;
 

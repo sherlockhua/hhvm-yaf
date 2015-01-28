@@ -545,6 +545,33 @@ static Variant HHVM_METHOD(Yaf_Config_Ini, valid)
     return ArrayIter(ptr_cursor->toObject()).end();
 }
 
+static Variant HHVM_METHOD(Yaf_Config_Ini, key)
+{
+    auto ptr_cursor = this_->o_realProp(YAF_CONFIG_PROPERT_NAME_CURSOR, 
+            ObjectData::RealPropUnchecked, "Yaf_Config_Ini");
+
+    if (ptr_cursor->isNull()) {
+        auto ptr_config = this_->o_realProp(YAF_CONFIG_PROPERT_NAME, 
+                ObjectData::RealPropUnchecked, "Yaf_Config_Ini");
+        if (!ptr_config->isArray()) {
+            return false;
+        }
+
+        Array& arr = ptr_config->toArrRef();
+        auto ptr_cursor = this_->o_realProp(YAF_CONFIG_PROPERT_NAME_CURSOR, 
+                ObjectData::RealPropUnchecked, "Yaf_Config_Ini");
+        *ptr_cursor = arr.begin().getObject();
+    } 
+
+    if (ptr_cursor->isString()) {
+        return ptr_cursor->toString();
+    } else if (ptr_cursor->isInteger()) {
+        return ptr_cursor->toInt64();
+    }
+
+    return ArrayIter(ptr_cursor->toObject().get()).first();
+}
+
 void YafExtension::_initYafConfigIniClass()
 {
     HHVM_ME(Yaf_Config_Ini, __construct);

@@ -352,7 +352,16 @@ static Variant HHVM_METHOD(Yaf_Config_Simple, key)
             ObjectData::RealPropUnchecked, "Yaf_Config_Simple");
 
     if (ptr_cursor->isNull()) {
-        return false;
+        auto ptr_config = this_->o_realProp(YAF_CONFIG_PROPERT_NAME, 
+                ObjectData::RealPropUnchecked, "Yaf_Config_Simple");
+        if (!ptr_config->isArray()) {
+            return false;
+        }
+
+        Array& arr = ptr_config->toArrRef();
+        auto ptr_cursor = this_->o_realProp(YAF_CONFIG_PROPERT_NAME_CURSOR, 
+                ObjectData::RealPropUnchecked, "Yaf_Config_Simple");
+        *ptr_cursor = arr.begin().getObject();
     } 
 
     if (ptr_cursor->isString()) {
