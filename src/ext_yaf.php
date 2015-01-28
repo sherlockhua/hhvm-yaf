@@ -619,10 +619,31 @@ class Yaf_Config_Ini extends Yaf_Config_Abstract
     public function __construct(mixed $filename, ?mixed $section = NULL):void;
 
     <<__Native>>
+    public function __isset(string $name):bool;
+
+    <<__Native>>
     public function get(?mixed $name):mixed;
 
     <<__Native>>
     public function set(string $name, mixed $value):mixed;
+
+    <<__Native>>
+    public function count():mixed;
+
+    <<__Native>>
+    public function rewind():mixed;
+
+    <<__Native>>
+    public function current():mixed;
+
+    <<__Native>>
+    public function next():mixed;
+
+    <<__Native>>
+    public function valid():mixed;
+
+    <<__Native>>
+    public function key():mixed;
 
     <<__Native>>
     public function readonly():mixed;

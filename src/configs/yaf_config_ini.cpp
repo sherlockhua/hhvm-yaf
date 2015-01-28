@@ -20,6 +20,15 @@
 
 namespace HPHP { 
 
+#ifdef HHVM_VERSION_3_2_NEW
+static Variant yaf_config_ini_instance(ObjectData* object, 
+#else
+static Variant yaf_config_ini_instance(const Object* object, 
+#endif
+        const Variant& filename, const Variant& section);
+
+
+
 static std::vector<std::string> split(const char* line, char demi)
 {
     std::vector<std::string> vec;
@@ -93,6 +102,18 @@ static char* trim(char* line)
     return line;
 }
 
+#ifdef HHVM_VERSION_3_2_NEW
+static Variant yaf_config_ini_format(ObjectData* object, 
+#else
+static Variant yaf_config_ini_format(const Object* object, 
+#endif
+        const Variant& config)
+{
+    auto ptr_readonly = (*object)->o_realProp(YAF_CONFIG_PROPERT_NAME_READONLY, 
+            ObjectData::RealPropUnchecked, "Yaf_Config_Ini");
+    return yaf_config_ini_instance(NULL, config, *ptr_readonly);
+}
+
 static int build_array(Array& arr, std::vector<std::string>& vec,
         const std::string& value)
 {
@@ -141,8 +162,6 @@ static int parse_field(char* field, Array& config, const char* cur_section, cons
 
         ptr_array = &(config.lvalAt(String(cur_section)).toArrRef());
     }
-
-    //Array& cur = cur_var.toArrRef();
 
     char* ptr = field;
     trim(ptr);
@@ -429,26 +448,117 @@ static Variant HHVM_METHOD(Yaf_Config_Ini, get, const Variant& name)
 
     Array& arr = ptr_config->toArrRef();
     if (!arr.exists(name.toString())) {
-        return false;
+        return init_null_variant;
     }
 
     Variant value = arr[name.toString()];
-    return value;
-    /*
     if (value.isArray()) {
-        Variant instance = yaf_config_simple_format(&this_, value);
+        Variant instance = yaf_config_ini_format(&this_, value);
         return instance;
-    }*/
+    }
 
     return value;
 }
 
+static bool HHVM_METHOD(Yaf_Config_Ini, __isset, const Variant& name)
+{
+    auto ptr_config = this_->o_realProp(YAF_CONFIG_PROPERT_NAME, 
+            ObjectData::RealPropUnchecked, "Yaf_Config_Ini");
 
+    if (!ptr_config->isArray()) {
+        *ptr_config = Array::Create();
+        return false;
+    } 
+
+    Array& arr = ptr_config->toArrRef();
+    if (!arr.exists(name.toString())) {
+        return false;
+    }
+
+    return true;
+}
+
+static Variant HHVM_METHOD(Yaf_Config_Ini, set, const String& name, const Variant& value)
+{
+    return false;
+}
+
+static Variant HHVM_METHOD(Yaf_Config_Ini, count) 
+{
+    auto ptr_config = this_->o_realProp(YAF_CONFIG_PROPERT_NAME, 
+            ObjectData::RealPropUnchecked, "Yaf_Config_Ini");
+    if (!ptr_config->isArray()) {
+        return 0;
+    }
+
+    Array& arr = ptr_config->toArrRef();
+    return arr.size();
+}
+
+static Variant HHVM_METHOD(Yaf_Config_Ini, rewind) 
+{
+    auto ptr_config = this_->o_realProp(YAF_CONFIG_PROPERT_NAME, 
+            ObjectData::RealPropUnchecked, "Yaf_Config_Ini");
+    if (!ptr_config->isArray()) {
+        return false;
+    }
+
+    Array& arr = ptr_config->toArrRef();
+    auto ptr_cursor = this_->o_realProp(YAF_CONFIG_PROPERT_NAME_CURSOR, 
+            ObjectData::RealPropUnchecked, "Yaf_Config_Ini");
+    *ptr_cursor = arr.begin().getObject();
+    return true;
+}
+
+static Variant HHVM_METHOD(Yaf_Config_Ini, current) 
+{
+    auto ptr_cursor = this_->o_realProp(YAF_CONFIG_PROPERT_NAME_CURSOR, 
+            ObjectData::RealPropUnchecked, "Yaf_Config_Ini");
+    Variant value =  ArrayIter(ptr_cursor->toObject()).second();
+    if (!value.isArray()) {
+        return value;
+    }
+
+    return yaf_config_ini_format(&this_, value);
+}
+
+static Variant HHVM_METHOD(Yaf_Config_Ini, next) 
+{
+    auto ptr_cursor = this_->o_realProp(YAF_CONFIG_PROPERT_NAME_CURSOR, 
+            ObjectData::RealPropUnchecked, "Yaf_Config_Ini");
+    if (ptr_cursor->isNull()) {
+        return false;
+    }
+    
+    ArrayIter(ptr_cursor->toObject()).next();
+    return true;
+}
+
+static Variant HHVM_METHOD(Yaf_Config_Ini, valid) 
+{
+    auto ptr_cursor = this_->o_realProp(YAF_CONFIG_PROPERT_NAME_CURSOR, 
+            ObjectData::RealPropUnchecked, "Yaf_Config_Ini");
+    if (ptr_cursor->isNull()) {
+        return false;
+    }
+ 
+    return ArrayIter(ptr_cursor->toObject()).end();
+}
 
 void YafExtension::_initYafConfigIniClass()
 {
     HHVM_ME(Yaf_Config_Ini, __construct);
+    HHVM_ME(Yaf_Config_Ini, __isset);
     HHVM_ME(Yaf_Config_Ini, get);
+    HHVM_ME(Yaf_Config_Ini, set);
+    HHVM_ME(Yaf_Config_Ini, count);
+
+    HHVM_ME(Yaf_Config_Ini, rewind);
+    HHVM_ME(Yaf_Config_Ini, current);
+    HHVM_ME(Yaf_Config_Ini, next);
+    HHVM_ME(Yaf_Config_Ini, valid);
+    HHVM_ME(Yaf_Config_Ini, key);
+
 }
 
 }
