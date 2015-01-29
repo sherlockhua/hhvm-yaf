@@ -96,9 +96,9 @@ public:
     bool   st_compatible;
     /* }}} */
     long        forward_limit;
-    Array       *configs;
-    Variant     *modules;
-    Variant     *default_route;
+    Array       configs;
+    Variant     modules;
+    Variant     default_route;
 /*#if ((PHP_MAJOR_VERSION == 5) && (PHP_MINOR_VERSION < 4))
     uint        buf_nesting;
     void        *buffer;

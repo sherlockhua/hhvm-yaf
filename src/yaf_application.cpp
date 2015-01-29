@@ -9,6 +9,7 @@
 *
 =============================================*/
 #include "yaf_application.h"
+#include "yaf_config.h"
 #include "ext_yaf.h"
 
 
@@ -33,6 +34,15 @@ static void HHVM_METHOD(Yaf_Application, __clone)
 static void HHVM_METHOD(Yaf_Application, __construct, const Variant& config, 
         const Variant& section)
 {
+    auto ptr_app = this_->o_realProp(YAF_APPLICATION_PROPERTY_NAME_APP, 
+            ObjectData::RealPropUnchecked, "Yaf_Application");
+
+    if (!ptr_app->isNull()) {
+        yaf_trigger_error(YAF_ERR_STARTUP_FAILED, 
+                "Only one application can be initialized");
+        return;
+    }
+
     String str_section;
     if (!section.isString() ||
             (section.isString() && section.toString().length() == 0)) {

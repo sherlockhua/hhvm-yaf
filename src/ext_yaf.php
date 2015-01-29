@@ -349,7 +349,7 @@ final class Yaf_Application {
     <<__Native>>
     public function getModules():mixed;
 
-    <<__Native>>
+    <<__Natie>>
     public function getDispatcher():mixed;
 
     <<__Native>>
@@ -672,3 +672,6 @@ class Yaf_Config_Ini extends Yaf_Config_Abstract
 
 }
 
+abstract class Yaf_Bootstrap_Abstract {
+
+} 

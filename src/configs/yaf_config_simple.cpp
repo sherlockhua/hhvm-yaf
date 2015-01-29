@@ -17,9 +17,9 @@
 namespace HPHP { 
 
 #ifdef HHVM_VERSION_3_2_NEW
-static Variant yaf_config_simple_instance(ObjectData* object, 
+Variant yaf_config_simple_instance(ObjectData* object, 
 #else
-static Variant yaf_config_simple_instance(const Object* object, 
+Variant yaf_config_simple_instance(const Object* object, 
 #endif
         const Variant& config, const Variant& readonly)
 {

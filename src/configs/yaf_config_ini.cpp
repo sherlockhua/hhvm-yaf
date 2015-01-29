@@ -20,14 +20,6 @@
 
 namespace HPHP { 
 
-#ifdef HHVM_VERSION_3_2_NEW
-static Variant yaf_config_ini_instance(ObjectData* object, 
-#else
-static Variant yaf_config_ini_instance(const Object* object, 
-#endif
-        const Variant& filename, const Variant& section);
-
-
 
 static std::vector<std::string> split(const char* line, char demi)
 {
@@ -103,9 +95,9 @@ static char* trim(char* line)
 }
 
 #ifdef HHVM_VERSION_3_2_NEW
-static Variant yaf_config_ini_format(ObjectData* object, 
+Variant yaf_config_ini_format(ObjectData* object, 
 #else
-static Variant yaf_config_ini_format(const Object* object, 
+Variant yaf_config_ini_format(const Object* object, 
 #endif
         const Variant& config)
 {
@@ -358,9 +350,9 @@ static  int parse_ini_file(const char* filename, Object* object)
 }
 
 #ifdef HHVM_VERSION_3_2_NEW
-static Variant yaf_config_ini_instance(ObjectData* object, 
+Variant yaf_config_ini_instance(ObjectData* object, 
 #else
-static Variant yaf_config_ini_instance(const Object* object, 
+Variant yaf_config_ini_instance(const Object* object, 
 #endif
         const Variant& filename, const Variant& section)
 {

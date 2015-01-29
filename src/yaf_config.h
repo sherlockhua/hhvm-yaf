@@ -20,6 +20,33 @@ namespace HPHP {
 #define YAF_CONFIG_PROPERT_NAME_READONLY "_readonly"
 #define YAF_CONFIG_PROPERT_NAME_CURSOR "_cursor"
 
+#define YAF_CONFIG_CACHE_CTIME "ctime"
+#define YAF_CONFIG_CACHE_DATA  "data"
+
+#ifdef HHVM_VERSION_3_2_NEW
+static Variant yaf_config_instance(ObjectData* object, 
+#else
+extern Variant yaf_config_instance(Object* object, 
+#endif
+        const Variant& filename, const Variant& section);
+
+#ifdef HHVM_VERSION_3_2_NEW
+Variant yaf_config_simple_instance(ObjectData* object, 
+#else
+Variant yaf_config_simple_instance(const Object* object, 
+#endif
+        const Variant& config, const Variant& readonly);
+
+#ifdef HHVM_VERSION_3_2_NEW
+extern Variant yaf_config_ini_instance(ObjectData* object, 
+#else
+extern Variant yaf_config_ini_instance(const Object* object, 
+#endif
+        const Variant& filename, const Variant& section);
+
+
+
+
 class yaf_config_cursor : public SweepableResourceData {
 public:
 
