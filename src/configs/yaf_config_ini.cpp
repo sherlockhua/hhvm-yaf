@@ -506,7 +506,8 @@ static Variant HHVM_METHOD(Yaf_Config_Ini, rewind)
     Array& arr = ptr_config->toArrRef();
     auto ptr_cursor = this_->o_realProp(YAF_CONFIG_PROPERT_NAME_CURSOR, 
             ObjectData::RealPropUnchecked, "Yaf_Config_Ini");
-    *ptr_cursor = arr.begin().getObject();
+
+    *ptr_cursor = Variant(NEWOBJ(yaf_config_cursor)(arr.begin()));
     return true;
 }
 
@@ -514,7 +515,10 @@ static Variant HHVM_METHOD(Yaf_Config_Ini, current)
 {
     auto ptr_cursor = this_->o_realProp(YAF_CONFIG_PROPERT_NAME_CURSOR, 
             ObjectData::RealPropUnchecked, "Yaf_Config_Ini");
-    Variant value =  ArrayIter(ptr_cursor->toObject()).second();
+
+    auto res = ptr_cursor->toResource();
+    ArrayIter& cursor = res.getTyped<yaf_config_cursor>()->cursor();
+    Variant value =  cursor.second();
     if (!value.isArray()) {
         return value;
     }
@@ -530,7 +534,9 @@ static Variant HHVM_METHOD(Yaf_Config_Ini, next)
         return false;
     }
     
-    ArrayIter(ptr_cursor->toObject()).next();
+    auto res = ptr_cursor->toResource();
+    ArrayIter& cursor = res.getTyped<yaf_config_cursor>()->cursor();
+    cursor.next();
     return true;
 }
 
@@ -542,7 +548,9 @@ static Variant HHVM_METHOD(Yaf_Config_Ini, valid)
         return false;
     }
  
-    return ArrayIter(ptr_cursor->toObject()).end();
+    auto res = ptr_cursor->toResource();
+    ArrayIter& cursor = res.getTyped<yaf_config_cursor>()->cursor();
+    return !cursor.end();
 }
 
 static Variant HHVM_METHOD(Yaf_Config_Ini, key)
@@ -560,18 +568,92 @@ static Variant HHVM_METHOD(Yaf_Config_Ini, key)
         Array& arr = ptr_config->toArrRef();
         auto ptr_cursor = this_->o_realProp(YAF_CONFIG_PROPERT_NAME_CURSOR, 
                 ObjectData::RealPropUnchecked, "Yaf_Config_Ini");
-        *ptr_cursor = arr.begin().getObject();
+        *ptr_cursor = Variant(NEWOBJ(yaf_config_cursor)(arr.begin()));
     } 
 
-    if (ptr_cursor->isString()) {
-        return ptr_cursor->toString();
-    } else if (ptr_cursor->isInteger()) {
-        return ptr_cursor->toInt64();
+    auto res = ptr_cursor->toResource();
+    ArrayIter& cursor = res.getTyped<yaf_config_cursor>()->cursor();
+
+    if (cursor.first().isString()) {
+        return cursor.first().toString();
+    } else if (cursor.first().isInteger()) {
+        return cursor.first().toInt64();
     }
 
-    return ArrayIter(ptr_cursor->toObject().get()).first();
+    return cursor.first();
 }
 
+static Variant HHVM_METHOD(Yaf_Config_Ini, toArray)
+{
+    auto ptr_config = this_->o_realProp(YAF_CONFIG_PROPERT_NAME, 
+            ObjectData::RealPropUnchecked, "Yaf_Config_Ini");
+    if (!ptr_config->isArray()) {
+        *ptr_config = Array::Create();
+    }
+
+    return ptr_config->toArray();
+}
+
+static Variant HHVM_METHOD(Yaf_Config_Ini, readonly)
+{
+    auto ptr_config = this_->o_realProp(YAF_CONFIG_PROPERT_NAME_READONLY, 
+            ObjectData::RealPropUnchecked, "Yaf_Config_Ini");
+    return ptr_config->toBoolean();
+}
+
+static Variant HHVM_METHOD(Yaf_Config_Ini, offsetUnset, const String& name)
+{
+    return false;
+}
+
+static Variant HHVM_METHOD(Yaf_Config_Ini, offsetGet, const String& name)
+{
+    return false;
+}
+
+static Variant HHVM_METHOD(Yaf_Config_Ini, offsetExists, const String& name)
+{
+    return false;
+}
+ 
+static Variant HHVM_METHOD(Yaf_Config_Ini, offsetSet, const String& name, const String& value)
+{
+    return false;
+}
+
+static Variant HHVM_METHOD(Yaf_Config_Ini, __get, const Variant& name)
+{
+    if (!name.isString() || (name.toString().length() == 0)) {
+        return this_;
+    }
+
+    auto ptr_config = this_->o_realProp(YAF_CONFIG_PROPERT_NAME, 
+            ObjectData::RealPropUnchecked, "Yaf_Config_Ini");
+
+    if (!ptr_config->isArray()) {
+        *ptr_config = Array::Create();
+        return false;
+    } 
+
+    Array& arr = ptr_config->toArrRef();
+    if (!arr.exists(name.toString())) {
+        return init_null_variant;
+    }
+
+    Variant value = arr[name.toString()];
+    if (value.isArray()) {
+        Variant instance = yaf_config_ini_format(&this_, value);
+        return instance;
+    }
+
+    return value;
+}
+
+static Variant HHVM_METHOD(Yaf_Config_Ini, __set, const String& name, const Variant& value)
+{
+    return false;
+}
+ 
 void YafExtension::_initYafConfigIniClass()
 {
     HHVM_ME(Yaf_Config_Ini, __construct);
@@ -585,6 +667,16 @@ void YafExtension::_initYafConfigIniClass()
     HHVM_ME(Yaf_Config_Ini, next);
     HHVM_ME(Yaf_Config_Ini, valid);
     HHVM_ME(Yaf_Config_Ini, key);
+
+    HHVM_ME(Yaf_Config_Ini, toArray);
+    HHVM_ME(Yaf_Config_Ini, readonly);
+    HHVM_ME(Yaf_Config_Ini, offsetUnset);
+
+    HHVM_ME(Yaf_Config_Ini, __set);
+    HHVM_ME(Yaf_Config_Ini, __get);
+    HHVM_ME(Yaf_Config_Ini, offsetGet);
+    HHVM_ME(Yaf_Config_Ini, offsetExists);
+    HHVM_ME(Yaf_Config_Ini, offsetSet);
 
 }
 

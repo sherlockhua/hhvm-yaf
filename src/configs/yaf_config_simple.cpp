@@ -179,7 +179,7 @@ static Variant HHVM_METHOD(Yaf_Config_Simple, rewind)
     Array& arr = ptr_config->toArrRef();
     auto ptr_cursor = this_->o_realProp(YAF_CONFIG_PROPERT_NAME_CURSOR, 
             ObjectData::RealPropUnchecked, "Yaf_Config_Simple");
-    *ptr_cursor = arr.begin().getObject();
+    *ptr_cursor = Variant(NEWOBJ(yaf_config_cursor)(arr.begin()));
     return true;
 }
 
@@ -187,7 +187,10 @@ static Variant HHVM_METHOD(Yaf_Config_Simple, current)
 {
     auto ptr_cursor = this_->o_realProp(YAF_CONFIG_PROPERT_NAME_CURSOR, 
             ObjectData::RealPropUnchecked, "Yaf_Config_Simple");
-    Variant value =  ArrayIter(ptr_cursor->toObject()).second();
+
+    auto res = ptr_cursor->toResource();
+    ArrayIter& cursor = res.getTyped<yaf_config_cursor>()->cursor();
+    Variant value =  cursor.second();
     if (!value.isArray()) {
         return value;
     }
@@ -203,7 +206,9 @@ static Variant HHVM_METHOD(Yaf_Config_Simple, next)
         return false;
     }
     
-    ArrayIter(ptr_cursor->toObject()).next();
+    auto res = ptr_cursor->toResource();
+    ArrayIter& cursor = res.getTyped<yaf_config_cursor>()->cursor();
+    cursor.next();
     return true;
 }
 
@@ -215,7 +220,9 @@ static Variant HHVM_METHOD(Yaf_Config_Simple, valid)
         return false;
     }
  
-    return ArrayIter(ptr_cursor->toObject()).end();
+    auto res = ptr_cursor->toResource();
+    ArrayIter& cursor = res.getTyped<yaf_config_cursor>()->cursor();
+    return !cursor.end();
 }
 
 static Variant HHVM_METHOD(Yaf_Config_Simple, readonly) 
@@ -353,24 +360,27 @@ static Variant HHVM_METHOD(Yaf_Config_Simple, key)
 
     if (ptr_cursor->isNull()) {
         auto ptr_config = this_->o_realProp(YAF_CONFIG_PROPERT_NAME, 
-                ObjectData::RealPropUnchecked, "Yaf_Config_Simple");
+                ObjectData::RealPropUnchecked, "Yaf_Config_Ini");
         if (!ptr_config->isArray()) {
             return false;
         }
 
         Array& arr = ptr_config->toArrRef();
         auto ptr_cursor = this_->o_realProp(YAF_CONFIG_PROPERT_NAME_CURSOR, 
-                ObjectData::RealPropUnchecked, "Yaf_Config_Simple");
-        *ptr_cursor = arr.begin().getObject();
+                ObjectData::RealPropUnchecked, "Yaf_Config_Ini");
+        *ptr_cursor = Variant(NEWOBJ(yaf_config_cursor)(arr.begin()));
     } 
 
-    if (ptr_cursor->isString()) {
-        return ptr_cursor->toString();
-    } else if (ptr_cursor->isInteger()) {
-        return ptr_cursor->toInt64();
+    auto res = ptr_cursor->toResource();
+    ArrayIter& cursor = res.getTyped<yaf_config_cursor>()->cursor();
+
+    if (cursor.first().isString()) {
+        return cursor.first().toString();
+    } else if (cursor.first().isInteger()) {
+        return cursor.first().toInt64();
     }
 
-    return false;
+    return cursor.first();
 }
 
 void YafExtension::_initYafConfigSimpleClass()

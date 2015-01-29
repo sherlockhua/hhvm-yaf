@@ -651,5 +651,24 @@ class Yaf_Config_Ini extends Yaf_Config_Abstract
 
     <<__Native>>
     public function toArray():mixed;
+
+    <<__Native>>
+    public function offsetUnset(string $name):mixed;
+
+    <<__Native>>
+    public function __set(string $name, mixed $value):mixed;
+
+    <<__Native>>
+    public function __get(?mixed $name = NULL):mixed;
+
+    <<__Native>>
+    public function offsetGet(?mixed $name = NULL):mixed;
+
+    <<__Native>>
+    public function offsetExists(string $name):bool;
+
+    <<__Native>>
+    public function offsetSet(string $name, mixed $value):mixed;
+
 }
 

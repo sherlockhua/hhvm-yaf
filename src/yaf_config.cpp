@@ -27,6 +27,10 @@ void YafExtension::_initYafConfigClass()
     _initYafConfigIniClass();
 }
 
+void yaf_config_cursor::sweep() {
+  Close();
+}
+
 
 
 }
