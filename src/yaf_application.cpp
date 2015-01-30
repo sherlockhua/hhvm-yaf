@@ -13,6 +13,7 @@
 #include "ext_yaf.h"
 #include "error.h"
 #include "yaf_router.h"
+#include "yaf_request.h"
 
 
 namespace HPHP{
@@ -371,6 +372,35 @@ static void HHVM_METHOD(Yaf_Application, __construct, const Variant& config,
                 "initialize yaf application config failed, parse option failed");
         return;
     }
+
+    Variant request = yaf_request_instance(NULL, 
+            g_yaf_local_data.get()->base_uri.c_str());
+    if (request.isNull()) {
+        yaf_trigger_error(YAF_ERR_STARTUP_FAILED, 
+                "initialize yaf request failed");
+        return ;
+    }
+
+    if (g_yaf_local_data.get().base_uri.length()) {
+        g_yaf_local_data.get().base_uri.clear();
+    }
+
+    Variant dispatcher = yaf_dispatcher_instance(NULL);
+    if (dispatcher.isNull() || !dispatcher.isObject()) {
+        yaf_trigger_error(YAF_ERR_STARTUP_FAILED, 
+                "initialize yaf dispatcher failed");
+        return;
+    }
+
+    if (!dispatcher.toObject()->o_instanceof("Yaf_Dispatcher")) {
+        yaf_trigger_error(YAF_ERR_STARTUP_FAILED, 
+                "initialize yaf dispatcher failed");
+        return;
+    }
+
+    Object o_dispatcher = dispatcher.toObject();
+    yaf_dispatcher_set_request(&o_dispatcher, request);
+    return;
 }
 
 static Variant HHVM_METHOD(Yaf_Application, run)

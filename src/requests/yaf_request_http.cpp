@@ -17,6 +17,12 @@
 
 namespace HPHP{
 
+
+Variant yaf_request_http_instance(Object* object, const char* request_uri, const char* base_uri)
+{
+    return true;
+}
+
 static Variant HHVM_METHOD(Yaf_Request_Http, getQuery, const Variant& name,
         const Variant& def) 
 {

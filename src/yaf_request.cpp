@@ -12,9 +12,14 @@
 #include "ext_yaf.h"
 #include "hphp/runtime/base/base-includes.h"
 #include "hphp/runtime/base/php-globals.h"
-
+#include "requests/yaf_request_http.h"
 
 namespace HPHP{
+
+Variant yaf_request_instance(Object* object, const char* base_uri)
+{
+    return yaf_request_http_instance(object, NULL, base_uri);
+}
 
 int yaf_request_set_dispatched(Object request, int flag)
 {

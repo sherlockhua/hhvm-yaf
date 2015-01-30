@@ -14,7 +14,7 @@
 #include "ext_yaf.h"
 
 namespace HPHP {
-
+extern Variant yaf_request_http_instance(Object* object, const char* request_uri, const char* base_uri);
 
 }
 
