@@ -13,14 +13,16 @@
 
 namespace HPHP {
 
-#ifdef HHVM_VERSION_3_2_NEW
-static Variant* yaf_dispatcher_init_view(ObjectData* object, 
-#else
-static Variant* yaf_dispatcher_init_view(Object object, 
-#endif
+
+Variant yaf_dispatcher_dispatch(Object* object)
+{
+    return init_null_variant;
+}
+
+static Variant yaf_dispatcher_init_view(const Object* object, 
         const Variant& tpl_dir, const Variant& options)
 {
-    return NULL;
+    return init_null_variant;
 }
 
 static void HHVM_METHOD(Yaf_Dispatcher, __clone)
@@ -60,9 +62,9 @@ static Variant HHVM_METHOD(Yaf_Dispatcher, disableView)
 static Variant HHVM_METHOD(Yaf_Dispatcher, initView, const Variant& tpl_dir, 
         const Variant& options)
 {
-    Variant* view = yaf_dispatcher_init_view(this_, tpl_dir, options);
-    if (view) {
-        return *view;
+    Variant view = yaf_dispatcher_init_view(&this_, tpl_dir, options);
+    if (!view.isNull()) {
+        return view;
     }
 
     return false;

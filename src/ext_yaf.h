@@ -15,12 +15,17 @@
 #include "hphp/runtime/base/base-includes.h"
 #include "hphp/runtime/ext/extension.h"
 #include "yaf_exception.h"
+#include "error.h"
+#include "yaf_loader.h"
+#include "yaf_dispatcher.h"
 
 
 namespace HPHP {
 
 #define DEFAULT_SLASH_CHAR '/'
 #define DEFAULT_SLASH_STR "/"
+
+#define DEFAULT_DIR_SEPARATOR   ';'
 
 #define IS_SLASH(c) ((c) == '/' || (c) == '\\') 
 

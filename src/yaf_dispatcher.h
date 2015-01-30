@@ -11,6 +11,9 @@
 #ifndef _YAF_DISPATCHER_H_
 #define _YAF_DISPATCHER_H_
 
+#include "hphp/runtime/base/base-includes.h"
+#include "hphp/runtime/ext/extension.h"
+
 #define YAF_DISPATCHER_PROPERTY_NAME_REQUEST    "_request"
 #define YAF_DISPATCHER_PROPERTY_NAME_VIEW       "_view"
 #define YAF_DISPATCHER_PROPERTY_NAME_ROUTER     "_router"
@@ -37,7 +40,10 @@
 #define YAF_PLUGIN_HOOK_LOOPSHUTDOWN                "dispatchloopshutdown"
 #define YAF_PLUGIN_HOOK_PRERESPONSE             "preresponse"
 
-
+namespace HPHP
+{
+    extern Variant yaf_dispatcher_dispatch(Object* object);
+}
 
 
 #endif //_YAF_DISPATCHER_H
