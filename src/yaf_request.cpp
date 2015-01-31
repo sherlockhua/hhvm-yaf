@@ -16,9 +16,11 @@
 
 namespace HPHP{
 
-Variant yaf_request_instance(Object* object, const char* base_uri)
+Variant yaf_request_instance(const Object* object, const char* base_uri)
 {
-    return yaf_request_http_instance(object, NULL, base_uri);
+    Variant str_base_uri = String(base_uri);
+    Variant tmp = init_null_variant;
+    return yaf_request_http_instance(object, tmp, str_base_uri);
 }
 
 int yaf_request_set_dispatched(Object request, int flag)

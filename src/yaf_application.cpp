@@ -18,6 +18,34 @@
 
 namespace HPHP{
 
+static int yaf_application_init_loader()
+{
+    Variant var_global_library = init_null_variant;
+    if (g_yaf_local_data.get()->global_library.length()) {
+        var_global_library = String(g_yaf_local_data.get()->global_library);
+    }
+ 
+    Variant loader = init_null_variant;
+    Variant var_local_library = init_null_variant;
+    if (g_yaf_local_data.get()->local_library.length()) {
+        var_local_library = String(g_yaf_local_data.get()->local_library);
+    } else {
+         char local_library[8192];
+         snprintf(local_library, sizeof(local_library), "%s%c%s", 
+                 g_yaf_local_data.get()->directory.c_str(), 
+                 DEFAULT_SLASH_CHAR, YAF_LIBRARY_DIRECTORY_NAME);
+        var_local_library = String(local_library);
+    }
+
+    loader = yaf_loader_instance(NULL, var_local_library, var_global_library);
+    if (loader.isNull()) {
+        yaf_trigger_error(YAF_ERR_STARTUP_FAILED, 
+                "Initialization of application auto loader failed");
+        return HHVM_YAF_FAILED;
+    }
+
+    return HHVM_YAF_SUCCESS;
+}
 
 static int yaf_application_parse_system(const Array& config)
 {
@@ -381,8 +409,8 @@ static void HHVM_METHOD(Yaf_Application, __construct, const Variant& config,
         return ;
     }
 
-    if (g_yaf_local_data.get().base_uri.length()) {
-        g_yaf_local_data.get().base_uri.clear();
+    if (g_yaf_local_data.get()->base_uri.length()) {
+        g_yaf_local_data.get()->base_uri.clear();
     }
 
     Variant dispatcher = yaf_dispatcher_instance(NULL);
@@ -399,7 +427,41 @@ static void HHVM_METHOD(Yaf_Application, __construct, const Variant& config,
     }
 
     Object o_dispatcher = dispatcher.toObject();
-    yaf_dispatcher_set_request(&o_dispatcher, request);
+    Object o_request = request.toObject();
+    yaf_dispatcher_set_request(&o_dispatcher, &o_request);
+
+    auto ptr_app_config = this_->o_realProp(YAF_APPLICATION_PROPERTY_NAME_CONFIG, 
+            ObjectData::RealPropUnchecked, "Yaf_Application");
+    *ptr_app_config = ob_config;
+
+    auto ptr_dispatcher = this_->o_realProp(YAF_APPLICATION_PROPERTY_NAME_DISPATCHER, 
+            ObjectData::RealPropUnchecked, "Yaf_Application");
+    *ptr_dispatcher = dispatcher;
+
+    ret = yaf_application_init_loader();
+    if (ret != 0) {
+        yaf_trigger_error(YAF_ERR_STARTUP_FAILED, 
+                "Initialization of application auto loader failed");
+        return;
+    }
+
+    auto ptr_run = this_->o_realProp(YAF_APPLICATION_PROPERTY_NAME_RUN, 
+            ObjectData::RealPropUnchecked, "Yaf_Application");
+    *ptr_run = Variant(false);
+
+    auto ptr_env = this_->o_realProp(YAF_APPLICATION_PROPERTY_NAME_ENV, 
+            ObjectData::RealPropUnchecked, "Yaf_Application");
+    *ptr_env = String(g_yaf_local_data.get()->environ);
+
+    auto ptr_modules = this_->o_realProp(YAF_APPLICATION_PROPERTY_NAME_MODULES, 
+            ObjectData::RealPropUnchecked, "Yaf_Application");
+    if (g_yaf_local_data.get()->modules.isInitialized()) {
+        *ptr_modules = g_yaf_local_data.get()->modules;
+    } else {
+        *ptr_modules = init_null_variant;
+    }
+
+    *ptr_app = this_;
     return;
 }
 
@@ -428,11 +490,26 @@ static Variant HHVM_METHOD(Yaf_Application, run)
     return false;
 }
 
+static Variant HHVM_METHOD(Yaf_Application, execute, const String& func_name, ActRec* ar) 
+{
+    Array func = Array::Create();
+    func.append(func_name);
+
+    Array params = Array::Create();
+    for (int i = 0; i < ar->numArgs(); i++) {
+        params.append(getArg<KindOfRef>(ar, i));
+    }
+
+    return vm_call_user_func(func, params);
+    return func_name;
+}
+
 void YafExtension::_initYafApplicationClass()
 {
     HHVM_ME(Yaf_Application, __clone);
     HHVM_ME(Yaf_Application, __construct);
     HHVM_ME(Yaf_Application, run);
+    HHVM_ME(Yaf_Application, execute);
 }
 
 }

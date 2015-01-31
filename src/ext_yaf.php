@@ -336,8 +336,8 @@ final class Yaf_Application {
     <<__Native>>
     public function run():mixed;
 
-    <<__Native>>
-    public function execute():mixed;
+    <<__Native("ActRec", "VariadicByRef")>>
+    public function execute(string $func, ...):mixed;
 
     //TODO yaf_application_environ::environ method not finished
     <<__Native>>
@@ -349,7 +349,7 @@ final class Yaf_Application {
     <<__Native>>
     public function getModules():mixed;
 
-    <<__Natie>>
+    <<__Native>>
     public function getDispatcher():mixed;
 
     <<__Native>>
@@ -675,3 +675,4 @@ class Yaf_Config_Ini extends Yaf_Config_Abstract
 abstract class Yaf_Bootstrap_Abstract {
 
 } 
+

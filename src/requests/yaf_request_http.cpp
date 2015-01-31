@@ -18,9 +18,91 @@
 namespace HPHP{
 
 
-Variant yaf_request_http_instance(Object* object, const char* request_uri, const char* base_uri)
+Variant yaf_request_http_instance(const Object* object, 
+        const Variant& request_uri, const Variant& base_uri)
 {
-    return true;
+    Object o;
+    if (object == NULL) {
+        Array arr = Array::Create();
+        arr.append(request_uri);
+        arr.append(base_uri);
+
+        o = createObject("Yaf_Request_Http", arr) ;
+    } else {
+        o = *object;
+    }
+
+    if (php_global(S_SERVER).toArray().exists(String("HTTP_REQUEST_METHOD"))) {
+        Variant request_method = php_global(S_SERVER).toArray()[String("HTTP_REQUEST_METHOD")];
+        auto tmp = o->o_realProp(YAF_REQUEST_PROPERTY_NAME_METHOD, 
+            ObjectData::RealPropUnchecked, "Yaf_Request_Http");
+        *tmp = request_method;
+    }
+
+    //TODO php client mode, the request method may be 'Cli'
+    std::string uri;
+    if (request_uri.isString()) {
+        uri = request_uri.toString().toCppString();
+    } else {
+        Variant tmp;
+        if (php_global(S_SERVER).toArray().exists(String("PATH_INFO"))) {
+            uri = php_global(S_SERVER).toArray()[String("PATH_INFO")].toString().toCppString();
+            goto done;
+        }
+
+        if (php_global(S_SERVER).toArray().exists(String("REQUEST_URI"))) {
+            tmp = php_global(S_SERVER).toArray()[String("REQUEST_URI")];
+            if (tmp.isString()) {
+                std::string str_tmp = tmp.toString().toCppString();
+                if (strncasecmp(str_tmp.c_str(), "http", 4) == 0) {
+                    //TODO use php_url_parse to get path
+                    php_url* url_info = php_url_parse(str_tmp.c_str());
+                    if (url_info && url_info->path) {
+                        uri = std::string(url_info->path);
+                    }
+                    php_url_free(url_info);
+                } else {
+                    const char* pos = strstr(str_tmp.c_str(), "?");
+                    if (pos) {
+                        uri = std::string(str_tmp.c_str(), pos - str_tmp.length());
+                    } else {
+                        uri = str_tmp;
+                    }
+                }
+            }
+
+            goto done;
+        }
+
+        if (php_global(S_SERVER).toArray().exists(String("ORIG_PATH_INFO"))) {
+            uri = php_global(S_SERVER).toArray()[String("ORIG_PATH_INFO")].toString().toCppString();
+            goto done;
+        } 
+    }
+
+done:
+    if (uri.length()) {
+        const char* p = uri.c_str();
+        while (*p == '/' && *(p+1) == '/') {
+            p++;
+        }
+
+        uri = std::string(p);
+        auto ptr_uri = o->o_realProp(YAF_REQUEST_PROPERTY_NAME_URI, 
+                ObjectData::RealPropUnchecked, "Yaf_Request_Http");
+
+        *ptr_uri = String(uri.c_str());
+
+        auto ptr_base_uri = o->o_realProp(YAF_REQUEST_PROPERTY_NAME_BASE, 
+                ObjectData::RealPropUnchecked, "Yaf_Request_Http");
+        *ptr_base_uri = base_uri;
+    }
+
+    auto ptr_params = o->o_realProp(YAF_REQUEST_PROPERTY_NAME_PARAMS, 
+            ObjectData::RealPropUnchecked, "Yaf_Request_Http");
+    *ptr_params = Array::Create();
+
+    return o;
 }
 
 static Variant HHVM_METHOD(Yaf_Request_Http, getQuery, const Variant& name,
@@ -153,75 +235,7 @@ static bool HHVM_METHOD(Yaf_Request_Http, isXmlHttpRequest)
 static void HHVM_METHOD(Yaf_Request_Http, __construct, 
         const Variant& request_uri, const Variant& base_uri)
 {
-    if (php_global(S_SERVER).toArray().exists(String("HTTP_REQUEST_METHOD"))) {
-        Variant request_method = php_global(S_SERVER).toArray()[String("HTTP_REQUEST_METHOD")];
-        auto tmp = this_->o_realProp(YAF_REQUEST_PROPERTY_NAME_METHOD, 
-            ObjectData::RealPropUnchecked, "Yaf_Request_Http");
-        *tmp = request_method;
-    }
-
-    //TODO php client mode, the request method may be 'Cli'
-    std::string uri;
-    if (request_uri.isString()) {
-        uri = request_uri.toString().toCppString();
-    } else {
-        Variant tmp;
-        if (php_global(S_SERVER).toArray().exists(String("PATH_INFO"))) {
-            uri = php_global(S_SERVER).toArray()[String("PATH_INFO")].toString().toCppString();
-            goto done;
-        }
-
-        if (php_global(S_SERVER).toArray().exists(String("REQUEST_URI"))) {
-            tmp = php_global(S_SERVER).toArray()[String("REQUEST_URI")];
-            if (tmp.isString()) {
-                std::string str_tmp = tmp.toString().toCppString();
-                if (strncasecmp(str_tmp.c_str(), "http", 4) == 0) {
-                    //TODO use php_url_parse to get path
-                    php_url* url_info = php_url_parse(str_tmp.c_str());
-                    if (url_info && url_info->path) {
-                        uri = std::string(url_info->path);
-                    }
-                    php_url_free(url_info);
-                } else {
-                    const char* pos = strstr(str_tmp.c_str(), "?");
-                    if (pos) {
-                        uri = std::string(str_tmp.c_str(), pos - str_tmp.length());
-                    } else {
-                        uri = str_tmp;
-                    }
-                }
-            }
-
-            goto done;
-        }
-
-        if (php_global(S_SERVER).toArray().exists(String("ORIG_PATH_INFO"))) {
-            uri = php_global(S_SERVER).toArray()[String("ORIG_PATH_INFO")].toString().toCppString();
-            goto done;
-        } 
-    }
-
-done:
-    if (uri.length()) {
-        const char* p = uri.c_str();
-        while (*p == '/' && *(p+1) == '/') {
-            p++;
-        }
-
-        uri = std::string(p);
-        auto ptr_uri = this_->o_realProp(YAF_REQUEST_PROPERTY_NAME_URI, 
-                ObjectData::RealPropUnchecked, "Yaf_Request_Http");
-
-        *ptr_uri = String(uri.c_str());
-
-        auto ptr_base_uri = this_->o_realProp(YAF_REQUEST_PROPERTY_NAME_BASE, 
-                ObjectData::RealPropUnchecked, "Yaf_Request_Http");
-        *ptr_base_uri = base_uri;
-    }
-
-    auto ptr_params = this_->o_realProp(YAF_REQUEST_PROPERTY_NAME_PARAMS, 
-            ObjectData::RealPropUnchecked, "Yaf_Request_Http");
-    *ptr_params = Array::Create();
+    (void)yaf_request_http_instance(&this_, request_uri, base_uri);
 }
 
 static void HHVM_METHOD(Yaf_Request_Http, __clone)

@@ -19,11 +19,22 @@ Variant yaf_dispatcher_dispatch(Object* object)
     return init_null_variant;
 }
 
+Variant yaf_dispatcher_instance(Object* object)
+{
+    return init_null_variant;
+}
+
+Variant yaf_dispatcher_set_request(Object* object, Object* request)
+{
+    return init_null_variant;
+}
+
 static Variant yaf_dispatcher_init_view(const Object* object, 
         const Variant& tpl_dir, const Variant& options)
 {
     return init_null_variant;
 }
+
 
 static void HHVM_METHOD(Yaf_Dispatcher, __clone)
 {

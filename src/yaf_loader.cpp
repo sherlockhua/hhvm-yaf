@@ -24,6 +24,12 @@ Variant yaf_loader_import(const char *path, int len, int use_path)
     return vm_call_user_func(func, params);
 }
 
+Variant yaf_loader_instance(const Object* object, 
+        const Variant& local_library, const Variant& var_global_library)
+{
+    return init_null_variant;
+}
+
 int yaf_loader_register_namespace_single(const std::string& str_namespace)
 {
     return HHVM_YAF_SUCCESS;

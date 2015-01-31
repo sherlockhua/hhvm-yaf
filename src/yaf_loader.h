@@ -48,7 +48,8 @@ namespace HPHP {
 
 extern Variant yaf_loader_import(const char *path, int len, int use_path);
 extern int yaf_loader_register_namespace_single(const std::string& str_namespace);
-
+extern Variant yaf_loader_instance(const Object* object, 
+        const Variant& local_library, const Variant& var_global_library);
 
 }
 
