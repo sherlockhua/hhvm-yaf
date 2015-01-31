@@ -22,7 +22,7 @@ IMPLEMENT_REQUEST_LOCAL(YafRequestData,
 Object createObject(const String& obj_typename, Array args) {
 
     if (!HHVM_FN(class_exists)(obj_typename)) {
-        raise_warning("runtime/ext_thrift: Class %s does not exist",
+        raise_warning("yaf Class %s does not exist",
                   obj_typename.data());
         return Object();
     }

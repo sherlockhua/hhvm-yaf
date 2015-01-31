@@ -321,8 +321,7 @@ final class Yaf_Application {
 
     protected        $config = NULL;
     protected        $dispatcher = NULL;
-    //TODO need be static
-    //static protected $_app = NULL;
+
     static public $_app = NULL;
     protected        $_modules = NULL;
     protected bool   $_running = false;
@@ -349,7 +348,9 @@ final class Yaf_Application {
     <<__Native("ActRec")>>
     public function execute(string $func, ...):mixed;
 
-    //TODO yaf_application_environ::environ method not finished
+    <<__Native>>
+    public function environ():mixed;
+
     <<__Native>>
     public function bootstrap():mixed;
 

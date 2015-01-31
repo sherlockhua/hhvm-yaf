@@ -20,3 +20,5 @@ namespace HPHP{
 #define YAF_BOOTSTRAP_INITFUNC_PREFIX   "_init"
 
 }
+
+#endif

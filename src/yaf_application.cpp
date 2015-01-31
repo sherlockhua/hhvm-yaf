@@ -8,12 +8,15 @@
 *   description  ：
 *
 =============================================*/
+#include "hphp/runtime/base/class-info.h"
+
 #include "yaf_application.h"
 #include "yaf_config.h"
 #include "ext_yaf.h"
 #include "error.h"
 #include "yaf_router.h"
 #include "yaf_request.h"
+#include "yaf_bootstrap.h"
 
 
 namespace HPHP{
@@ -522,12 +525,94 @@ static TypedValue* HHVM_MN(Yaf_Application, execute)(ActRec* ar)
     return arReturn(ar,vm_call_user_func(func_name, params));
 }
 
+static Variant HHVM_METHOD(Yaf_Application, environ)
+{
+    auto ptr_environ = this_->o_realProp(YAF_APPLICATION_PROPERTY_NAME_ENV, 
+            ObjectData::RealPropUnchecked, "Yaf_Application");
+    return ptr_environ->toString();
+}
+
+static Variant HHVM_METHOD(Yaf_Application, bootstrap)
+{
+    Array args = Array::Create();
+    Object o = createObject("bootstrap", args);
+    if (o.isNull() || !o->o_instanceof("Yaf_Bootstrap_Abstract")) {
+        std::string bootstrap_path;
+        if (g_yaf_local_data.get()->bootstrap.length()) {
+            bootstrap_path = g_yaf_local_data.get()->bootstrap;
+        } else {
+            bootstrap_path = g_yaf_local_data.get()->directory + DEFAULT_SLASH_STR + 
+                YAF_DEFAULT_BOOTSTRAP + g_yaf_local_data.get()->ext;
+        }
+
+        Variant ret = yaf_loader_import(bootstrap_path.c_str(), 
+                bootstrap_path.length(), 0);
+        if (ret.toBoolean() == false) {
+            yaf_trigger_error(YAF_ERR_STARTUP_FAILED, 
+                    "yaf_loader_import %s failed", bootstrap_path.c_str());
+            return false;
+        }
+
+        o = createObject("bootstrap", args);
+        if (o.isNull() || !o->o_instanceof("Yaf_Bootstrap_Abstract")) {
+            yaf_trigger_error(YAF_ERR_STARTUP_FAILED, 
+                    "can't found bootstrap in %s", bootstrap_path.c_str());
+            return false;
+        }
+    }
+
+    auto ptr_dispatcher = this_->o_realProp(YAF_APPLICATION_PROPERTY_NAME_DISPATCHER, 
+            ObjectData::RealPropUnchecked, "Yaf_Application");
+
+    Array arr = Array::Create();
+    Class* cls = o->getVMClass(); 
+
+    Func* const* methods = cls->preClass()->methods();
+    size_t const numMethods = cls->preClass()->numMethods();
+    for (Slot i = 0; i < numMethods; ++i) {
+        const Func* m = methods[i];
+        if (m->isGenerated()) {
+            continue;
+        }
+
+        arr.append(String(m->nameStr()));
+    }
+
+    for (Slot i = cls->traitsBeginIdx(); i < cls->traitsEndIdx(); ++i) {
+        const Func* m = cls->getMethod(i);
+        if (m->isGenerated()) {
+            continue;
+        }
+
+        arr.append(String(m->nameStr()));
+    }
+
+    ArrayIter iter = arr.begin();
+    while (!iter.end()) {
+        String func_name = iter.second();
+
+        Array arr_func = Array::Create();
+        arr_func.append(o);
+        arr_func.append(func_name);
+
+        Array params = Array::Create();
+        params.append(*ptr_dispatcher);
+
+        vm_call_user_func(arr_func, params);
+        iter.next();
+    }
+
+    return this_;
+}
+
 void YafExtension::_initYafApplicationClass()
 {
     HHVM_ME(Yaf_Application, __clone);
     HHVM_ME(Yaf_Application, __construct);
     HHVM_ME(Yaf_Application, run);
     HHVM_ME(Yaf_Application, execute);
+    HHVM_ME(Yaf_Application, environ);
+    HHVM_ME(Yaf_Application, bootstrap);
 }
 
 }
