@@ -323,7 +323,7 @@ final class Yaf_Application {
     protected        $dispatcher = NULL;
     //TODO need be static
     //static protected $_app = NULL;
-    protected $_app = NULL;
+    static public $_app = NULL;
     protected        $_modules = NULL;
     protected bool   $_running = false;
 
@@ -331,6 +331,14 @@ final class Yaf_Application {
     protected string $_environ = NULL;
     protected int    $_err_no = 0;
     protected string $_err_msg = '';
+
+    public static function get_app() {
+        return self::$_app;
+    }
+
+    public static function set_app($app) {
+        self::$_app = $app;
+    }
 
     <<__Native>>
     public function __construct(mixed $config, ?mixed $section = NULL):void;

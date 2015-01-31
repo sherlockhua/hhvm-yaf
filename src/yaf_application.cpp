@@ -354,13 +354,32 @@ static void HHVM_METHOD(Yaf_Application, __clone)
 {
 }
 
+static Variant get_app()
+{
+    Array func = Array::Create();
+    func.append("Yaf_Application");
+    func.append("get_app");
+
+    Array params = Array::Create();
+    return vm_call_user_func(func, params);
+}
+
+static void set_app(const Object object)
+{ 
+    Array func = Array::Create();
+    func.append("Yaf_Application");
+    func.append("set_app");
+
+    Array params = Array::Create();
+    params.append(Variant(object));
+    vm_call_user_func(func, params);
+}
+
 static void HHVM_METHOD(Yaf_Application, __construct, const Variant& config, 
         const Variant& section)
 {
-    auto ptr_app = this_->o_realProp(YAF_APPLICATION_PROPERTY_NAME_APP, 
-            ObjectData::RealPropUnchecked, "Yaf_Application");
-
-    if (!ptr_app->isNull()) {
+    Variant var_app = get_app();
+    if (!var_app.isNull()) {
         yaf_trigger_error(YAF_ERR_STARTUP_FAILED, 
                 "Only one application can be initialized");
         return;
@@ -461,7 +480,8 @@ static void HHVM_METHOD(Yaf_Application, __construct, const Variant& config,
         *ptr_modules = init_null_variant;
     }
 
-    *ptr_app = this_;
+    //*ptr_app = this_;
+    set_app(this_);
     return;
 }
 
