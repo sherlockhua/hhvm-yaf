@@ -490,18 +490,16 @@ static Variant HHVM_METHOD(Yaf_Application, run)
     return false;
 }
 
-static Variant HHVM_METHOD(Yaf_Application, execute, const String& func_name, ActRec* ar) 
+static TypedValue* HHVM_MN(Yaf_Application, execute)(ActRec* ar) 
 {
-    Array func = Array::Create();
-    func.append(func_name);
+    String func_name(getArg<KindOfString>(ar, 0)); 
 
     Array params = Array::Create();
-    for (int i = 0; i < ar->numArgs(); i++) {
+    for (int i = 1; i < ar->numArgs(); i++) {
         params.append(getArg<KindOfRef>(ar, i));
     }
 
-    return vm_call_user_func(func, params);
-    return func_name;
+    return arReturn(ar,vm_call_user_func(func_name, params));
 }
 
 void YafExtension::_initYafApplicationClass()
