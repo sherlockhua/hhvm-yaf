@@ -364,7 +364,7 @@ final class Yaf_Application {
     public function getDispatcher():mixed;
 
     <<__Native>>
-    public function setAppDirectory():mixed;
+    public function setAppDirectory(string $name):mixed;
 
     <<__Native>>
     public function getAppDirectory():mixed;
@@ -379,7 +379,7 @@ final class Yaf_Application {
     public function clearLastError():mixed;
 
     <<__Native>>
-    public function __destruct():mixed;
+    public function __destruct():void;
 
     <<__Native>>
     private function __clone():void;

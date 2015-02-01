@@ -353,10 +353,6 @@ static int yaf_application_parse_option(const Array& config)
     return HHVM_YAF_SUCCESS;
 }
 
-static void HHVM_METHOD(Yaf_Application, __clone)
-{
-}
-
 static Variant get_app()
 {
     Array func = Array::Create();
@@ -590,6 +586,11 @@ static Variant HHVM_METHOD(Yaf_Application, bootstrap)
     ArrayIter iter = arr.begin();
     while (!iter.end()) {
         String func_name = iter.second();
+        if (strncasecmp(func_name.c_str(), YAF_BOOTSTRAP_INITFUNC_PREFIX, 
+                    sizeof(YAF_BOOTSTRAP_INITFUNC_PREFIX) - 1)) {
+            iter.next();
+            continue;
+        }
 
         Array arr_func = Array::Create();
         arr_func.append(o);
@@ -605,14 +606,112 @@ static Variant HHVM_METHOD(Yaf_Application, bootstrap)
     return this_;
 }
 
+static Variant HHVM_METHOD(Yaf_Application, getConfig)
+{
+    auto ptr_config = this_->o_realProp(YAF_APPLICATION_PROPERTY_NAME_CONFIG, 
+            ObjectData::RealPropUnchecked, "Yaf_Application");
+    return *ptr_config;
+}
+
+static Variant HHVM_METHOD(Yaf_Application, getModules)
+{
+    auto ptr_modules = this_->o_realProp(YAF_APPLICATION_PROPERTY_NAME_MODULES, 
+            ObjectData::RealPropUnchecked, "Yaf_Application");
+    return *ptr_modules;
+}
+
+static Variant HHVM_METHOD(Yaf_Application, getDispatcher)
+{
+    auto ptr_dispatcher = this_->o_realProp(YAF_APPLICATION_PROPERTY_NAME_DISPATCHER, 
+            ObjectData::RealPropUnchecked, "Yaf_Application");
+    return *ptr_dispatcher;
+}
+
+static Variant HHVM_METHOD(Yaf_Application, setAppDirectory,
+       const String& directory)
+{
+    if (!directory.length()) {
+        return false;
+    }
+
+    if (!IS_ABSOLUTE_PATH(directory)) {
+        return false;
+    }
+
+    g_yaf_local_data.get()->directory = directory.toCppString();
+    return this_;
+}
+
+static Variant HHVM_METHOD(Yaf_Application, getAppDirectory)
+{
+    return String(g_yaf_local_data.get()->directory);
+}
+
+static Variant HHVM_METHOD(Yaf_Application, getLastErrorNo)
+{
+    auto ptr_error = this_->o_realProp(YAF_APPLICATION_PROPERTY_NAME_ERRNO, 
+            ObjectData::RealPropUnchecked, "Yaf_Application");
+    return *ptr_error;
+}
+
+static Variant HHVM_METHOD(Yaf_Application, getLastErrorMsg)
+{
+    auto ptr_error = this_->o_realProp(YAF_APPLICATION_PROPERTY_NAME_ERRMSG, 
+            ObjectData::RealPropUnchecked, "Yaf_Application");
+    return *ptr_error;
+}
+
+static Variant HHVM_METHOD(Yaf_Application, clearLastError)
+{
+    auto ptr_errno = this_->o_realProp(YAF_APPLICATION_PROPERTY_NAME_ERRNO, 
+            ObjectData::RealPropUnchecked, "Yaf_Application");
+
+    *ptr_errno = 0;
+
+    auto ptr_error = this_->o_realProp(YAF_APPLICATION_PROPERTY_NAME_ERRMSG, 
+            ObjectData::RealPropUnchecked, "Yaf_Application");
+    *ptr_error = String("");
+
+    return this_;
+}
+
+static void HHVM_METHOD(Yaf_Application, __destruct)
+{
+    set_app(Object());        
+}
+
+static void HHVM_METHOD(Yaf_Application, __clone)
+{
+}
+
+static void HHVM_METHOD(Yaf_Application, __sleep)
+{
+}
+
+static void HHVM_METHOD(Yaf_Application, __wakeup)
+{
+}
+
 void YafExtension::_initYafApplicationClass()
 {
-    HHVM_ME(Yaf_Application, __clone);
     HHVM_ME(Yaf_Application, __construct);
     HHVM_ME(Yaf_Application, run);
     HHVM_ME(Yaf_Application, execute);
     HHVM_ME(Yaf_Application, environ);
     HHVM_ME(Yaf_Application, bootstrap);
+    HHVM_ME(Yaf_Application, getConfig);
+    HHVM_ME(Yaf_Application, getModules);
+    HHVM_ME(Yaf_Application, getDispatcher);
+    HHVM_ME(Yaf_Application, setAppDirectory);
+    HHVM_ME(Yaf_Application, getAppDirectory);
+    HHVM_ME(Yaf_Application, getLastErrorNo);
+    HHVM_ME(Yaf_Application, getLastErrorMsg);
+    HHVM_ME(Yaf_Application, clearLastError);
+
+    HHVM_ME(Yaf_Application, __destruct);
+    HHVM_ME(Yaf_Application, __clone);
+    HHVM_ME(Yaf_Application, __sleep);
+    HHVM_ME(Yaf_Application, __wakeup);
 }
 
 }
