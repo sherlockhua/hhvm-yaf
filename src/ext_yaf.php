@@ -687,3 +687,30 @@ abstract class Yaf_Bootstrap_Abstract {
 
 } 
 
+final class Yaf_Router {
+    protected $_routes = NULL;
+    protected $_current = NULL;
+
+    <<__Native>>
+    public function __construct():void;
+
+    <<__Native>>
+    public function addRoute(string $name, mixed $value):mixed;
+
+    <<__Native>>
+    public function addConfig(mixed $value):mixed;
+
+    <<__Native>>
+    public function route(mixed $request):mixed;
+
+    <<__Native>>
+    public function getRoute(string $name):mixed;
+
+    <<__Native>>
+    public function getRoutes():mixed;
+
+    <<__Native>>
+    public function getCurrentRoute():mixed;
+
+}
+
