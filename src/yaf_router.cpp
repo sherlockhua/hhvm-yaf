@@ -265,6 +265,8 @@ void YafExtension::_initYafRouterClass()
     HHVM_ME(Yaf_Router, getRoute);
     HHVM_ME(Yaf_Router, getRoutes);
     HHVM_ME(Yaf_Router, getCurrentRoute);
+
+    _initYafMapRouterClass();
 }
  
 }

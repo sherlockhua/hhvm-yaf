@@ -12,4 +12,10 @@
 
 namespace HPHP {
 
+void YafExtension::_initYafMapRouterClass()
+{
+    HHVM_ME(Yaf_Route_Map, __construct);
+    HHVM_ME(Yaf_Route_Map, route);
+}
+ 
 }

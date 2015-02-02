@@ -11,6 +11,7 @@
 #ifndef _YAF_ROUTER_MAP_H_
 #define _YAF_ROUTER_MAP_H_
 
+#include "ext_yaf.h"
 
 #define YAF_ROUTE_MAP_VAR_NAME_DELIMETER    "_delimeter"
 #define YAF_ROUTE_MAP_VAR_NAME_CTL_PREFER   "_ctl_router"

@@ -714,3 +714,18 @@ final class Yaf_Router {
 
 }
 
+interface Yaf_Route_Interface {
+    abstract public function route();
+}
+
+final class Yaf_Route_Map implements Yaf_Route_Interface {
+    protected $_ctl_router = false;
+    protected $_delimeter = NULL;
+
+    <<__Native>>
+    public function __construct():void;
+
+    <<__Native>>
+    public function route(mixed $request):mixed;
+}
+

@@ -69,6 +69,7 @@ private:
 
     //router
     void _initYafRouterClass();
+    void _initYafMapRouterClass();
 }; 
 
 class YafRequestData: public RequestEventHandler {
