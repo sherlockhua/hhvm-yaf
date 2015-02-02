@@ -1,0 +1,24 @@
+/*===========================================
+*   Copyright (C) 2015 All rights reserved.
+*   
+*   company      : xiaomi
+*   author       : sherlockhua
+*   email        : sherlockhua@xiaomi.com
+*   date         ：2015-02-02 12:01:35
+*   description  ：
+*
+=============================================*/
+#ifndef _YAF_ROUTER_MAP_H_
+#define _YAF_ROUTER_MAP_H_
+
+
+#define YAF_ROUTE_MAP_VAR_NAME_DELIMETER    "_delimeter"
+#define YAF_ROUTE_MAP_VAR_NAME_CTL_PREFER   "_ctl_router"
+
+namespace HPHP {
+
+}
+
+
+
+#endif //_YAF_ROUTER_MAP_H
