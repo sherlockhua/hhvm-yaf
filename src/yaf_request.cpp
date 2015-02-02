@@ -23,6 +23,20 @@ Variant yaf_request_instance(const Object* object, const char* base_uri)
     return yaf_request_http_instance(object, tmp, str_base_uri);
 }
 
+int yaf_request_set_routed(Object* object, int flag)
+{
+    if (object == NULL) {
+        return HHVM_YAF_FAILED;
+    }
+
+    auto var_flag = (*object)->o_realProp(YAF_REQUEST_PROPERTY_NAME_ROUTED, 
+            ObjectData::RealPropUnchecked, "Yaf_Request_Abstract");
+
+    *var_flag = flag;
+
+    return HHVM_YAF_SUCCESS;
+}
+
 int yaf_request_set_dispatched(Object request, int flag)
 {
     auto var_flag = request->o_realProp(YAF_REQUEST_PROPERTY_NAME_STATE, 

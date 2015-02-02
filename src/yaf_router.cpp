@@ -12,10 +12,54 @@
 #include "ext_yaf.h"
 #include "error.h"
 #include "yaf_config.h"
+#include "yaf_request.h"
 #include "routes/yaf_router_interface.h"
 
 
 namespace HPHP {
+
+
+static int yaf_router_route (const Object* object, const Variant& request)
+{
+    auto ptr_routes = (*object)->o_realProp(YAF_ROUTER_PROPERTY_NAME_ROUTERS, 
+            ObjectData::RealPropUnchecked, "Yaf_Router");
+    if (!ptr_routes->isArray()) {
+        return HHVM_YAF_FAILED;
+    }
+
+    Array& arr_routes = ptr_routes->toArrRef();
+    ArrayIter iter = arr_routes.begin();
+    while (!iter.end()) {
+        Variant key = iter.first();
+        Variant value = iter.second();
+
+        Object route = value.toObject();
+
+        Array func = Array::Create();
+        func.append(route);
+        func.append(String("route"));
+
+        Array params = Array::Create();
+        params.append(request);
+
+        Variant ret = vm_call_user_func(func, params);
+        if (!ret.isBoolean() || ret.toBoolean() == false) {
+            iter.next();
+            continue;
+        }
+
+        auto ptr_routes = (*object)->o_realProp(YAF_ROUTER_PROPERTY_NAME_CURRENT_ROUTE, 
+                ObjectData::RealPropUnchecked, "Yaf_Router");
+        *ptr_routes = key;
+
+        Object o_request = request.toObject();
+        yaf_request_set_routed(&o_request, 1);
+        
+        iter.next();
+    }
+
+    return HHVM_YAF_SUCCESS;
+}
 
 static int yaf_router_add_config(const Object* object, const Array& routes)
 {
@@ -169,11 +213,58 @@ static Variant HHVM_METHOD(Yaf_Router, addConfig,
     return this_;
 }
 
+static Variant HHVM_METHOD(Yaf_Router, route, 
+        const Variant& request)
+{
+    int ret = yaf_router_route(&this_, request);
+    if (ret != HHVM_YAF_SUCCESS) {
+        return false;
+    }
+
+    return true;
+}
+
+static Variant HHVM_METHOD(Yaf_Router, getRoute, 
+        const String& name)
+{
+    auto ptr_routes = this_->o_realProp(YAF_ROUTER_PROPERTY_NAME_ROUTERS, 
+            ObjectData::RealPropUnchecked, "Yaf_Router");
+    if (!ptr_routes->isArray()) {
+        return init_null_variant;
+    }
+
+    Array& arr_routes = ptr_routes->toArrRef();
+    if (!arr_routes.exists(name)) {
+        return init_null_variant;
+    }
+
+    return arr_routes[name];
+}
+
+static Variant HHVM_METHOD(Yaf_Router, getRoutes, 
+        const String& name)
+{
+    auto ptr_routes = this_->o_realProp(YAF_ROUTER_PROPERTY_NAME_ROUTERS, 
+            ObjectData::RealPropUnchecked, "Yaf_Router");
+    return *ptr_routes;
+}
+
+static Variant HHVM_METHOD(Yaf_Router, getCurrentRoute)
+{
+    auto ptr_routes = this_->o_realProp(YAF_ROUTER_PROPERTY_NAME_CURRENT_ROUTE, 
+            ObjectData::RealPropUnchecked, "Yaf_Router");
+    return *ptr_routes;
+}
+
 void YafExtension::_initYafRouterClass()
 {
     HHVM_ME(Yaf_Router, __construct);
     HHVM_ME(Yaf_Router, addRoute);
     HHVM_ME(Yaf_Router, addConfig);
+    HHVM_ME(Yaf_Router, route);
+    HHVM_ME(Yaf_Router, getRoute);
+    HHVM_ME(Yaf_Router, getRoutes);
+    HHVM_ME(Yaf_Router, getCurrentRoute);
 }
  
 }

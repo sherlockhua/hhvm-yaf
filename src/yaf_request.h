@@ -40,7 +40,7 @@ const StaticString
 
 extern int yaf_request_set_dispatched(Object request, int flag);
 extern Variant yaf_request_instance(const Object* object, const char* base_uri);
-
+extern int yaf_request_set_routed(Object* object, int flag);
 
 
 }
