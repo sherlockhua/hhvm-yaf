@@ -723,7 +723,7 @@ final class Yaf_Route_Map implements Yaf_Route_Interface {
     protected $_delimeter = NULL;
 
     <<__Native>>
-    public function __construct():void;
+    public function __construct(?mixed $controller_prefer = NULL, ?mixed $delim = NULL):void;
 
     <<__Native>>
     public function route(mixed $request):mixed;
