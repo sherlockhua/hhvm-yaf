@@ -26,6 +26,7 @@ namespace HPHP
 {
 
 extern Variant yaf_router_instance(const Object* object);
+extern Array yaf_router_parse_parameters(const char* uri);
 
 }
 

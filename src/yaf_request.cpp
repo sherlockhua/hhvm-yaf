@@ -16,6 +16,15 @@
 
 namespace HPHP{
 
+int yaf_request_set_params_multi(const Object* request, const Array& params)
+{
+    auto ptr_params = (*request)->o_realProp(YAF_REQUEST_PROPERTY_NAME_PARAMS, 
+            ObjectData::RealPropUnchecked, "Yaf_Request_Abstract");
+    *ptr_params = params;
+
+    return HHVM_YAF_SUCCESS;
+}
+
 Variant yaf_request_instance(const Object* object, const char* base_uri)
 {
     Variant str_base_uri = String(base_uri);

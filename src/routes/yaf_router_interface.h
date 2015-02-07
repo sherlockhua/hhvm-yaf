@@ -13,6 +13,15 @@
 
 #include "ext_yaf.h"
 
+#define YAF_ROUTE_PROPETY_NAME_MATCH    "_route"
+#define YAF_ROUTE_PROPETY_NAME_ROUTE    "_default"
+#define YAF_ROUTE_PROPETY_NAME_MAP      "_maps"
+#define YAF_ROUTE_PROPETY_NAME_VERIFY   "_verify"
+
+#define YAF_ROUTER_URL_DELIMIETER    "/"                                                                          
+#define YAF_ROUTE_REGEX_DILIMITER    '#'
+
+
 
 namespace HPHP
 {
