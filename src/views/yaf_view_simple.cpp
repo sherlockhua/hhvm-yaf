@@ -291,18 +291,26 @@ static Variant yaf_view_simple_eval(Object object,
     return yaf_ob_get_clean();
 }
 
-#ifdef HHVM_VERSION_3_2_NEW
-static void yaf_view_simple_instance(ObjectData* object, const Variant& tpl_dir,
-#else
-static void yaf_view_simple_instance(Object object, const Variant& tpl_dir,
-#endif
+//static void yaf_view_simple_instance(ObjectData* object, const Variant& tpl_dir,
+Variant yaf_view_simple_instance(const Object* object, const Variant& tpl_dir,
         const Variant& options)
 {
-    auto ptr_tplvars = object->o_realProp(YAF_VIEW_PROPERTY_NAME_TPLVARS, 
+    Object o;
+    if (object == NULL) {
+        Array params = Array::Create();
+        params.append(tpl_dir);
+        params.append(options);
+
+        o = createObject("Yaf_View_Simple", params);
+    } else {
+        o = *object;
+    }
+
+    auto ptr_tplvars = o->o_realProp(YAF_VIEW_PROPERTY_NAME_TPLVARS, 
             ObjectData::RealPropUnchecked, "Yaf_View_Simple");
     *ptr_tplvars = Array::Create();
 
-    auto ptr_tpldir = object->o_realProp(YAF_VIEW_PROPERTY_NAME_TPLDIR, 
+    auto ptr_tpldir = o->o_realProp(YAF_VIEW_PROPERTY_NAME_TPLDIR, 
             ObjectData::RealPropUnchecked, "Yaf_View_Simple");
 
     if (tpl_dir.isString()) {
@@ -312,22 +320,24 @@ static void yaf_view_simple_instance(Object object, const Variant& tpl_dir,
                 *ptr_tpldir = str_tpl_dir;
             } else {
                 raise_error("template_dir expect a absolute path:%s", str_tpl_dir.toCppString().c_str());
+                return init_null_variant;
             }
         }
     }
 
     if (options.isArray()) {
-        auto ptr_options = object->o_realProp(YAF_VIEW_PROPERTY_NAME_OPTS, 
+        auto ptr_options = o->o_realProp(YAF_VIEW_PROPERTY_NAME_OPTS, 
                 ObjectData::RealPropUnchecked, "Yaf_View_Simple");
         *ptr_options = options;
     } 
 
+    return o;
 }
 
 static void HHVM_METHOD(Yaf_View_Simple, __construct, const Variant& tpl_dir,
         const Variant& options)
 {
-    yaf_view_simple_instance(this_, tpl_dir, options);
+    yaf_view_simple_instance(&this_, tpl_dir, options);
 }
 
 static bool HHVM_METHOD(Yaf_View_Simple, __isset, const String& name)

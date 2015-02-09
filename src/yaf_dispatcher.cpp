@@ -10,6 +10,7 @@
 =============================================*/
 #include "yaf_dispatcher.h"
 #include "ext_yaf.h"
+#include "yaf_view.h"
 
 namespace HPHP {
 
@@ -32,7 +33,14 @@ Variant yaf_dispatcher_set_request(Object* object, Object* request)
 static Variant yaf_dispatcher_init_view(const Object* object, 
         const Variant& tpl_dir, const Variant& options)
 {
-    return init_null_variant;
+    auto ptr_view = (*object)->o_realProp(YAF_DISPATCHER_PROPERTY_NAME_VIEW, 
+            ObjectData::RealPropUnchecked, "Yaf_Dispatcher");
+    if (ptr_view->isObject() && ptr_view->toObject()->o_instanceof("Yaf_View_Interface")) {
+        return *ptr_view;
+    }
+
+    *ptr_view = yaf_view_instance(NULL, tpl_dir, options);
+    return *ptr_view;
 }
 
 
