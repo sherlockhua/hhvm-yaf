@@ -17,6 +17,35 @@
 
 namespace HPHP {
 
+static int yaf_dispatcher_fix_default(const Object& object, const Object& request)
+{
+    return HHVM_YAF_SUCCESS;
+}
+
+static void yaf_dispatcher_call_router_hook(const Array& arr, 
+        const Object& request, const Object& response, const String& function)
+{
+    ArrayIter iter = arr_plugin.begin();
+    while (!iter.end()) {
+        Variant value = iter.second();
+        if (!value.isObject()) {
+            iter.next();
+            continue;
+        }
+        
+        Array func = Array::Create();
+        Array params = Array::Create();
+
+        func.append(value.toObject());
+        func.append(function);
+
+        params.append(request);
+        params.append(response);
+
+        vm_call_user_func(func, params);
+        iter.next();
+    }
+}
 
 Variant yaf_dispatcher_dispatch(const Object* object)
 {
@@ -28,19 +57,95 @@ Variant yaf_dispatcher_dispatch(const Object* object)
     auto ptr_plugin = (*object)->o_realProp(YAF_DISPATCHER_PROPERTY_NAME_PLUGINS, 
             ObjectData::RealPropUnchecked, "Yaf_Dispatcher");
 
+    if (!ptr_plugin->isArray()) {
+        ptr_plugin = Array::Create();
+    }
+
     if (ptr_request->isObject() == false) {
         yaf_trigger_error(YAF_ERR_TYPE_ERROR, "Expect a object of request");
         return false;
     }
 
+    Object response = response.toObject();
     Object request = ptr_request->toObject();
-    if (!yaf_request_is_routed(&request)) {
-        
-    } else {
+    Array& arr_plugin = ptr_plugin->toArrRef();
 
+    if (!yaf_request_is_routed(&request)) {
+
+        yaf_dispatcher_call_router_hook(arr_plugin, request, response, 
+                String(YAF_PLUGIN_HOOK_ROUTESTARTUP));
+
+        //TODO need implement YAF_EXCEPTION_HANDLE
+        //YAF_EXCEPTION_HANDLE(dispatcher, request, response); 
+        if (!yaf_dispatcher_route(this_, request)) {
+            yaf_trigger_error(YAF_ERR_ROUTE_FAILED, "Routing request failed");
+            //TODO need implement
+            //YAF_EXCEPTION_HANDLE_NORET
+            return init_null_variant;
+        }
+
+        yaf_dispatcher_fix_default(this_, request);
+        yaf_dispatcher_call_router_hook(arr_plugin, request, response, 
+                String(YAF_PLUGIN_HOOK_ROUTESHUTDOWN));
+
+        //TODO need implement YAF_EXCEPTION_HANDLE
+        //YAF_EXCEPTION_HANDLE(dispatcher, request, response); 
+        yaf_request_set_routed(&request, 1);
+    } else {
+        yaf_dispatcher_fix_default(this_, request);
     }
 
-    return init_null_variant;
+    yaf_dispatcher_call_router_hook(arr_plugin, request, response, 
+            String(YAF_PLUGIN_HOOK_LOOPSTARTUP));
+
+    //TODO need implement YAF_EXCEPTION_HANDLE
+    //YAF_EXCEPTION_HANDLE(dispatcher, request, response); 
+   
+    Variant view = yaf_dispatcher_init_view(this_, init_null_variant, init_null_variant);
+    if (view.isNull()) {
+        return init_null_variant;
+    }
+
+    int nesting = g_yaf_local_data.get()->forward_limit;
+
+    do {
+        yaf_dispatcher_call_router_hook(arr_plugin, request, response, 
+                String(YAF_PLUGIN_HOOK_PREDISPATCH));
+        if (!yaf_dispatcher_handle(this_, request, response, view)) {
+            //YAF_EXCEPTION_HANDLE(dispatcher, request, response);
+            return init_null_variant;
+        }
+
+        yaf_dispatcher_fix_default(this_, request);
+        yaf_dispatcher_call_router_hook(arr_plugin, request, response, 
+                String(YAF_PLUGIN_HOOK_POSTDISPATCH));
+
+        //TODO need implement YAF_EXCEPTION_HANDLE
+        //YAF_EXCEPTION_HANDLE(dispatcher, request, response); 
+    } while (--nesting > 0 && !yaf_request_is_dispatched(request));
+
+    yaf_dispatcher_call_router_hook(arr_plugin, request, response, 
+            String(YAF_PLUGIN_HOOK_LOOPSHUTDOWN));
+
+    //TODO need implement YAF_EXCEPTION_HANDLE
+    //YAF_EXCEPTION_HANDLE(dispatcher, request, response); 
+    if (nesting == 0 && !yaf_request_is_dispatched(request)) {
+        yaf_trigger_error(YAF_ERR_DISPATCH_FAILED, 
+                "The max dispatch nesting %ld was reached",
+                g_yaf_local_data.get()->forward_limit);
+
+        return init_null_variant;
+    }
+
+    auto ptr_return_response = (*object)->o_realProp(YAF_DISPATCHER_PROPERTY_NAME_RETURN, 
+            ObjectData::RealPropUnchecked, "Yaf_Dispatcher");
+
+    if (!ptr_return_response->toBoolean()) {
+        (void)yaf_response_send(response);
+        yaf_response_clear_body(response, NULL, 0);
+    }
+
+    return response;
 }
 
 int  yaf_dispatcher_set_request(const Object* object, const Variant& request)
