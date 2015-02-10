@@ -20,8 +20,12 @@
 #define YAF_APPLICATION_PROPERTY_NAME_ERRNO         "_err_no"
 #define YAF_APPLICATION_PROPERTY_NAME_ERRMSG        "_err_msg"
 
+namespace HPHP{
 
+extern bool yaf_application_is_module_name(const String& module);
+extern Variant get_app();
 
+}
 
 
 #endif //_YAF_APPLICATION_H

@@ -16,11 +16,39 @@
 
 namespace HPHP{
 
-#ifdef HHVM_VERSION_3_2_NEW
-static int yaf_response_send(ObjectData* object)
-#else
-static int yaf_response_send(Object object)
-#endif
+Variant yaf_response_instance(const Object* object, const char* sapi_name)
+{
+    Object o;
+    String class_name;
+    if (strncasecmp(sapi_name, "cli", 3) == 0) {
+        class_name = String("Yaf_Response_Cli");
+    } else {
+        class_name = String("Yaf_Response_Http");
+    }
+
+    if (object == NULL) {
+        Array arr = Array::Create();
+        if (strncasecmp(sapi_name, "cli", 3) == 0) {
+            o = createObject("Yaf_Response_Cli", arr) ;
+        } else {
+            o = createObject("Yaf_Response_Http", arr) ;
+        }
+    } else {
+        o = *object;
+    }
+
+    auto ptr_header = o->o_realProp(YAF_RESPONSE_PROPERTY_NAME_HEADER, 
+            ObjectData::RealPropUnchecked, class_name.c_str());
+    *ptr_header = Array::Create();
+
+    auto ptr_body = o->o_realProp(YAF_RESPONSE_PROPERTY_NAME_BODY, 
+            ObjectData::RealPropUnchecked, class_name.c_str());
+    *ptr_body = Array::Create();
+
+    return o;
+}
+
+static int yaf_response_send(const Object& object)
 {
     auto ptr_body = object->o_realProp(YAF_RESPONSE_PROPERTY_NAME_BODY, 
             ObjectData::RealPropUnchecked, "Yaf_Response_Abstract");

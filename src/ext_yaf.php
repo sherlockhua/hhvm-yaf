@@ -428,46 +428,47 @@ final class Yaf_Dispatcher {
     public function initView(mixed $tpl_dir, ?mixed $options):mixed;
 
     <<__Native>>
-    public function setView():void;
+    public function setView(mixed $view):mixed;
 
     <<__Native>>
-    public function setRequest():void;
+    public function setRequest(mixed $request):mixed;
 
     <<__Native>>
-    public function getApplication():void;
+    public function getApplication():mixed;
 
     <<__Native>>
-    public function getRouter():void;
+    public function getRouter():mixed;
 
     <<__Native>>
-    public function getRequest():void;
+    public function getRequest():mixed;
 
     <<__Native>>
-    public function setErrorHandler():void;
+    public function setErrorHandler(string $callback, ?mixed $type=NULL):mixed;
 
     <<__Native>>
-    public function setDefaultModule():void;
+    public function setDefaultModule(mixed $module):mixed;
 
     <<__Native>>
-    public function setDefaultController():void;
+    public function setDefaultController(mixed $controller):mixed;
 
     <<__Native>>
-    public function setDefaultAction():void;
+    public function setDefaultAction(mixed $action):mixed;
 
     <<__Native>>
-    public function returnResponse():void;
+    public function returnResponse(?mixed $res = NULL):mixed;
 
     <<__Native>>
-    public function autoRender():void;
+    public function autoRender(?mixed $res = NULL):mixed;
 
     <<__Native>>
-    public function flushInstantly():void;
+    public function flushInstantly(?mixed $flush = NULL):mixed;
+
+    static public function getInstance() {
+        return self::$_instance;
+    }
 
     <<__Native>>
-    static public function getInstance():void;
-
-    <<__Native>>
-    public function dispatch():void;
+    public function dispatch(mixed $request):mixed;
 
     <<__Native>>
     public function throwException():void;
@@ -714,11 +715,11 @@ final class Yaf_Router {
 
 }
 
-interface Yaf_Route_Interface {
-    abstract public function route();
+abstract class Yaf_Route_Interface {
+    abstract public function route(mixed $request):mixed;
 }
 
-final class Yaf_Route_Map implements Yaf_Route_Interface {
+final class Yaf_Route_Map extends Yaf_Route_Interface {
     protected $_ctl_router = false;
     protected $_delimeter = NULL;
 
@@ -729,3 +730,25 @@ final class Yaf_Route_Map implements Yaf_Route_Interface {
     public function route(mixed $request):mixed;
 }
 
+abstract class Yaf_Plugin_Abstract {
+    <<__Native>>
+    public function routerStartup(mixed $request, mixed $response):mixed; 
+
+    <<__Native>>
+    public function routerShutdown(mixed $request, mixed $response):mixed;
+
+    <<__Native>>
+    public function dispatchLoopStartup(mixed $request, mixed $response):mixed;
+
+    <<__Native>>
+    public function dispatchLoopShutdown(mixed $request, mixed $response):mixed;
+
+    <<__Native>>
+    public function preDispatch(mixed $request, mixed $response):mixed;
+
+    <<__Native>>
+    public function postDispatch(mixed $request, mixed $response):mixed;
+
+    <<__Native>>
+    public function preResponse(mixed $request, mixed $response):mixed;
+}

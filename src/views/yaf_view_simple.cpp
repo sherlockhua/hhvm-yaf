@@ -291,7 +291,6 @@ static Variant yaf_view_simple_eval(Object object,
     return yaf_ob_get_clean();
 }
 
-//static void yaf_view_simple_instance(ObjectData* object, const Variant& tpl_dir,
 Variant yaf_view_simple_instance(const Object* object, const Variant& tpl_dir,
         const Variant& options)
 {

@@ -70,6 +70,9 @@ private:
     //router
     void _initYafRouterClass();
     void _initYafMapRouterClass();
+    
+    //plugin
+    void _initYafPluginClass();
 }; 
 
 class YafRequestData: public RequestEventHandler {

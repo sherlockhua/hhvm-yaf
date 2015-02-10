@@ -13,15 +13,23 @@
 
 
 namespace HPHP {
+
 /*
 static void HHVM_METHOD(Yaf_View_Interface, __construct)
 {
+}
+
+
+static Variant HHVM_METHOD(Yaf_View_Interface, route, const Variant&request)
+{
+    return init_null_variant;
 }
 */
 
 void YafExtension::_initYafViewInterfaceClass()
 {
-//    HHVM_ME(Yaf_View_Interface, __construct);
+    //HHVM_ME(Yaf_View_Interface, __construct);
+    //HHVM_ME(Yaf_View_Interface, route);
 }
 
 

@@ -21,6 +21,37 @@
 
 namespace HPHP{
 
+bool yaf_application_is_module_name(const String& module)
+{
+    Variant var_app = get_app();
+    if (!var_app.isObject()) {
+        return false;
+    }
+
+    Object o = var_app.toObject();
+    auto ptr_modules = o->o_realProp(YAF_APPLICATION_PROPERTY_NAME_MODULES, 
+            ObjectData::RealPropUnchecked, "Yaf_Application");
+    if (!ptr_modules->isArray()) {
+        return false;
+    }
+
+    Array& tmp = ptr_modules->toArrRef();
+    ArrayIter iter = tmp.begin();
+    while (!iter.end()) {
+        Variant key = iter.first();
+        Variant value = iter.second();
+
+        String& str_value = value.toStrRef();
+        if (strncasecmp(str_value.c_str(), module.c_str(), module.length()) == 0) {
+            return true;
+        }
+
+        iter.next();
+    }
+
+    return false;
+}
+
 static int yaf_application_init_loader()
 {
     Variant var_global_library = init_null_variant;
@@ -353,7 +384,7 @@ static int yaf_application_parse_option(const Array& config)
     return HHVM_YAF_SUCCESS;
 }
 
-static Variant get_app()
+extern Variant get_app()
 {
     Array func = Array::Create();
     func.append("Yaf_Application");
@@ -445,8 +476,7 @@ static void HHVM_METHOD(Yaf_Application, __construct, const Variant& config,
     }
 
     Object o_dispatcher = dispatcher.toObject();
-    Object o_request = request.toObject();
-    yaf_dispatcher_set_request(&o_dispatcher, &o_request);
+    yaf_dispatcher_set_request(&o_dispatcher,request);
 
     auto ptr_app_config = this_->o_realProp(YAF_APPLICATION_PROPERTY_NAME_CONFIG, 
             ObjectData::RealPropUnchecked, "Yaf_Application");

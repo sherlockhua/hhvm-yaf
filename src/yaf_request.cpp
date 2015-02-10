@@ -16,6 +16,14 @@
 
 namespace HPHP{
 
+
+bool yaf_request_is_routed(const Object* request)
+{
+    auto ptr_route = (*request)->o_realProp(YAF_REQUEST_PROPERTY_NAME_ROUTED, 
+            ObjectData::RealPropUnchecked, "Yaf_Request_Abstract");
+    return ptr_route->toBoolean();
+}
+
 int yaf_request_set_params_multi(const Object* request, const Array& params)
 {
     auto ptr_params = (*request)->o_realProp(YAF_REQUEST_PROPERTY_NAME_PARAMS, 
