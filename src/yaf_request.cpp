@@ -16,6 +16,12 @@
 
 namespace HPHP{
 
+bool yaf_request_is_dispatched(const Object* request)
+{
+    auto ptr_dispatched = (*request)->o_realProp(YAF_REQUEST_PROPERTY_NAME_STATE, 
+            ObjectData::RealPropUnchecked, "Yaf_Request_Abstract");
+    return ptr_dispatched->toBoolean();
+}
 
 bool yaf_request_is_routed(const Object* request)
 {

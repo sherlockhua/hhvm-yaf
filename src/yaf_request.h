@@ -43,6 +43,7 @@ extern Variant yaf_request_instance(const Object* object, const char* base_uri);
 extern int yaf_request_set_routed(Object* object, int flag);
 extern int yaf_request_set_params_multi(const Object* request, const Array& params); 
 extern bool yaf_request_is_routed(const Object* request);
+extern bool yaf_request_is_dispatched(const Object* request);
 }
 
 #endif //_YAF_REQUEST_H

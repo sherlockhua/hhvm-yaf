@@ -14,16 +14,178 @@
 #include "yaf_application.h"
 #include "yaf_response.h"
 #include "yaf_request.h"
+#include "yaf_router.h"
+#include "yaf_controller.h"
 
 namespace HPHP {
 
-static int yaf_dispatcher_fix_default(const Object& object, const Object& request)
+static Variant yaf_dispatcher_get_controller(const char* app_dir, 
+        const char* module, const char* controller, int is_def_module)
+{
+    char directory[8192];
+    if (is_def_module) {
+        snprintf(directory, sizeof(directory), "%s%c%s", app_dir, 
+                DEFAULT_SLASH_CHAR, YAF_CONTROLLER_DIRECTORY_NAME);
+    } else {
+        snprintf(directory, sizeof(directory), "%s%c%s%c%s%c%s", 
+                app_dir, DEFAULT_SLASH_CHAR, YAF_MODULE_DIRECTORY_NAME, 
+                DEFAULT_SLASH_CHAR, module, DEFAULT_SLASH_CHAR, 
+                YAF_CONTROLLER_DIRECTORY_NAME);
+    }
+
+	char class_name[8192];
+	if (g_yaf_local_data.get()->name_suffix) {
+		snprintf(class_name, sizeof(class_name), "%s%s%s", 
+				controller, g_yaf_local_data.get()->name_separator.c_str(), "Controller");
+	} else {
+		snprintf(class_name, sizeof(class_name), "%s%s%s", 
+				"Controller", g_yaf_local_data.get()->name_separator.c_str(), controller);
+	}
+
+	Array params = Array::Create();
+	Object o = createObject(String(class_name), params);
+	if (!o->o_instanceof("Yaf_Controller_Abstract")) {
+		int ret = yaf_internal_autoload(controller, (char**)&directory);
+		if (ret != HHVM_YAF_SUCCESS) {
+			return init_null_variant;
+		}
+
+		o = createObject(String(class_name), params);
+		if (!o->o_instanceof("Yaf_Controller_Abstract")) {
+			return init_null_variant;
+		}
+	}
+	
+	return o;
+}
+
+static int yaf_dispatcher_handle(const Object& object, const Object& request, 
+        const Object& response, const Object& view)
+{
+    std::string app_dir = g_yaf_local_data.get()->directory;
+    yaf_request_set_dispatched(request, 1);
+    if (!app_dir.length()) {
+        yaf_trigger_error(YAF_ERR_STARTUP_FAILED, 
+                "application.directory must be set first");
+        return HHVM_YAF_FAILED;
+    }
+
+    int is_def_module = 0;
+    auto ptr_module = request->o_realProp(YAF_REQUEST_PROPERTY_NAME_MODULE, 
+            ObjectData::RealPropUnchecked, "Yaf_Request_Abstract");
+
+    auto ptr_controller = request->o_realProp(YAF_REQUEST_PROPERTY_NAME_CONTROLLER, 
+            ObjectData::RealPropUnchecked, "Yaf_Request_Abstract");
+
+    auto ptr_dispatcher_module = object->o_realProp(YAF_DISPATCHER_PROPERTY_NAME_MODULE, 
+            ObjectData::RealPropUnchecked, "Yaf_Dispatcher");
+
+    auto ptr_dispatcher_controller = object->o_realProp(YAF_DISPATCHER_PROPERTY_NAME_CONTROLLER, 
+            ObjectData::RealPropUnchecked, "Yaf_Dispatcher");
+
+    if (!ptr_module->isString() ||
+            ptr_module->toString().length() == 0) {
+        yaf_trigger_error(YAF_ERR_DISPATCH_FAILED, "unexpect a empty module");
+        return HHVM_YAF_FAILED;
+    }
+
+    bool ret = yaf_application_is_module_name(ptr_module->toString());
+    if (!ret) {
+        yaf_trigger_error(YAF_ERR_NOTFOUND_MODULE, "not found module:%s",
+                ptr_module->toString().c_str());
+        return HHVM_YAF_FAILED;
+    }
+
+    if (!ptr_controller->isString() ||
+            ptr_controller->toString().length() == 0) {
+        yaf_trigger_error(YAF_ERR_DISPATCH_FAILED, "unexpect a empty controller");
+        return HHVM_YAF_FAILED;
+    }
+
+    if (strncasecmp(ptr_dispatcher_module->toString().c_str(),
+                ptr_module->toString().c_str(), 
+                ptr_module->toString().length()) == 0) {
+        is_def_module = 1;
+    }
+
+    Variant tmp_controller = yaf_dispatcher_get_controller(app_dir.c_str(), 
+            ptr_module->toString().c_str(), ptr_controller->toString().c_str(), is_def_module);
+    if (tmp_controller.isNull()) {
+        yaf_trigger_error(YAF_ERR_DISPATCH_FAILED, 
+                "get controller failed, dir:%s", app_dir.c_str());
+        return HHVM_YAF_FAILED;
+    }
+
+    int retval = yaf_controller_construct(tmp_controller, request, response, view, init_null_variant);
+    if (retval != HHVM_YAF_SUCCESS) {
+        yaf_trigger_error(YAF_ERR_DISPATCH_FAILED, 
+                "construct controller failed, dir:%s", app_dir.c_str());
+        return HHVM_YAF_FAILED;
+    }
+
+    char view_dir[8192];
+    if (is_def_module) {
+        snprintf(view_dir, sizeof(view_dir), "%s/%s", app_dir.c_str() ,"views");
+    } else {
+        snprintf(view_dir, sizeof(view_dir), "%s/%s/%s/%s", 
+                app_dir.c_str(), "modules", ptr_module->toString().c_str(), "views");
+    }
+
+    return HHVM_YAF_SUCCESS;
+}
+
+static Variant yaf_dispatcher_init_view(const Object* object, 
+        const Variant& tpl_dir, const Variant& options)
+{
+    auto ptr_view = (*object)->o_realProp(YAF_DISPATCHER_PROPERTY_NAME_VIEW, 
+            ObjectData::RealPropUnchecked, "Yaf_Dispatcher");
+    if (ptr_view->isObject() && ptr_view->toObject()->o_instanceof("Yaf_View_Interface")) {
+        return *ptr_view;
+    }
+
+    *ptr_view = yaf_view_instance(NULL, tpl_dir, options);
+    return *ptr_view;
+}
+
+static int yaf_dispatcher_route(const Object* object, const Object& request)
+{
+    auto ptr_router = (*object)->o_realProp(YAF_DISPATCHER_PROPERTY_NAME_ROUTER, 
+            ObjectData::RealPropUnchecked, "Yaf_Dispatcher");
+    if (!ptr_router->isObject()) {
+        return HHVM_YAF_FAILED; 
+    }
+    
+    Object o_router = ptr_router->toObject();
+    String class_name = o_router->o_getClassName();
+    if (strncasecmp(class_name.c_str(), "Yaf_Router", 
+                sizeof("Yaf_Router") - 1) == 0) {
+        yaf_router_route(&o_router, request);
+    } else {
+        Array func = Array::Create();
+        Array params = Array::Create();
+
+        func.append(o_router);
+        func.append(String("route"));
+
+        params.append(request);
+
+        Variant ret = vm_call_user_func(func, params);
+        if (ret.isBoolean() && ret.toBoolean() == false) {
+            yaf_trigger_error(YAF_ERR_ROUTE_FAILED, "routing request failed");
+            return HHVM_YAF_FAILED;
+        }
+    }
+
+    return HHVM_YAF_SUCCESS;
+}
+
+static int yaf_dispatcher_fix_default(const Object* object, const Object& request)
 {
     return HHVM_YAF_SUCCESS;
 }
 
-static void yaf_dispatcher_call_router_hook(const Array& arr, 
-        const Object& request, const Object& response, const String& function)
+static void yaf_dispatcher_call_router_hook(const Array& arr_plugin, 
+        const Object& request, const Object& response, String function)
 {
     ArrayIter iter = arr_plugin.begin();
     while (!iter.end()) {
@@ -50,7 +212,7 @@ static void yaf_dispatcher_call_router_hook(const Array& arr,
 Variant yaf_dispatcher_dispatch(const Object* object)
 {
     //TODO need modify sapi_name to support cli or http mode
-    Variant response = yaf_response_instance(NULL, "online");
+    Variant var_response = yaf_response_instance(NULL, "online");
     auto ptr_request = (*object)->o_realProp(YAF_DISPATCHER_PROPERTY_NAME_REQUEST, 
             ObjectData::RealPropUnchecked, "Yaf_Dispatcher");
 
@@ -58,7 +220,7 @@ Variant yaf_dispatcher_dispatch(const Object* object)
             ObjectData::RealPropUnchecked, "Yaf_Dispatcher");
 
     if (!ptr_plugin->isArray()) {
-        ptr_plugin = Array::Create();
+        *ptr_plugin = Array::Create();
     }
 
     if (ptr_request->isObject() == false) {
@@ -66,7 +228,7 @@ Variant yaf_dispatcher_dispatch(const Object* object)
         return false;
     }
 
-    Object response = response.toObject();
+    Object response = var_response.toObject();
     Object request = ptr_request->toObject();
     Array& arr_plugin = ptr_plugin->toArrRef();
 
@@ -77,14 +239,14 @@ Variant yaf_dispatcher_dispatch(const Object* object)
 
         //TODO need implement YAF_EXCEPTION_HANDLE
         //YAF_EXCEPTION_HANDLE(dispatcher, request, response); 
-        if (!yaf_dispatcher_route(this_, request)) {
+        if (yaf_dispatcher_route(object, request) != HHVM_YAF_SUCCESS) {
             yaf_trigger_error(YAF_ERR_ROUTE_FAILED, "Routing request failed");
             //TODO need implement
             //YAF_EXCEPTION_HANDLE_NORET
             return init_null_variant;
         }
 
-        yaf_dispatcher_fix_default(this_, request);
+        yaf_dispatcher_fix_default(object, request);
         yaf_dispatcher_call_router_hook(arr_plugin, request, response, 
                 String(YAF_PLUGIN_HOOK_ROUTESHUTDOWN));
 
@@ -92,7 +254,7 @@ Variant yaf_dispatcher_dispatch(const Object* object)
         //YAF_EXCEPTION_HANDLE(dispatcher, request, response); 
         yaf_request_set_routed(&request, 1);
     } else {
-        yaf_dispatcher_fix_default(this_, request);
+        yaf_dispatcher_fix_default(object, request);
     }
 
     yaf_dispatcher_call_router_hook(arr_plugin, request, response, 
@@ -101,7 +263,7 @@ Variant yaf_dispatcher_dispatch(const Object* object)
     //TODO need implement YAF_EXCEPTION_HANDLE
     //YAF_EXCEPTION_HANDLE(dispatcher, request, response); 
    
-    Variant view = yaf_dispatcher_init_view(this_, init_null_variant, init_null_variant);
+    Variant view = yaf_dispatcher_init_view(object, init_null_variant, init_null_variant);
     if (view.isNull()) {
         return init_null_variant;
     }
@@ -111,25 +273,25 @@ Variant yaf_dispatcher_dispatch(const Object* object)
     do {
         yaf_dispatcher_call_router_hook(arr_plugin, request, response, 
                 String(YAF_PLUGIN_HOOK_PREDISPATCH));
-        if (!yaf_dispatcher_handle(this_, request, response, view)) {
+        if (!yaf_dispatcher_handle(*object, request, response, view.toObject())) {
             //YAF_EXCEPTION_HANDLE(dispatcher, request, response);
             return init_null_variant;
         }
 
-        yaf_dispatcher_fix_default(this_, request);
+        yaf_dispatcher_fix_default(object, request);
         yaf_dispatcher_call_router_hook(arr_plugin, request, response, 
                 String(YAF_PLUGIN_HOOK_POSTDISPATCH));
 
         //TODO need implement YAF_EXCEPTION_HANDLE
         //YAF_EXCEPTION_HANDLE(dispatcher, request, response); 
-    } while (--nesting > 0 && !yaf_request_is_dispatched(request));
+    } while (--nesting > 0 && !yaf_request_is_dispatched(&request));
 
     yaf_dispatcher_call_router_hook(arr_plugin, request, response, 
             String(YAF_PLUGIN_HOOK_LOOPSHUTDOWN));
 
     //TODO need implement YAF_EXCEPTION_HANDLE
     //YAF_EXCEPTION_HANDLE(dispatcher, request, response); 
-    if (nesting == 0 && !yaf_request_is_dispatched(request)) {
+    if (nesting == 0 && !yaf_request_is_dispatched(&request)) {
         yaf_trigger_error(YAF_ERR_DISPATCH_FAILED, 
                 "The max dispatch nesting %ld was reached",
                 g_yaf_local_data.get()->forward_limit);
@@ -142,7 +304,7 @@ Variant yaf_dispatcher_dispatch(const Object* object)
 
     if (!ptr_return_response->toBoolean()) {
         (void)yaf_response_send(response);
-        yaf_response_clear_body(response, NULL, 0);
+        yaf_response_clear_body(&response, init_null_variant);
     }
 
     return response;
@@ -155,19 +317,6 @@ int  yaf_dispatcher_set_request(const Object* object, const Variant& request)
     *ptr_request = request;
 
     return HHVM_YAF_SUCCESS;
-}
-
-static Variant yaf_dispatcher_init_view(const Object* object, 
-        const Variant& tpl_dir, const Variant& options)
-{
-    auto ptr_view = (*object)->o_realProp(YAF_DISPATCHER_PROPERTY_NAME_VIEW, 
-            ObjectData::RealPropUnchecked, "Yaf_Dispatcher");
-    if (ptr_view->isObject() && ptr_view->toObject()->o_instanceof("Yaf_View_Interface")) {
-        return *ptr_view;
-    }
-
-    *ptr_view = yaf_view_instance(NULL, tpl_dir, options);
-    return *ptr_view;
 }
 
 

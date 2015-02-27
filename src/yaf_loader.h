@@ -45,12 +45,16 @@ namespace HPHP {
 #define YAF_LOADER_SERVICE                  "Service_"
 #define YAF_LOADER_LEN_SERVICE              8
 
+#define YAF_LOADER_PROPERTY_NAME_LIBRARY    "_library"      
+#define YAF_LOADER_PROPERTY_NAME_GLOBAL_LIB "_global_library"
 
-extern Variant yaf_loader_import(const char *path, int len, int use_path);
+
+extern bool yaf_loader_import(const char *path, int len, int use_path);
 extern int yaf_loader_register_namespace_single(const std::string& str_namespace);
 extern Variant yaf_loader_instance(const Object* object, 
         const Variant& local_library, const Variant& var_global_library);
 
+extern int yaf_internal_autoload(const char* file_name, char** directory);
 }
 
 

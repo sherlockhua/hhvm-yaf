@@ -25,6 +25,8 @@ namespace HPHP {
 #define YAF_CONTROLLER_PROPERTY_NAME_RENDER     "yafAutoRender"
 
 
+extern int yaf_controller_construct(Variant& control, const Object& request, 
+        const Object& response, const Object& view, const Variant& params);
 
 }
 

@@ -24,7 +24,7 @@ Array yaf_router_parse_parameters(const char* uri)
     return Array::Create();
 }
 
-static int yaf_router_route (const Object* object, const Variant& request)
+int yaf_router_route (const Object* object, const Variant& request)
 {
     auto ptr_routes = (*object)->o_realProp(YAF_ROUTER_PROPERTY_NAME_ROUTERS, 
             ObjectData::RealPropUnchecked, "Yaf_Router");
@@ -142,6 +142,7 @@ static_route:
 
     return o;
 } 
+
 
 static void HHVM_METHOD(Yaf_Router, __construct)
 {

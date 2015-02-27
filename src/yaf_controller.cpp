@@ -22,6 +22,11 @@
 
 namespace HPHP { 
 
+int yaf_controller_construct(Variant& control, Object& request, 
+        Object& response, Object& view, const Variant& params)
+{
+    return HHVM_YAF_SUCCESS;
+}
 
 static Variant HHVM_METHOD(Yaf_Controller_Abstract, test)
 {

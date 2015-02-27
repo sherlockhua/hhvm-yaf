@@ -550,7 +550,10 @@ function yaf_loader_import(string $path)
     if ( file_exists($path) ) { 
         extract($GLOBALS);
         require_once $path;
+        return true;
     } 
+
+    return false;
 }
 
 abstract class Yaf_Config_Abstract {
@@ -751,4 +754,59 @@ abstract class Yaf_Plugin_Abstract {
 
     <<__Native>>
     public function preResponse(mixed $request, mixed $response):mixed;
+}
+
+class Yaf_Loader{
+	protected $_library = null;
+	protected $_global_library = null;
+	static protected $_instance = null;
+
+    <<__Native>>
+    public function __construct():void;
+
+    <<__Native>>
+    private function __clone():void;
+
+    <<__Native>>
+    private function __sleep():void;
+
+    <<__Native>>
+    private function __wakeup():void;
+
+    <<__Native>>
+    public function autoload(string $class_name):mixed;
+
+    <<__Native>>
+    static public function getInstance(?mixed $library_path = NULL, 
+        ?mixed $global_path = NULL):mixed;
+
+    <<__Native>>
+    public function registerLocalNamespace(mixed $namespace):mixed;
+
+    <<__Native>>
+    public function getLocalNamespace():mixed;
+
+    <<__Native>>
+    public function clearLocalNamespace():mixed;
+
+    <<__Native>>
+    public function isLocalName(mixed $name):mixed;
+
+    <<__Native>>
+    static public function import(string $file):mixed;
+
+    <<__Native>>
+    public function setLibraryPath(string $path, ?mixed $is_global = NULL):mixed;
+
+    <<__Native>>
+    public function getLibraryPath(?mixed $is_global = NULL):mixed;
+
+    public static function get_instance() {
+        return self::$_instance;
+    }
+
+    public static function set_instance($instance) {
+        self::$_instance = $instance;
+    }
+
 }

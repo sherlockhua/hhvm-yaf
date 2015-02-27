@@ -42,6 +42,8 @@ void YafExtension::moduleInit()
 
     _initYafViewClass();
     _initYafConfigClass();
+    _initYafAutoloadClass();
+
     loadSystemlib();
 }
 

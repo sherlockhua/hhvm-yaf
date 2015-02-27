@@ -571,9 +571,9 @@ static Variant HHVM_METHOD(Yaf_Application, bootstrap)
                 YAF_DEFAULT_BOOTSTRAP + g_yaf_local_data.get()->ext;
         }
 
-        Variant ret = yaf_loader_import(bootstrap_path.c_str(), 
+        bool ret = yaf_loader_import(bootstrap_path.c_str(), 
                 bootstrap_path.length(), 0);
-        if (ret.toBoolean() == false) {
+        if (ret == false) {
             yaf_trigger_error(YAF_ERR_STARTUP_FAILED, 
                     "yaf_loader_import %s failed", bootstrap_path.c_str());
             return false;

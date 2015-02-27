@@ -48,7 +48,7 @@ Variant yaf_response_instance(const Object* object, const char* sapi_name)
     return o;
 }
 
-static int yaf_response_send(const Object& object)
+int yaf_response_send(const Object& object)
 {
     auto ptr_body = object->o_realProp(YAF_RESPONSE_PROPERTY_NAME_BODY, 
             ObjectData::RealPropUnchecked, "Yaf_Response_Abstract");
@@ -124,14 +124,10 @@ static int yaf_response_alter_body(Object object,
     return 0;
 }
 
-#ifdef HHVM_VERSION_3_2_NEW
-static int yaf_response_clear_body(ObjectData* object, const Variant& name)
-#else
-static int yaf_response_clear_body(Object object, const Variant& name)
-#endif
+int yaf_response_clear_body(const Object* object, const Variant& name)
 {
 
-    auto ptr_body = object->o_realProp(YAF_RESPONSE_PROPERTY_NAME_BODY, 
+    auto ptr_body = (*object)->o_realProp(YAF_RESPONSE_PROPERTY_NAME_BODY, 
             ObjectData::RealPropUnchecked, "Yaf_Response_Abstract");
 
     if (!ptr_body->isArray()) {
@@ -250,7 +246,7 @@ static Variant HHVM_METHOD(Yaf_Response_Abstract, prependBody,
 
 static Variant HHVM_METHOD(Yaf_Response_Abstract, clearBody, const Variant& name)
 {
-    int ret = yaf_response_clear_body(this_, name);
+    int ret = yaf_response_clear_body(&this_, name);
     if (ret != 0) {
         return false;
     }

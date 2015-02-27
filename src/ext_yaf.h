@@ -73,6 +73,9 @@ private:
     
     //plugin
     void _initYafPluginClass();
+
+	//autoload
+	void _initYafAutoloadClass();
 }; 
 
 class YafRequestData: public RequestEventHandler {

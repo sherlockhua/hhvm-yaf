@@ -203,10 +203,10 @@ static Variant yaf_view_simple_display(Object object,
         }
     }
 
-    yaf_loader_import(script_path.c_str(), script_path.length(), 0);
-    //if (yaf_loader_import(script_path.c_str(), script_path.length(), 0)) {
-    //    raise_error("Failed opening template %s: %d", script_path.c_str(), errno); 
-    //}
+    //yaf_loader_import(script_path.c_str(), script_path.length(), 0);
+    if (!yaf_loader_import(script_path.c_str(), script_path.length(), 0)) {
+        raise_error("Failed opening template %s: %d", script_path.c_str(), errno); 
+    }
 
     //yaf_ob_end_clean();
 
@@ -253,10 +253,10 @@ static Variant yaf_view_simple_render(Object object,
         }
     }
 
-    yaf_loader_import(script_path.c_str(), script_path.length(), 0);
-    //if (yaf_loader_import(script_path.c_str(), script_path.length(), 0)) {
-    //    raise_error("Failed opening template %s: %d", script_path.c_str(), errno); 
-    //}
+    //yaf_loader_import(script_path.c_str(), script_path.length(), 0);
+    if (!yaf_loader_import(script_path.c_str(), script_path.length(), 0)) {
+        raise_error("Failed opening template %s: %d", script_path.c_str(), errno); 
+    }
 
     //yaf_ob_end_clean();
 
