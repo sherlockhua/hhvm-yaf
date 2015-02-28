@@ -19,6 +19,75 @@
 
 namespace HPHP {
 
+
+static Variant get_instance()
+{
+    Array func = Array::Create();
+    func.append("Yaf_Dispatcher");
+    func.append("getInstance");
+
+    Array params = Array::Create();
+    return vm_call_user_func(func, params);
+}
+
+static Variant set_instance(const Object& o)
+{
+    Array func = Array::Create();
+    func.append("Yaf_Dispatcher");
+    func.append("setInstance");
+
+    Array params = Array::Create();
+    params.append(o);
+    return vm_call_user_func(func, params);
+}
+
+Variant yaf_dispatcher_instance(Object* object)
+{
+    Variant router;
+
+    Variant instance = get_instance();
+    if (instance.isObject()
+            && instance.toObject()->o_instanceof(String("Yaf_Dispatcher"))) {
+        return instance;
+    }
+
+    if (object) {
+        instance = object;
+        return instance;
+    } else {
+        Array params = Array::Create();
+        instance = createObject(String("Yaf_Dispatcher"), params);
+    }
+
+    Object o_instance = instance.toObject();
+    auto ptr_plugins = o_instance->o_realProp(YAF_DISPATCHER_PROPERTY_NAME_PLUGINS, 
+            ObjectData::RealPropUnchecked, "Yaf_Dispatcher");
+
+    *ptr_plugins = Array::Create();
+    router   = yaf_router_instance(NULL);
+
+    auto ptr_router = o_instance->o_realProp(YAF_DISPATCHER_PROPERTY_NAME_ROUTER, 
+            ObjectData::RealPropUnchecked, "Yaf_Dispatcher");
+    *ptr_router = router;
+
+    auto ptr_module = o_instance->o_realProp(YAF_DISPATCHER_PROPERTY_NAME_MODULE, 
+            ObjectData::RealPropUnchecked, "Yaf_Dispatcher");
+    *ptr_module = String(g_yaf_local_data.get()->default_module);
+
+    auto ptr_controller = o_instance->o_realProp(YAF_DISPATCHER_PROPERTY_NAME_CONTROLLER, 
+            ObjectData::RealPropUnchecked, "Yaf_Dispatcher");
+    *ptr_controller = String(g_yaf_local_data.get()->default_controller);
+
+    auto ptr_action = o_instance->o_realProp(YAF_DISPATCHER_PROPERTY_NAME_ACTION, 
+            ObjectData::RealPropUnchecked, "Yaf_Dispatcher");
+    *ptr_action = String(g_yaf_local_data.get()->default_action);
+
+
+    set_instance(o_instance);
+
+    return instance;
+}
+
 static Variant yaf_dispatcher_get_controller(const char* app_dir, 
         const char* module, const char* controller, int is_def_module)
 {
@@ -545,7 +614,52 @@ static Variant HHVM_METHOD(Yaf_Dispatcher, dispatch, const Variant& request)
     return response;
 }
 
+static Variant HHVM_METHOD(Yaf_Dispatcher, throwException, const Variant& flag) 
+{
+    if (flag.isBoolean()) {
+        bool throw_exception = flag.toBoolean();
+        g_yaf_local_data.get()->throw_exception =  throw_exception;
+        return this_;
+    } 
 
+    return g_yaf_local_data.get()->throw_exception;
+}
+
+static Variant HHVM_METHOD(Yaf_Dispatcher, catchException, const Variant& flag) 
+{
+    if (flag.isBoolean()) {
+        g_yaf_local_data.get()->catch_exception = flag.toBoolean();
+        return this_;
+    } 
+
+    return g_yaf_local_data.get()->catch_exception;
+}
+
+static Variant HHVM_METHOD(Yaf_Dispatcher, registerPlugin, const Variant& plugin) 
+{
+    if (!plugin.isObject()) {
+        raise_warning("Expect a instance of Yaf_Plugin_Abstract");
+        return false;
+    }
+
+    Object o_plugin = plugin.toObject();
+    if (!o_plugin->o_instanceof(String("Yaf_Plugin_Abstract"))) {
+        raise_warning("Expect a instance of Yaf_Plugin_Abstract");
+        return false;
+    }
+
+    auto ptr_plugin = this_->o_realProp(YAF_DISPATCHER_PROPERTY_NAME_PLUGINS, 
+        ObjectData::RealPropUnchecked, "Yaf_Dispatcher");
+
+    if (!ptr_plugin->isArray()) {
+        *ptr_plugin = Array::Create();
+    }
+
+    Array& arr_plugin = ptr_plugin->toArrRef();
+    arr_plugin.append(o_plugin);
+
+    return this_;
+}
 
 void YafExtension::_initYafDispatcherClass()
 {
@@ -572,6 +686,10 @@ void YafExtension::_initYafDispatcherClass()
     HHVM_ME(Yaf_Dispatcher, autoRender);
     HHVM_ME(Yaf_Dispatcher, flushInstantly);
     HHVM_ME(Yaf_Dispatcher, dispatch);
+
+    HHVM_ME(Yaf_Dispatcher, throwException);
+    HHVM_ME(Yaf_Dispatcher, catchException);
+    HHVM_ME(Yaf_Dispatcher, registerPlugin);
 }
 
 

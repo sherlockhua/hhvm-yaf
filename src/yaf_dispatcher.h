@@ -42,7 +42,7 @@
 
 namespace HPHP
 {
-    extern Variant yaf_dispatcher_dispatch(Object* object);
+    extern Variant yaf_dispatcher_dispatch(const Object* object);
     extern Variant yaf_dispatcher_instance(Object* object);
     extern int yaf_dispatcher_set_request(const Object* object, const Variant& request);
 }

@@ -465,13 +465,13 @@ static void HHVM_METHOD(Yaf_Application, __construct, const Variant& config,
     Variant dispatcher = yaf_dispatcher_instance(NULL);
     if (dispatcher.isNull() || !dispatcher.isObject()) {
         yaf_trigger_error(YAF_ERR_STARTUP_FAILED, 
-                "initialize yaf dispatcher failed");
+                "initialize yaf dispatcher failed, create instance of dispatcher failed");
         return;
     }
 
     if (!dispatcher.toObject()->o_instanceof("Yaf_Dispatcher")) {
         yaf_trigger_error(YAF_ERR_STARTUP_FAILED, 
-                "initialize yaf dispatcher failed");
+                "initialize yaf dispatcher failed, not Yaf_Dispatcher instance");
         return;
     }
 
@@ -568,7 +568,7 @@ static Variant HHVM_METHOD(Yaf_Application, bootstrap)
             bootstrap_path = g_yaf_local_data.get()->bootstrap;
         } else {
             bootstrap_path = g_yaf_local_data.get()->directory + DEFAULT_SLASH_STR + 
-                YAF_DEFAULT_BOOTSTRAP + g_yaf_local_data.get()->ext;
+                YAF_DEFAULT_BOOTSTRAP + "." +g_yaf_local_data.get()->ext;
         }
 
         bool ret = yaf_loader_import(bootstrap_path.c_str(), 

@@ -11,8 +11,17 @@
 #include "yaf_exception.h"
 
 #include <stdio.h>
+#include <stdarg.h>
+
 
 void yaf_trigger_error(int level, char* format, ...)
 {
-    printf("err:%s", format);
+    char msg_buf[8192];
+    va_list va;
+    va_start(va, format);
+    int ret = vsnprintf(msg_buf, sizeof(msg_buf), format, va);            
+    va_end(va); 
+
+    printf("error:%s\n", msg_buf);
 }
+

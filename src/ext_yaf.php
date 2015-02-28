@@ -407,7 +407,7 @@ final class Yaf_Dispatcher {
     protected $_default_action = NULL;
 
     <<__Native>>
-    private function __construct():void;
+    public function __construct():void;
 
     <<__Native>>
     private function __clone():void;
@@ -467,17 +467,21 @@ final class Yaf_Dispatcher {
         return self::$_instance;
     }
 
+    static public function setInstance($instance) {
+        self::$_instance = $instance;
+    }
+
     <<__Native>>
     public function dispatch(mixed $request):mixed;
 
     <<__Native>>
-    public function throwException():void;
+    public function throwException(?mixed $flag = NULL):mixed;
 
     <<__Native>>
-    public function catchException():void;
+    public function catchException(?mixed $flag = NULL):mixed;
 
     <<__Native>>
-    public function registerPlugin():void;
+    public function registerPlugin(mixed $plugin):mixed;
 }
 
 abstract class Yaf_View_Interface {

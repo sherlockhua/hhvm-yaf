@@ -137,7 +137,7 @@ public:
             //this->bootstrap        = NULL;
             //this->local_library    = NULL;
             //this->local_namespaces = NULL;
-            this->modules          = NULL;
+            //this->modules          = NULL;
             //this->base_uri         = NULL;
             //this->view_directory   = NULL;
 /*
