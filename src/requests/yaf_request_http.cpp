@@ -19,17 +19,22 @@ namespace HPHP{
 
 
 Variant yaf_request_http_instance(const Object* object, 
-        const Variant& request_uri, const Variant& base_uri)
+        const Variant& request_uri, const Variant& var_base_uri)
 {
     Object o;
     if (object == NULL) {
         Array arr = Array::Create();
         arr.append(request_uri);
-        arr.append(base_uri);
+        arr.append(var_base_uri);
 
         o = createObject("Yaf_Request_Http", arr) ;
     } else {
         o = *object;
+    }
+
+    const char* base_uri = NULL;
+    if (var_base_uri.isString() && var_base_uri.toString().length()) {
+        base_uri = var_base_uri.toString().c_str();
     }
 
     if (php_global(S_SERVER).toArray().exists(String("HTTP_REQUEST_METHOD"))) {
@@ -52,6 +57,7 @@ Variant yaf_request_http_instance(const Object* object,
 
         if (php_global(S_SERVER).toArray().exists(String("REQUEST_URI"))) {
             tmp = php_global(S_SERVER).toArray()[String("REQUEST_URI")];
+            raise_warning("debug: get request_uri:%s", tmp.toString().c_str());
             if (tmp.isString()) {
                 std::string str_tmp = tmp.toString().toCppString();
                 if (strncasecmp(str_tmp.c_str(), "http", 4) == 0) {
@@ -93,11 +99,11 @@ done:
 
         *ptr_uri = String(uri.c_str());
 
-        auto ptr_base_uri = o->o_realProp(YAF_REQUEST_PROPERTY_NAME_BASE, 
-                ObjectData::RealPropUnchecked, "Yaf_Request_Http");
-        *ptr_base_uri = base_uri;
+        raise_warning("hhtp set base uri:%s", base_uri);
+        yaf_request_set_base_uri(o, base_uri, uri.c_str());
     }
 
+    raise_warning("get request http uri:%s", uri.c_str());
     auto ptr_params = o->o_realProp(YAF_REQUEST_PROPERTY_NAME_PARAMS, 
             ObjectData::RealPropUnchecked, "Yaf_Request_Http");
     *ptr_params = Array::Create();

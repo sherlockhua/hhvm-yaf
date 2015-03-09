@@ -30,7 +30,12 @@
 #define YAF_ERR_TYPE_WARN          522
 
 
+namespace HPHP {
+
+
 extern void yaf_trigger_error(int type, char* format, ...);
+
+}
 
 
 

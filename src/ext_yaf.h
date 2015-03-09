@@ -70,6 +70,7 @@ private:
     //router
     void _initYafRouterClass();
     void _initYafMapRouterClass();
+    void _initYafStaticRouterClass();
     
     //plugin
     void _initYafPluginClass();

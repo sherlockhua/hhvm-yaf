@@ -22,10 +22,66 @@
 
 namespace HPHP { 
 
-int yaf_controller_construct(Variant& control, Object& request, 
-        Object& response, Object& view, const Variant& params)
+int yaf_controller_construct(const Object& control, const Object& request, 
+        const Object& response, const Object& view, const Variant& params)
 {
-    return HHVM_YAF_SUCCESS;
+    /*
+	Array params = Array::Create();
+    params.append(request);
+    params.append(response);
+    params.append(view);
+    params.append(args);
+
+	control = createObject(String(class_name), params);
+	if (!control->o_instanceof("Yaf_Controller_Abstract")) {
+		int ret = yaf_internal_autoload(controller, (char**)&directory);
+		if (ret != HHVM_YAF_SUCCESS) {
+            raise_warning("yaf_internal_autoload failed, ret:%d", ret);
+			return init_null_variant;
+		}
+
+		o = createObject(String(class_name), params);
+		if (!o->o_instanceof("Yaf_Controller_Abstract")) {
+			return init_null_variant;
+		}
+	}
+    */
+    
+    if (!params.isNull()) {
+        auto var_params = control->o_realProp(YAF_CONTROLLER_PROPERTY_NAME_ARGS, 
+                ObjectData::RealPropUnchecked, "Yaf_Controller_Abstract");
+        *var_params = params;
+    }
+
+    auto var_request = control->o_realProp(YAF_CONTROLLER_PROPERTY_NAME_REQUEST, 
+            ObjectData::RealPropUnchecked, "Yaf_Controller_Abstract");
+    *var_request = request;
+
+    auto var_response = control->o_realProp(YAF_CONTROLLER_PROPERTY_NAME_RESPONSE, 
+            ObjectData::RealPropUnchecked, "Yaf_Controller_Abstract");
+    *var_response = response;
+
+    auto var_view = control->o_realProp(YAF_CONTROLLER_PROPERTY_NAME_VIEW, 
+            ObjectData::RealPropUnchecked, "Yaf_Controller_Abstract");
+    *var_view = view;
+    
+    auto module = request->o_realProp(YAF_REQUEST_PROPERTY_NAME_MODULE, 
+            ObjectData::RealPropUnchecked, "Yaf_Request_Abstract");
+
+    auto var_module = control->o_realProp(YAF_CONTROLLER_PROPERTY_NAME_REQUEST, 
+            ObjectData::RealPropUnchecked, "Yaf_Controller_Abstract");
+    *var_module = *module;
+
+    if (!control->o_instanceof("Yaf_Action_Abstract")) {
+        Array func = Array::Create();
+        func.append(control);
+        func.append(String("init"));
+
+        Array arr_params = Array::Create();
+        vm_call_user_func(func, arr_params);
+    }
+
+    return HHVM_YAF_SUCCESS;;
 }
 
 static Variant HHVM_METHOD(Yaf_Controller_Abstract, test)
@@ -400,39 +456,7 @@ static void HHVM_METHOD(Yaf_Controller_Abstract, __construct,
         const Object& request, const Object& response,
         const Object& view, const Variant& invokeArgs)
 {
-    if (!invokeArgs.isNull()) {
-        auto var_params = this_->o_realProp(YAF_CONTROLLER_PROPERTY_NAME_ARGS, 
-                ObjectData::RealPropUnchecked, "Yaf_Request_Abstract");
-        *var_params = invokeArgs;
-    }
-
-    auto var_request = this_->o_realProp(YAF_CONTROLLER_PROPERTY_NAME_REQUEST, 
-            ObjectData::RealPropUnchecked, "Yaf_Controller_Abstract");
-    *var_request = request;
-
-    auto var_response = this_->o_realProp(YAF_CONTROLLER_PROPERTY_NAME_RESPONSE, 
-            ObjectData::RealPropUnchecked, "Yaf_Controller_Abstract");
-    *var_response = response;
-
-    auto var_view = this_->o_realProp(YAF_CONTROLLER_PROPERTY_NAME_VIEW, 
-            ObjectData::RealPropUnchecked, "Yaf_Controller_Abstract");
-    *var_view = view;
-
-    auto module = request->o_realProp(YAF_REQUEST_PROPERTY_NAME_MODULE, 
-            ObjectData::RealPropUnchecked, "Yaf_Request_Abstract");
-
-    auto var_module = this_->o_realProp(YAF_CONTROLLER_PROPERTY_NAME_REQUEST, 
-            ObjectData::RealPropUnchecked, "Yaf_Controller_Abstract");
-    *var_module = *module;
-
-    if (!this_->o_instanceof("Yaf_Action_Abstract")) {
-        Array func = Array::Create();
-        func.append(this_);
-        func.append(String("init"));
-
-        Array params = Array::Create();
-        vm_call_user_func(func, params);
-    }
+    (void) yaf_controller_construct(this_, request, response, view, invokeArgs);
 }
 
 

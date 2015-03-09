@@ -9,6 +9,7 @@
 *
 =============================================*/
 #include "hphp/runtime/base/class-info.h"
+#include "hphp/runtime/ext/std/ext_std_classobj.h"
 
 #include "yaf_application.h"
 #include "yaf_config.h"
@@ -69,6 +70,8 @@ static int yaf_application_init_loader()
                  g_yaf_local_data.get()->directory.c_str(), 
                  DEFAULT_SLASH_CHAR, YAF_LIBRARY_DIRECTORY_NAME);
         var_local_library = String(local_library);
+
+        raise_warning("local library:%s golobal:%s", local_library, g_yaf_local_data.get()->global_library.c_str());
     }
 
     loader = yaf_loader_instance(NULL, var_local_library, var_global_library);
@@ -408,6 +411,7 @@ static void set_app(const Object object)
 static void HHVM_METHOD(Yaf_Application, __construct, const Variant& config, 
         const Variant& section)
 {
+    raise_warning("begin initialize yaf_application succ");
     Variant var_app = get_app();
     if (!var_app.isNull()) {
         yaf_trigger_error(YAF_ERR_STARTUP_FAILED, 
@@ -509,6 +513,8 @@ static void HHVM_METHOD(Yaf_Application, __construct, const Variant& config,
         *ptr_modules = init_null_variant;
     }
 
+
+    raise_warning("initialize yaf_application succ");
     //*ptr_app = this_;
     set_app(this_);
     return;
@@ -561,30 +567,29 @@ static Variant HHVM_METHOD(Yaf_Application, environ)
 static Variant HHVM_METHOD(Yaf_Application, bootstrap)
 {
     Array args = Array::Create();
-    Object o = createObject("bootstrap", args);
+    Object o;
+
+    std::string bootstrap_path;
+    if (g_yaf_local_data.get()->bootstrap.length()) {
+        bootstrap_path = g_yaf_local_data.get()->bootstrap;
+    } else {
+        bootstrap_path = g_yaf_local_data.get()->directory + DEFAULT_SLASH_STR + 
+            YAF_DEFAULT_BOOTSTRAP + "." +g_yaf_local_data.get()->ext;
+    }
+
+    bool ret = yaf_loader_import(bootstrap_path.c_str(), 
+            bootstrap_path.length(), 0);
+    if (ret == false) {
+        yaf_trigger_error(YAF_ERR_STARTUP_FAILED, 
+                "yaf_loader_import %s failed", bootstrap_path.c_str());
+        return false;
+    }
+
+    o = createObject("bootstrap", args);
     if (o.isNull() || !o->o_instanceof("Yaf_Bootstrap_Abstract")) {
-        std::string bootstrap_path;
-        if (g_yaf_local_data.get()->bootstrap.length()) {
-            bootstrap_path = g_yaf_local_data.get()->bootstrap;
-        } else {
-            bootstrap_path = g_yaf_local_data.get()->directory + DEFAULT_SLASH_STR + 
-                YAF_DEFAULT_BOOTSTRAP + "." +g_yaf_local_data.get()->ext;
-        }
-
-        bool ret = yaf_loader_import(bootstrap_path.c_str(), 
-                bootstrap_path.length(), 0);
-        if (ret == false) {
-            yaf_trigger_error(YAF_ERR_STARTUP_FAILED, 
-                    "yaf_loader_import %s failed", bootstrap_path.c_str());
-            return false;
-        }
-
-        o = createObject("bootstrap", args);
-        if (o.isNull() || !o->o_instanceof("Yaf_Bootstrap_Abstract")) {
-            yaf_trigger_error(YAF_ERR_STARTUP_FAILED, 
-                    "can't found bootstrap in %s", bootstrap_path.c_str());
-            return false;
-        }
+        yaf_trigger_error(YAF_ERR_STARTUP_FAILED, 
+                "can't found bootstrap in %s", bootstrap_path.c_str());
+        return false;
     }
 
     auto ptr_dispatcher = this_->o_realProp(YAF_APPLICATION_PROPERTY_NAME_DISPATCHER, 

@@ -34,5 +34,4 @@ extern php_url *php_url_parse_ex(char const *str, int length);
 extern char *php_replace_controlchars_ex(char *str, int len);
 extern void php_url_free(php_url *theurl);
 
-
 #endif //_URL_H

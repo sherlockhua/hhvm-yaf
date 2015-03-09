@@ -13,8 +13,122 @@
 #include "hphp/runtime/base/base-includes.h"
 #include "hphp/runtime/base/php-globals.h"
 #include "requests/yaf_request_http.h"
+#include "hphp/runtime/ext/ext_file.h"
 
 namespace HPHP{
+
+
+int yaf_request_set_base_uri(const Object& request, 
+        const char *base_uri, const char *request_uri) 
+{
+   // char *basename = NULL;
+    //unsigned int basename_len = 0;
+    raise_warning(" in set baseuri base_uri:%s:%p, request_uri:%s", base_uri, base_uri, request_uri);
+    String basename;
+    Variant container = NULL;
+
+    if (!base_uri) {
+        Variant script_filename = init_null_variant;
+        char    *file_name;
+        size_t  file_name_len;
+
+        if (php_global(S_SERVER).toArray().exists(String("SCRIPT_FILENAME"))) {
+            script_filename = php_global(S_SERVER).toArray()[String("SCRIPT_FILENAME")];
+        }
+
+        do {
+            if (script_filename.isString()) {
+                Variant script_name;
+                Variant phpself_name;
+                Variant orig_name;
+
+                if (php_global(S_SERVER).toArray().exists(String("SCRIPT_NAME"))) {
+                    script_name = php_global(S_SERVER).toArray()[String("SCRIPT_NAME")];
+                }
+
+                String str_ext(g_yaf_local_data.get()->ext);
+                String file_name = f_basename(script_filename.toString(), str_ext);
+                if (script_name.isString()) {
+                    String script = f_basename(script_name.toString());
+                    if (strncmp(file_name.c_str(), script.c_str(), file_name.length()) == 0) {
+                        basename = script_name;
+                        container = script_name;
+                        break;
+                    }
+                }
+
+                if (php_global(S_SERVER).toArray().exists(String("PHP_SELF"))) {
+                    script_name = php_global(S_SERVER).toArray()[String("PHP_SELF")];
+                }
+
+                if (phpself_name.isString()) {
+                    String phpself = f_basename(phpself_name.toString());
+                    if (strncmp(file_name.c_str(), phpself.c_str(), file_name.length()) == 0) {
+                        basename = phpself_name;
+                        container = phpself_name;
+                        break;
+                    }
+                }
+
+                if (php_global(S_SERVER).toArray().exists(String("ORIG_SCRIPT_NAME"))) {
+                    orig_name = php_global(S_SERVER).toArray()[String("ORIG_SCRIPT_NAME")];
+                }
+
+                if (orig_name.isString()) {
+                    String orig = f_basename(orig_name.toString());
+                    if (strncmp(file_name.c_str(), orig.c_str(), file_name.length()) == 0) {
+                        basename = orig_name;
+                        container = orig_name;
+                        break;
+                    }
+                }
+            }
+        } while (0);
+
+        raise_warning("basename:%s",basename.c_str());
+        if (basename.length() && strstr(request_uri, basename.c_str()) == request_uri) {
+            unsigned basename_len = basename.length();
+            if (basename[basename_len - 1] == '/') {
+                --basename_len;
+            }
+
+            auto ptr_basename = request->o_realProp(YAF_REQUEST_PROPERTY_NAME_BASE, 
+                                        ObjectData::RealPropUnchecked, "Yaf_Request_Abstract");
+
+            *ptr_basename = String(std::string(basename.c_str(), basename_len));
+            return HHVM_YAF_SUCCESS;
+        } else if (basename.length()) {
+
+            String dir = f_dirname(basename);
+            std::string str_dir = dir.toCppString();
+            if (str_dir[str_dir.length() - 1] == '/') {
+                str_dir.erase(str_dir.end() - 1);
+            }
+
+            if (str_dir.length()) {
+                if (strstr(request_uri, dir.c_str()) == request_uri) {
+
+                    auto ptr_basename = request->o_realProp(YAF_REQUEST_PROPERTY_NAME_BASE, 
+                                            ObjectData::RealPropUnchecked, "Yaf_Request_Abstract");
+                    *ptr_basename = String(str_dir);
+                    return HHVM_YAF_SUCCESS;
+                }
+            }
+        }
+
+        auto ptr_basename = request->o_realProp(YAF_REQUEST_PROPERTY_NAME_BASE, 
+                                ObjectData::RealPropUnchecked, "Yaf_Request_Abstract");
+
+        *ptr_basename = String("");
+        return HHVM_YAF_SUCCESS;
+    } else {
+        auto ptr_basename = request->o_realProp(YAF_REQUEST_PROPERTY_NAME_BASE, 
+                                    ObjectData::RealPropUnchecked, "Yaf_Request_Abstract");
+        *ptr_basename = String(base_uri);
+    }
+
+    return HHVM_YAF_SUCCESS;
+}
 
 bool yaf_request_is_dispatched(const Object* request)
 {
@@ -46,7 +160,7 @@ Variant yaf_request_instance(const Object* object, const char* base_uri)
     return yaf_request_http_instance(object, tmp, str_base_uri);
 }
 
-int yaf_request_set_routed(Object* object, int flag)
+int yaf_request_set_routed(const Object* object, int flag)
 {
     if (object == NULL) {
         return HHVM_YAF_FAILED;
@@ -376,17 +490,18 @@ static Variant HHVM_METHOD(Yaf_Request_Abstract, getLanguage)
     return lang;
 }
 
-static bool HHVM_METHOD(Yaf_Request_Abstract, setBaseUri, const Variant& uri)
+static Variant HHVM_METHOD(Yaf_Request_Abstract, setBaseUri, const Variant& uri)
 {
     if (!uri.isString()) {
         return false;
     }
 
-    auto tmp = this_->o_realProp(YAF_REQUEST_PROPERTY_NAME_BASE, 
-            ObjectData::RealPropUnchecked, "Yaf_Request_Abstract");
+    const char* base_uri = uri.toString().c_str();
+    if (yaf_request_set_base_uri(this_, base_uri, NULL)  == HHVM_YAF_SUCCESS) {
+        return this_;
+    }
 
-    *tmp = uri;
-    return true; 
+    return false;
 }
 
 static Variant HHVM_METHOD(Yaf_Request_Abstract, getBaseUri)

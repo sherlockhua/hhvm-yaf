@@ -11,6 +11,7 @@
 #ifndef _YAF_ROUTER_STATIC_H_
 #define _YAF_ROUTER_STATIC_H_
 
+#include "ext_yaf.h"
 
 namespace HPHP {
 

@@ -142,7 +142,7 @@ abstract class Yaf_Request_Abstract  {
      public function getLanguage():mixed;
 
      <<__Native>>
-     public function setBaseUri(mixed $uri):bool;
+     public function setBaseUri(mixed $uri):mixed;
 
      <<__Native>>
      public function getBaseUri():mixed;
@@ -735,6 +735,15 @@ final class Yaf_Route_Map extends Yaf_Route_Interface {
 
     <<__Native>>
     public function route(mixed $request):mixed;
+}
+
+final class Yaf_Route_Static extends Yaf_Route_Interface {
+
+    <<__Native>>
+    public function route(mixed $request):mixed;
+
+    <<__Native>>
+    public function match():mixed;
 }
 
 abstract class Yaf_Plugin_Abstract {

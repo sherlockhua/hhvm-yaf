@@ -21,20 +21,48 @@ namespace HPHP {
 
 Array yaf_router_parse_parameters(const char* uri)
 {
-    return Array::Create();
+    char *key, *ptrptr, *tmp, *value;
+    Array params =  Array::Create();
+    Variant val;
+    uint key_len;
+
+    tmp = strdup(uri);
+    key = strtok_r(tmp, YAF_ROUTER_URL_DELIMIETER, &ptrptr);
+    while (key) {
+        key_len = strlen(key);
+        if (key_len) {
+            value = strtok_r(NULL, YAF_ROUTER_URL_DELIMIETER, &ptrptr);
+            if (value && strlen(value)) {
+                val = String(value);
+            } else {
+                val = init_null_variant;
+            }
+
+            params.set(String(key), val);
+        }
+
+        key = strtok_r(NULL, YAF_ROUTER_URL_DELIMIETER, &ptrptr);
+    }
+
+    free(tmp);
+    return params;
 }
 
-int yaf_router_route (const Object* object, const Variant& request)
+int yaf_router_route (const Object* object, const Object& request)
 {
+    raise_warning("in yaf router route");
     auto ptr_routes = (*object)->o_realProp(YAF_ROUTER_PROPERTY_NAME_ROUTERS, 
             ObjectData::RealPropUnchecked, "Yaf_Router");
     if (!ptr_routes->isArray()) {
         return HHVM_YAF_FAILED;
     }
 
+    raise_warning("begin yaf router route");
     Array& arr_routes = ptr_routes->toArrRef();
     ArrayIter iter = arr_routes.begin();
     while (!iter.end()) {
+        raise_warning("run yaf router route");
+
         Variant key = iter.first();
         Variant value = iter.second();
 
@@ -49,6 +77,7 @@ int yaf_router_route (const Object* object, const Variant& request)
 
         Variant ret = vm_call_user_func(func, params);
         if (!ret.isBoolean() || ret.toBoolean() == false) {
+            raise_warning("run yaf router route failed");
             iter.next();
             continue;
         }
@@ -57,8 +86,7 @@ int yaf_router_route (const Object* object, const Variant& request)
                 ObjectData::RealPropUnchecked, "Yaf_Router");
         *ptr_routes = key;
 
-        Object o_request = request.toObject();
-        yaf_request_set_routed(&o_request, 1);
+        yaf_request_set_routed(&request, 1);
         
         iter.next();
     }
@@ -222,7 +250,7 @@ static Variant HHVM_METHOD(Yaf_Router, addConfig,
 static Variant HHVM_METHOD(Yaf_Router, route, 
         const Variant& request)
 {
-    int ret = yaf_router_route(&this_, request);
+    int ret = yaf_router_route(&this_, request.toObject());
     if (ret != HHVM_YAF_SUCCESS) {
         return false;
     }
@@ -273,6 +301,7 @@ void YafExtension::_initYafRouterClass()
     HHVM_ME(Yaf_Router, getCurrentRoute);
 
     _initYafMapRouterClass();
+    _initYafStaticRouterClass();
 }
  
 }
