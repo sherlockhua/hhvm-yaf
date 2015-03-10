@@ -26,8 +26,7 @@ namespace HPHP {
 
 
 extern int yaf_controller_construct(const Object& control, const Object& request, 
-        const Object& response, const Object& view, const Variant& params, 
-        const Array& args);
+        const Object& response, const Object& view, const Variant& params);
 
 }
 

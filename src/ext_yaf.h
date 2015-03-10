@@ -134,6 +134,13 @@ public:
             this->in_exception     = 0;
             this->throw_exception  = 1;
             this->catch_exception  = 0;
+            this->modules          = init_null_variant;
+            this->directory.clear();
+            this->bootstrap.clear();
+            this->local_library.clear();
+            this->local_namespaces.clear();
+            this->base_uri.clear();
+            this->view_directory.clear();
             //this->directory        = NULL;
             //this->bootstrap        = NULL;
             //this->local_library    = NULL;

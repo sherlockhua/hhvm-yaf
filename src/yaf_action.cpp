@@ -11,6 +11,7 @@
 //#include "ext_example.h"
 #include "hphp/runtime/base/base-includes.h"
 #include "hphp/runtime/ext/extension.h"
+#include "yaf_action.h"
 #include "ext_yaf.h"
 
 namespace HPHP { 

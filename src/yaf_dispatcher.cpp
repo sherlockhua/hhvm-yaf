@@ -15,6 +15,7 @@
 #include "yaf_response.h"
 #include "yaf_request.h"
 #include "yaf_router.h"
+#include "yaf_action.h"
 #include "yaf_controller.h"
 
 namespace HPHP {
@@ -88,6 +89,128 @@ Variant yaf_dispatcher_instance(Object* object)
     return instance;
 }
 
+static Variant yaf_dispatcher_get_action(const char* app_dir, 
+        const Object& controller, const String& module, int def_module, 
+        const String& action)
+{
+    auto ptr_action_map = controller->o_realProp(YAF_CONTROLLER_PROPERTY_NAME_ACTIONS,
+            ObjectData::RealPropUnchecked, "Yaf_Controller_Abstract");
+
+    char action_upper[1024];
+    snprintf(action_upper, sizeof(action_upper), "%s", action.c_str());
+    action_upper[0] = toupper(action_upper[0]);
+
+    if (ptr_action_map->isArray()) {
+        Array& action_map = ptr_action_map->toArrRef();
+        if (!action_map.exists(action)) {
+            raise_warning("there's no method %sAction in %s::$%s", 
+                    action.c_str(), controller->getVMClass()->name()->data(), 
+                    YAF_CONTROLLER_PROPERTY_NAME_ACTIONS);
+            return init_null_variant;
+        }
+
+        Variant var_value = action_map[action];
+        if (!var_value.isString()) {
+            raise_warning("wrong value type, there's no method %sAction in %s::$%s", 
+                    action.c_str(), controller->getVMClass()->name()->data(), 
+                    YAF_CONTROLLER_PROPERTY_NAME_ACTIONS);
+            return init_null_variant;
+        }
+
+        char action_path[1024];
+        snprintf(action_path, sizeof(action_path), "%s%c%s", 
+                app_dir, DEFAULT_SLASH_CHAR, var_value.toString().c_str());
+
+        raise_warning("action class path is %s", action_path);
+        if (!yaf_loader_import(action_path, strlen(action_path), 0)) {
+            raise_warning("can't open action script:%s", action_path);
+            return init_null_variant;
+        }
+
+        char action_class[1024];
+        if (g_yaf_local_data.get()->name_suffix) {
+            snprintf(action_class, sizeof(action_class), "%s%sAction",
+                    action_upper, g_yaf_local_data.get()->name_separator.c_str());
+        } else {
+            snprintf(action_class, sizeof(action_class), "Action%s%s",
+                    g_yaf_local_data.get()->name_separator.c_str(), action_upper);
+        }
+
+        raise_warning("action class name is %s", action_class);
+        Array args = Array::Create();
+	    Object o = createObject(String(action_class), args);
+        if (!o->o_instanceof("Yaf_Action_Abstract")) {
+            raise_warning("Action must extends from Yaf_Action_Abstract");
+            return init_null_variant;
+        }
+
+        return o;
+    }
+
+    if (g_yaf_local_data.get()->st_compatible) {
+        char *p;
+        char directory[1024];
+        char class_name[1024];
+        /**
+         * upper Action Name
+         * eg: Index_sub -> Index_Sub
+         */
+        p = action_upper;
+        *(p) = toupper(*p);
+        while (*p != '\0') {
+            if (*p == '_'
+#ifdef YAF_HAVE_NAMESPACE
+                    || *p == '\\'
+#endif
+               ) {
+                if (*(p+1) != '\0') {
+                    *(p+1) = toupper(*(p+1));
+                    p++;
+                }
+            }
+            p++;
+        }
+
+        if (def_module) {
+            snprintf(directory, sizeof(directory), "%s%c%s", 
+                    app_dir, DEFAULT_SLASH_CHAR, "actions");
+        } else {
+            snprintf(directory, sizeof(directory), 
+                    "%s%c%s%c%s%c%s", app_dir, DEFAULT_SLASH_CHAR,
+                    "modules", DEFAULT_SLASH_CHAR, module.c_str(), DEFAULT_SLASH_CHAR, "actions");
+        }
+
+        if (g_yaf_local_data.get()->name_suffix) {
+            snprintf(class_name, sizeof(class_name), "%s%sAction", 
+                    action_upper, g_yaf_local_data.get()->name_separator.c_str());
+        } else {
+            snprintf(class_name, sizeof(class_name), "Action%s%s", 
+                    g_yaf_local_data.get()->name_separator.c_str(), action_upper);
+        }
+
+        Array args = Array::Create();
+        Object o = createObject(String(class_name), args);
+        if (!o->o_instanceof("Yaf_Action_Abstract")) {
+            int ret = yaf_internal_autoload(action_upper, (int)strlen(action_upper),
+                    (char**)&directory);
+            if (ret != HHVM_YAF_SUCCESS) {
+                raise_warning("yaf_internal_autoload failed, ret:%d, "\
+                        "failed open action script:%s", ret, directory);
+                return init_null_variant;
+            }
+
+            o = createObject(String(class_name), args);
+            if (!o->o_instanceof("Yaf_Action_Abstract")) {
+                return init_null_variant;
+            }
+        }
+
+        return o;
+    }
+
+    return init_null_variant;
+}
+
 static Variant yaf_dispatcher_get_controller(const char* app_dir, 
         const char* module, const char* controller, int is_def_module, 
         const Array& args)
@@ -120,7 +243,7 @@ static Variant yaf_dispatcher_get_controller(const char* app_dir,
 	//Array params = Array::Create();
 	Object o = createObject(String(class_name), args);
 	if (!o->o_instanceof("Yaf_Controller_Abstract")) {
-		int ret = yaf_internal_autoload(controller, (char**)&directory);
+		int ret = yaf_internal_autoload(controller, strlen(controller), (char**)&directory);
 		if (ret != HHVM_YAF_SUCCESS) {
             raise_warning("yaf_internal_autoload failed, ret:%d", ret);
 			return init_null_variant;
@@ -152,6 +275,46 @@ static Variant yaf_dispatcher_get_controller(const char* app_dir,
     */
 
 	return o;
+}
+
+static int yaf_dispatcher_get_call_parameters(const Object& request, 
+            const Func* func, Array& params)
+{
+    auto ptr_args = request->o_realProp(YAF_REQUEST_PROPERTY_NAME_PARAMS, 
+            ObjectData::RealPropUnchecked, "Yaf_Request_Abstract");
+
+    if (!ptr_args->isArray()) {
+        return HHVM_YAF_SUCCESS;
+    }
+
+    Array& arr_args = ptr_args->toArrRef();
+    uint32_t func_params_size = func->numNamedLocals();
+
+    raise_warning("get call parameters, count:%u", func_params_size);
+
+    for (uint32_t i = 0; i < func_params_size; i++) {
+
+        const StringData* params_name = func->localVarName(i);
+        const char* ptr_params_name = params_name->data();
+
+        if (arr_args.exists(String(ptr_params_name))) {
+            params.append(arr_args[String(ptr_params_name)]);
+        } else {
+            ArrayIter iter = arr_args.begin();
+            while (!iter.end()) {
+                Variant first = iter.first();
+                Variant second = iter.second();
+
+                if (strncasecmp(first.toString().c_str(), ptr_params_name, 
+                            first.toString().length()) == 0) {
+                    params.append(second);
+                }
+                iter.next();
+            }
+        }
+    }
+
+    return HHVM_YAF_SUCCESS;
 }
 
 static int yaf_dispatcher_handle(const Object& object, const Object& request, 
@@ -231,6 +394,94 @@ static int yaf_dispatcher_handle(const Object& object, const Object& request,
     } else {
         snprintf(view_dir, sizeof(view_dir), "%s/%s/%s/%s", 
                 app_dir.c_str(), "modules", ptr_module->toString().c_str(), "views");
+    }
+
+    g_yaf_local_data.get()->view_directory = std::string(view_dir);
+    auto ptr_ctl_controller = tmp_controller.toObject()->o_realProp(YAF_CONTROLLER_PROPERTY_NAME_NAME,
+            ObjectData::RealPropUnchecked, "Yaf_Controller_Abstract");
+    *ptr_ctl_controller = *ptr_controller;
+
+    auto ptr_action = request->o_realProp(YAF_REQUEST_PROPERTY_NAME_ACTION, 
+            ObjectData::RealPropUnchecked, "Yaf_Request_Abstract");
+
+    std::string action_lower = ptr_action->toString().toCppString();
+    transform(action_lower.begin(), action_lower.end(), action_lower.begin(), tolower);
+
+    std::string actionMethod = action_lower + "action";
+    raise_warning("start check func %s of controller", actionMethod.c_str());
+
+    Variant executor = init_null_variant;
+    const Func* action_func = tmp_controller.toObject()->methodNamed(String(actionMethod).get());
+    if (action_func != nullptr) {
+         const Func::ParamInfoVec& func_params  = action_func->params();
+
+         Array params = Array::Create();
+         String method(actionMethod);
+         Array arr_func = Array::Create();
+
+         arr_func.append(tmp_controller.toObject());
+         arr_func.append(method);
+
+         executor = tmp_controller;
+         raise_warning("parameter size:%d", func_params.size());
+         if (func_params.size()) {
+             yaf_dispatcher_get_call_parameters(request, action_func, params);
+         } 
+
+         Variant ret = vm_call_user_func(arr_func, params);
+         if (ret.isBoolean() && !ret.toBoolean()) {
+             return HHVM_YAF_SUCCESS;
+         }
+    } else {
+        Variant var_action = yaf_dispatcher_get_action(app_dir.c_str(), tmp_controller.toObject(), 
+                             ptr_module->toString(), is_def_module, ptr_action->toString());
+        if (var_action.isNull()) {
+            raise_warning("yaf_dispatcher_get_action failed, " \
+                    "module:%s action:%s", 
+                    ptr_module->toString().c_str(), 
+                    ptr_action->toString().c_str());
+            return HHVM_YAF_FAILED;
+        }
+
+        executor = var_action;
+        const Func* action_func = var_action.toObject()->methodNamed(
+                                    String(YAF_ACTION_EXECUTOR_NAME).get());
+        if (action_func != nullptr) {
+            yaf_controller_construct(var_action.toObject(), 
+                        request, response, view, init_null_variant);
+
+            Object o_action = var_action.toObject();
+            auto ptr_name = o_action->o_realProp(YAF_CONTROLLER_PROPERTY_NAME_NAME, 
+                            ObjectData::RealPropUnchecked, "Yaf_Controller_Abstract");
+            *ptr_name = *ptr_controller;
+
+            auto ptr_action_ctrl = o_action->o_realProp(YAF_ACTION_PROPERTY_NAME_CTRL, 
+                            ObjectData::RealPropUnchecked, "Yaf_Action_Abstract");
+            *ptr_action_ctrl = tmp_controller;
+
+            const Func::ParamInfoVec& func_params  = action_func->params();
+
+             Array params = Array::Create();
+             String method(YAF_ACTION_EXECUTOR_NAME);
+             Array arr_func = Array::Create();
+
+             arr_func.append(o_action);
+             arr_func.append(method);
+
+             raise_warning("parameter size:%d", func_params.size());
+             if (func_params.size()) {
+                 yaf_dispatcher_get_call_parameters(request, action_func, params);
+             } 
+
+             Variant ret = vm_call_user_func(arr_func, params);
+             if (ret.isBoolean() && !ret.toBoolean()) {
+                 return HHVM_YAF_SUCCESS;
+             }
+        }
+    }
+
+    if (!executor.isNull()) {
+
     }
 
     return HHVM_YAF_SUCCESS;

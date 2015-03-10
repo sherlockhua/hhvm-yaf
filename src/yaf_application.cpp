@@ -42,6 +42,14 @@ bool yaf_application_is_module_name(const String& module)
         Variant key = iter.first();
         Variant value = iter.second();
 
+        if (!value.isString()) {
+            iter.next();
+            continue;
+        }
+
+        raise_warning("application modules, key:%s value:%s", 
+                key.toString().c_str(), value.toString().c_str());
+
         String& str_value = value.toStrRef();
         if (strncasecmp(str_value.c_str(), module.c_str(), module.length()) == 0) {
             return true;
@@ -123,6 +131,7 @@ static int yaf_application_parse_module(const Array& config)
         String str_module = String(g_yaf_local_data.get()->default_module);
         arr_modules.append(str_module);
 
+        raise_warning("parse application, def module:%s", str_module.c_str());
         g_yaf_local_data.get()->modules = arr_modules;
         return HHVM_YAF_SUCCESS;
     }
@@ -135,12 +144,15 @@ static int yaf_application_parse_module(const Array& config)
     char* seg = strtok_r(ptr_modules_dup, ",", &save_ptr);
     while (seg) {
         if (seg && strlen(seg)) {
+            raise_warning("parse application, module:%s", seg);
             arr_modules.append(String(seg));       
         }
 
         seg = strtok_r(NULL, ",", &save_ptr);
     }
 
+    free(ptr_modules_dup);
+    g_yaf_local_data.get()->modules = arr_modules;
     return HHVM_YAF_SUCCESS;
 }
 
@@ -508,6 +520,18 @@ static void HHVM_METHOD(Yaf_Application, __construct, const Variant& config,
     auto ptr_modules = this_->o_realProp(YAF_APPLICATION_PROPERTY_NAME_MODULES, 
             ObjectData::RealPropUnchecked, "Yaf_Application");
     if (g_yaf_local_data.get()->modules.isInitialized()) {
+        raise_warning("yaf_local_data: modules set");
+        Array& tmp = g_yaf_local_data.get()->modules.toArrRef();
+        ArrayIter iter = tmp.begin();
+        while (!iter.end()) {
+            Variant first = iter.first();
+            Variant second = iter.second();
+
+            raise_warning("yaf_local_data modules, "\
+                    "key:%s value:%s", first.toString().c_str(),
+                    second.toString().c_str());
+            iter.next();
+        }
         *ptr_modules = g_yaf_local_data.get()->modules;
     } else {
         *ptr_modules = init_null_variant;

@@ -54,7 +54,7 @@ extern int yaf_loader_register_namespace_single(const std::string& str_namespace
 extern Variant yaf_loader_instance(const Object* object, 
         const Variant& local_library, const Variant& var_global_library);
 
-extern int yaf_internal_autoload(const char* file_name, char** directory);
+extern int yaf_internal_autoload(const char* file_name, int len, char** directory);
 }
 
 
