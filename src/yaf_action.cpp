@@ -27,6 +27,8 @@ static Variant HHVM_METHOD(Yaf_Action_Abstract, getController)
     return _controller->toObject();
 }
 
+static void HHVM_METHOD(Yaf_Action_Abstract, execute)
+{}
 
 static void HHVM_METHOD(Yaf_Action_Abstract, __construct)
 {}
@@ -35,6 +37,7 @@ static void HHVM_METHOD(Yaf_Action_Abstract, __construct)
 void YafExtension::_initYafActionClass()
 {
     HHVM_ME(Yaf_Action_Abstract, getController);
+    HHVM_ME(Yaf_Action_Abstract, execute);
     HHVM_ME(Yaf_Action_Abstract, __construct);
 }
 

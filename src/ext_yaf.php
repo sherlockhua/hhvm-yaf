@@ -248,7 +248,9 @@ abstract class Yaf_Action_Abstract extends Yaf_Controller_Abstract{
      <<__Native>>
     public function getController():mixed;
 
-    abstract public function execute();
+    //<<__Native("ActRec")>>
+     <<__Native>>
+    public function execute():mixed;
 }
  
 abstract class Yaf_Response_Abstract {

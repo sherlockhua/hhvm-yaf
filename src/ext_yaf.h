@@ -134,7 +134,8 @@ public:
             this->in_exception     = 0;
             this->throw_exception  = 1;
             this->catch_exception  = 0;
-            this->modules          = init_null_variant;
+
+            //this->modules = Array::Create();
             this->directory.clear();
             this->bootstrap.clear();
             this->local_library.clear();
@@ -158,6 +159,9 @@ public:
         }
 
         virtual void requestShutdown() {
+            if (this->modules.isArray()) {
+                this->modules.toArrRef().clear();
+            }
         }
         virtual ~YafRequestData(){}
 };
