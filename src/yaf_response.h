@@ -29,6 +29,10 @@ extern int yaf_response_set_redirect(Variant response, const String& location);
 extern Variant yaf_response_instance(const Object* object, const char* sapi_name);
 extern int yaf_response_send(const Object& object);
 extern int yaf_response_clear_body(const Object* object, const Variant& name);
+
+extern int yaf_response_alter_body(const Object& object, 
+        const Variant& name, const String& body, int flag);
+
 }
 
 

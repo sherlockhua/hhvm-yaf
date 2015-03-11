@@ -11,7 +11,8 @@ abstract class Yaf_Controller_Abstract {
     protected $_view        = NULL;
 
     <<__Native>>
-    protected function render(string $tpl, ?array $parameters = NULL):mixed;
+    //protected function render(string $tpl, ?array $parameters = NULL):mixed;
+    public function render(string $tpl, ?array $parameters = NULL):mixed;
 
     <<__Native>>
     public function test():mixed;
@@ -332,6 +333,10 @@ final class Yaf_Application {
     protected string $_environ = NULL;
     protected int    $_err_no = 0;
     protected string $_err_msg = '';
+
+    public static function app() {
+        return self::$_app;
+    }
 
     public static function get_app() {
         return self::$_app;
@@ -821,6 +826,38 @@ class Yaf_Loader{
     }
 
     public static function set_instance($instance) {
+        self::$_instance = $instance;
+    }
+
+}
+
+final class Yaf_Registry {
+    protected static $_instance = null;
+    protected $_entries = null;
+    
+    <<__Native>>
+    public function __construct():void;
+
+    <<__Native>>
+    private function __clone():void;
+
+    <<__Native>>
+    static public function get(string $name):mixed;
+
+    <<__Native>>
+    static public function set(string $name, mixed $value):mixed;
+
+    <<__Native>>
+    static public function has(string $name):mixed;
+
+    <<__Native>>
+    static public function del(string $name):mixed;
+
+    static public function  get_instance() {
+        return self::$_instance;
+    }
+
+    static public function set_instance($instance) {
         self::$_instance = $instance;
     }
 

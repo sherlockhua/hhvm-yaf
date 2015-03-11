@@ -77,6 +77,9 @@ private:
 
 	//autoload
 	void _initYafAutoloadClass();
+
+    //registry
+    void _initYafRegistryClass();
 }; 
 
 class YafRequestData: public RequestEventHandler {

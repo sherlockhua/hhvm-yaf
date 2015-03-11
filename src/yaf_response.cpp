@@ -79,11 +79,7 @@ int yaf_response_set_redirect(ObjectData* response, const String& location)
     return 0;
 }
 
-#ifdef HHVM_VERSION_3_2_NEW
-static int yaf_response_alter_body(ObjectData* object, 
-#else
-static int yaf_response_alter_body(Object object, 
-#endif
+int yaf_response_alter_body(const Object& object, 
         const Variant& name, const String& body, int flag)
 {
     if (!body.length()) {

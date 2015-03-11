@@ -91,7 +91,7 @@ Variant yaf_dispatcher_instance(Object* object)
 
 static Variant yaf_dispatcher_get_action(const char* app_dir, 
         const Object& controller, const String& module, int def_module, 
-        const String& action)
+        const String& action, const Array& params)
 {
     auto ptr_action_map = controller->o_realProp(YAF_CONTROLLER_PROPERTY_NAME_ACTIONS,
             ObjectData::RealPropUnchecked, "Yaf_Controller_Abstract");
@@ -137,8 +137,7 @@ static Variant yaf_dispatcher_get_action(const char* app_dir,
         }
 
         raise_warning("action class name is %s", action_class);
-        Array args = Array::Create();
-	    Object o = createObject(String(action_class), args);
+	    Object o = createObject(String(action_class), params);
         if (!o->o_instanceof("Yaf_Action_Abstract")) {
             raise_warning("Action must extends from Yaf_Action_Abstract");
             return init_null_variant;
@@ -188,8 +187,7 @@ static Variant yaf_dispatcher_get_action(const char* app_dir,
                     g_yaf_local_data.get()->name_separator.c_str(), action_upper);
         }
 
-        Array args = Array::Create();
-        Object o = createObject(String(class_name), args);
+        Object o = createObject(String(class_name), params);
         if (!o->o_instanceof("Yaf_Action_Abstract")) {
             int ret = yaf_internal_autoload(action_upper, (int)strlen(action_upper),
                     (char**)&directory);
@@ -199,7 +197,7 @@ static Variant yaf_dispatcher_get_action(const char* app_dir,
                 return init_null_variant;
             }
 
-            o = createObject(String(class_name), args);
+            o = createObject(String(class_name), params);
             if (!o->o_instanceof("Yaf_Action_Abstract")) {
                 return init_null_variant;
             }
@@ -410,7 +408,8 @@ static int yaf_dispatcher_handle(const Object& object, const Object& request,
     std::string actionMethod = action_lower + "action";
     raise_warning("start check func %s of controller", actionMethod.c_str());
 
-    Variant executor = init_null_variant;
+    Variant* executor = NULL;
+    Variant var_action;
     const Func* action_func = tmp_controller.toObject()->methodNamed(String(actionMethod).get());
     if (action_func != nullptr) {
          const Func::ParamInfoVec& func_params  = action_func->params();
@@ -422,7 +421,7 @@ static int yaf_dispatcher_handle(const Object& object, const Object& request,
          arr_func.append(tmp_controller.toObject());
          arr_func.append(method);
 
-         executor = tmp_controller;
+         executor = &tmp_controller;
          raise_warning("parameter size:%d", func_params.size());
          if (func_params.size()) {
              yaf_dispatcher_get_call_parameters(request, action_func, params);
@@ -433,8 +432,14 @@ static int yaf_dispatcher_handle(const Object& object, const Object& request,
              return HHVM_YAF_SUCCESS;
          }
     } else {
-        Variant var_action = yaf_dispatcher_get_action(app_dir.c_str(), tmp_controller.toObject(), 
-                             ptr_module->toString(), is_def_module, ptr_action->toString());
+
+        Array arr_params = Array::Create();
+        arr_params.append(request);
+        arr_params.append(response);
+        arr_params.append(view);
+
+        var_action = yaf_dispatcher_get_action(app_dir.c_str(), tmp_controller.toObject(), 
+                             ptr_module->toString(), is_def_module, ptr_action->toString(), arr_params);
         if (var_action.isNull()) {
             raise_warning("yaf_dispatcher_get_action failed, " \
                     "module:%s action:%s", 
@@ -443,7 +448,7 @@ static int yaf_dispatcher_handle(const Object& object, const Object& request,
             return HHVM_YAF_FAILED;
         }
 
-        executor = var_action;
+        executor = &var_action;
         const Func* action_func = var_action.toObject()->methodNamed(
                                     String(YAF_ACTION_EXECUTOR_NAME).get());
         if (action_func != nullptr) {
@@ -480,7 +485,70 @@ static int yaf_dispatcher_handle(const Object& object, const Object& request,
         }
     }
 
-    if (!executor.isNull()) {
+    if (executor->isObject()) {
+        bool auto_render = true;
+        auto ptr_render = (*executor).toObject()->o_realProp(YAF_CONTROLLER_PROPERTY_NAME_RENDER,
+                                ObjectData::RealPropUnchecked, "Yaf_Controller_Abstract");
+
+        auto ptr_flush = object->o_realProp(YAF_DISPATCHER_PROPERTY_NAME_FLUSH,
+                                ObjectData::RealPropUnchecked, "Yaf_Dispatcher");
+
+        /*
+        if (ptr_render->isNull()) {
+            ptr_render = object->o_realProp(YAF_DISPATCHER_PROPERTY_NAME_RENDER,
+                                ObjectData::RealPropUnchecked, "Yaf_Dispatcher");
+            if (ptr_render->isBoolean()) {
+                auto_render = ptr_render->toBoolean();
+            }
+        } else {
+            auto_render = ptr_render->toBoolean();
+        }
+        */
+        if (executor->toObject()->o_instanceof("Yaf_Action_Abstract")) {
+            raise_warning("executor is extends from Yaf_Action_Abstract");
+        } 
+
+        if (executor->toObject()->o_instanceof("Yaf_Controller_Abstract")) {
+            raise_warning("executor is extends from Yaf_Controller_Abstract");
+        }
+
+        if (auto_render) {
+            if (!ptr_flush->toBoolean()) {
+                Array params = Array::Create();
+                String method("render");
+                Array arr_func = Array::Create();
+
+                arr_func.append(executor->toObject());
+                arr_func.append(method);
+
+                params.append(ptr_action->toString());
+
+                Variant ret = vm_call_user_func(arr_func, params);
+                if (ret.isBoolean() && !ret.toBoolean()) {
+                    return HHVM_YAF_FAILED;
+                }
+
+                if (ret.isString() && ret.toString().length()) {
+                    raise_warning("render ret:%s", ret.toString().c_str());
+                    yaf_response_alter_body(response, 
+                            init_null_variant, ret.toString(), YAF_RESPONSE_APPEND);
+                }
+            } else {
+                Array params = Array::Create();
+                String method("display");
+                Array arr_func = Array::Create();
+
+                arr_func.append(*executor);
+                arr_func.append(method);
+
+                params.append(ptr_action->toString());
+
+                Variant ret = vm_call_user_func(arr_func, params);
+                if (ret.isBoolean() && !ret.toBoolean()) {
+                    return HHVM_YAF_FAILED;
+                }
+            }
+        }
 
     }
 
@@ -699,7 +767,7 @@ Variant yaf_dispatcher_dispatch(const Object* object)
     do {
         yaf_dispatcher_call_router_hook(arr_plugin, request, response, 
                 String(YAF_PLUGIN_HOOK_PREDISPATCH));
-        if (!yaf_dispatcher_handle(*object, request, response, view.toObject())) {
+        if (yaf_dispatcher_handle(*object, request, response, view.toObject()) != HHVM_YAF_SUCCESS) {
             //YAF_EXCEPTION_HANDLE(dispatcher, request, response);
             return init_null_variant;
         }
@@ -729,10 +797,12 @@ Variant yaf_dispatcher_dispatch(const Object* object)
             ObjectData::RealPropUnchecked, "Yaf_Dispatcher");
 
     if (!ptr_return_response->toBoolean()) {
+        raise_warning("begin send to client");
         (void)yaf_response_send(response);
         yaf_response_clear_body(&response, init_null_variant);
     }
 
+    raise_warning("handle request finished, return it");
     return response;
 }
 
