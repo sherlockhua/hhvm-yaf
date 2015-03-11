@@ -69,7 +69,7 @@ int yaf_response_send(const Object& object)
     return 0;
 }
 
-int yaf_response_set_redirect(ObjectData* response, const String& location)
+int yaf_response_set_redirect(const Object& response, const String& location)
 {
     Transport *transport = g_context->getTransport();
     if (transport) {

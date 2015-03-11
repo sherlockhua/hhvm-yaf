@@ -46,6 +46,7 @@ void YafExtension::moduleInit()
 
     _initYafRouterClass();
     _initYafRegistryClass();
+    _initYafExceptionClass();
 
     loadSystemlib();
 }

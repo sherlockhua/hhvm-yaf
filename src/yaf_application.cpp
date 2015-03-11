@@ -500,7 +500,7 @@ static void HHVM_METHOD(Yaf_Application, __construct, const Variant& config,
 
     auto ptr_dispatcher = this_->o_realProp(YAF_APPLICATION_PROPERTY_NAME_DISPATCHER, 
             ObjectData::RealPropUnchecked, "Yaf_Application");
-    *ptr_dispatcher = dispatcher;
+    *ptr_dispatcher = o_dispatcher;
 
     ret = yaf_application_init_loader();
     if (ret != 0) {

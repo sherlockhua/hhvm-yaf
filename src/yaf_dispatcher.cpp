@@ -810,7 +810,7 @@ int  yaf_dispatcher_set_request(const Object* object, const Variant& request)
 {
     auto ptr_request = (*object)->o_realProp(YAF_DISPATCHER_PROPERTY_NAME_REQUEST, 
             ObjectData::RealPropUnchecked, "Yaf_Dispatcher");
-    *ptr_request = request;
+    *ptr_request = request.toObject();
 
     return HHVM_YAF_SUCCESS;
 }

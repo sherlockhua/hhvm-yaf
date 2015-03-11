@@ -25,7 +25,7 @@ namespace HPHP {
 #define YAF_RESPONSE_PREPEND 1
 #define YAF_RESPONSE_APPEND  2
 
-extern int yaf_response_set_redirect(Variant response, const String& location);
+extern int yaf_response_set_redirect(const Object& response, const String& location);
 extern Variant yaf_response_instance(const Object* object, const char* sapi_name);
 extern int yaf_response_send(const Object& object);
 extern int yaf_response_clear_body(const Object* object, const Variant& name);

@@ -68,7 +68,7 @@ int yaf_controller_construct(const Object& control, const Object& request,
     auto module = request->o_realProp(YAF_REQUEST_PROPERTY_NAME_MODULE, 
             ObjectData::RealPropUnchecked, "Yaf_Request_Abstract");
 
-    auto var_module = control->o_realProp(YAF_CONTROLLER_PROPERTY_NAME_REQUEST, 
+    auto var_module = control->o_realProp(YAF_CONTROLLER_PROPERTY_NAME_MODULE, 
             ObjectData::RealPropUnchecked, "Yaf_Controller_Abstract");
     *var_module = *module;
 
@@ -204,7 +204,7 @@ static Variant HHVM_METHOD(Yaf_Controller_Abstract, display, const String& tpl,
 
 static Variant HHVM_METHOD(Yaf_Controller_Abstract, getRequest)
 {
-    auto _requestTmp = this_->o_realProp("_request", 
+    auto _requestTmp = this_->o_realProp(YAF_CONTROLLER_PROPERTY_NAME_REQUEST, 
             ObjectData::RealPropUnchecked, "Yaf_Controller_Abstract");
     if (_requestTmp->isNull()) {
         return *_requestTmp;

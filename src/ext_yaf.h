@@ -80,6 +80,9 @@ private:
 
     //registry
     void _initYafRegistryClass();
+
+    //exception
+    void _initYafExceptionClass();
 }; 
 
 class YafRequestData: public RequestEventHandler {
@@ -133,6 +136,7 @@ public:
 
 public:
         virtual void requestInit() {
+            this->name_suffix = true;
             this->running          = 0;
             this->in_exception     = 0;
             this->throw_exception  = 1;
