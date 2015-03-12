@@ -71,6 +71,7 @@ private:
     void _initYafRouterClass();
     void _initYafMapRouterClass();
     void _initYafStaticRouterClass();
+    void _initYafRegexRouterClass();
     
     //plugin
     void _initYafPluginClass();
@@ -83,6 +84,9 @@ private:
 
     //exception
     void _initYafExceptionClass();
+
+    //session
+    void _initYafSessionClass();
 }; 
 
 class YafRequestData: public RequestEventHandler {

@@ -744,6 +744,21 @@ final class Yaf_Route_Map extends Yaf_Route_Interface {
     public function route(mixed $request):mixed;
 }
 
+final class Yaf_Route_Regex extends Yaf_Route_Interface {
+    protected $_route = NULL;
+    protected $_default = NULL;
+    protected $_maps = NULL;
+    protected $_verify = NULL;
+
+
+    <<__Native>>
+    public function __construct(mixed $match, array $route, 
+        array $map, ?mixed $verify = NULL):void;
+
+    <<__Native>>
+    public function route(mixed $request):mixed;
+}
+
 final class Yaf_Route_Static extends Yaf_Route_Interface {
 
     <<__Native>>
@@ -902,4 +917,10 @@ class Yaf_Exception_LoadFailed_View extends Yaf_Exception_LoadFailed{
 }
 
 class Yaf_Exception_TypeError extends Yaf_Exception {
+}
+
+class Yaf_Session //implements  Iterator, Traversable, ArrayAccess, Countable
+{
+    <<__Native>>
+    public function __construct():void;
 }

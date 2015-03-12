@@ -12,6 +12,7 @@
 #include "yaf_application.h"
 #include "yaf_request.h"
 #include "yaf_router.h"
+#include "ext_yaf.h"
 
 
 namespace HPHP {

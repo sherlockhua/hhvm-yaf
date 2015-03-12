@@ -11,6 +11,7 @@
 #ifndef _YAF_ROUTER_REGEX_H_
 #define _YAF_ROUTER_REGEX_H_
 
+#include "ext_yaf.h"
 
 namespace HPHP {
 

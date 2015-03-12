@@ -302,6 +302,7 @@ void YafExtension::_initYafRouterClass()
 
     _initYafMapRouterClass();
     _initYafStaticRouterClass();
+    _initYafRegexRouterClass();
 }
  
 }
