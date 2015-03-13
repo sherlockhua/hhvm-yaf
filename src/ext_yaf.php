@@ -580,7 +580,7 @@ abstract class Yaf_Config_Abstract {
     abstract public function toArray():mixed;
 }
 
-class Yaf_Config_Simple extends Yaf_Config_Abstract {
+class Yaf_Config_Simple extends Yaf_Config_Abstract implements Iterator, Traversable, ArrayAccess, Countable {
     protected bool $_readonly = false;
     private $_cursor = NULL;
 
@@ -600,7 +600,7 @@ class Yaf_Config_Simple extends Yaf_Config_Abstract {
     public function count():mixed;
 
     <<__Native>>
-    public function offsetUnset(string $name):mixed;
+    public function offsetUnset(mixed $name):mixed;
 
     <<__Native>>
     public function rewind():mixed;
@@ -624,7 +624,7 @@ class Yaf_Config_Simple extends Yaf_Config_Abstract {
     public function toArray():mixed;
 
     <<__Native>>
-    public function __set(string $name, mixed $value):mixed;
+    public function __set(mixed $name, mixed $value):mixed;
 
     <<__Native>>
     public function __get(?mixed $name = NULL):mixed;
@@ -633,10 +633,10 @@ class Yaf_Config_Simple extends Yaf_Config_Abstract {
     public function offsetGet(?mixed $name = NULL):mixed;
 
     <<__Native>>
-    public function offsetExists(string $name):bool;
+    public function offsetExists(mixed $name):mixed;
 
     <<__Native>>
-    public function offsetSet(string $name, mixed $value):mixed;
+    public function offsetSet(mixed $name, mixed $value):mixed;
 }
 
 class Yaf_Config_Ini extends Yaf_Config_Abstract 
@@ -921,6 +921,11 @@ class Yaf_Exception_TypeError extends Yaf_Exception {
 
 class Yaf_Session //implements  Iterator, Traversable, ArrayAccess, Countable
 {
+    static protected $_instance = NULL;
     <<__Native>>
     public function __construct():void;
+
+    static public function getInstance() {
+        return self::$_instance;
+    }
 }

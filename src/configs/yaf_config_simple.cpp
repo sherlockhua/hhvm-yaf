@@ -76,7 +76,7 @@ static void HHVM_METHOD(Yaf_Config_Simple, __construct,
     (void)yaf_config_simple_instance(&this_, config, readonly);
 }
 
-static bool HHVM_METHOD(Yaf_Config_Simple, __isset, const String& name)
+static bool HHVM_METHOD(Yaf_Config_Simple, __isset, const Variant& name)
 {
     auto ptr_config = this_->o_realProp(YAF_CONFIG_PROPERT_NAME, 
             ObjectData::RealPropUnchecked, "Yaf_Config_Simple");
@@ -148,7 +148,7 @@ static Variant HHVM_METHOD(Yaf_Config_Simple, count)
     return arr.size();
 }
 
-static Variant HHVM_METHOD(Yaf_Config_Simple, offsetUnset, const String& name) 
+static Variant HHVM_METHOD(Yaf_Config_Simple, offsetUnset, const Variant& name) 
 {
     auto ptr_readonly = this_->o_realProp(YAF_CONFIG_PROPERT_NAME_READONLY, 
             ObjectData::RealPropUnchecked, "Yaf_Config_Simple");
@@ -247,7 +247,7 @@ static Variant HHVM_METHOD(Yaf_Config_Simple, toArray)
     return ptr_config->toArray();
 }
 
-static bool HHVM_METHOD(Yaf_Config_Simple, offsetExists, const String& name)
+static Variant HHVM_METHOD(Yaf_Config_Simple, offsetExists, const Variant& name)
 {
     auto ptr_config = this_->o_realProp(YAF_CONFIG_PROPERT_NAME, 
             ObjectData::RealPropUnchecked, "Yaf_Config_Simple");
@@ -262,7 +262,7 @@ static bool HHVM_METHOD(Yaf_Config_Simple, offsetExists, const String& name)
 }
 
 static Variant HHVM_METHOD(Yaf_Config_Simple, offsetSet, 
-        const String& name, const Variant& value)
+        const Variant& name, const Variant& value)
 {
     auto ptr_readonly = this_->o_realProp(YAF_CONFIG_PROPERT_NAME_READONLY, 
             ObjectData::RealPropUnchecked, "Yaf_Config_Simple");
@@ -280,7 +280,7 @@ static Variant HHVM_METHOD(Yaf_Config_Simple, offsetSet,
 }
 
 static Variant HHVM_METHOD(Yaf_Config_Simple, __set, 
-        const String& name, const Variant& value)
+        const Variant& name, const Variant& value)
 {
     auto ptr_readonly = this_->o_realProp(YAF_CONFIG_PROPERT_NAME_READONLY, 
             ObjectData::RealPropUnchecked, "Yaf_Config_Simple");

@@ -58,13 +58,24 @@ int yaf_router_route (const Object* object, const Object& request)
     }
 
     raise_warning("begin yaf router route");
+
+    std::vector<std::string> reverse_vector;
+
     Array& arr_routes = ptr_routes->toArrRef();
     ArrayIter iter = arr_routes.begin();
     while (!iter.end()) {
-        raise_warning("run yaf router route");
-
         Variant key = iter.first();
-        Variant value = iter.second();
+        reverse_vector.push_back(key.toString().toCppString());
+        iter.next();
+    }
+
+    for (int i = reverse_vector.size() - 1; i >= 0; i--) {
+        if (!arr_routes.exists(String(reverse_vector[i]))) {
+            continue;
+        }
+
+        Variant key = String(reverse_vector[i]);
+        Variant value = arr_routes[key];
 
         Object route = value.toObject();
 
@@ -75,6 +86,7 @@ int yaf_router_route (const Object* object, const Object& request)
         Array params = Array::Create();
         params.append(request);
 
+        raise_warning("run yaf router route,%s", key.toString().c_str());
         Variant ret = vm_call_user_func(func, params);
         if (!ret.isBoolean() || ret.toBoolean() == false) {
             raise_warning("run yaf router route failed");
@@ -89,6 +101,7 @@ int yaf_router_route (const Object* object, const Object& request)
         yaf_request_set_routed(&request, 1);
         
         iter.next();
+        break;
     }
 
     return HHVM_YAF_SUCCESS;
@@ -100,6 +113,7 @@ static int yaf_router_add_config(const Object* object, const Array& routes)
         return HHVM_YAF_FAILED;
     }
 
+    raise_warning(" in begin add config");
     auto ptr_routes = (*object)->o_realProp(YAF_ROUTER_PROPERTY_NAME_ROUTERS, 
             ObjectData::RealPropUnchecked, "Yaf_Router");
 
@@ -113,12 +127,15 @@ static int yaf_router_add_config(const Object* object, const Array& routes)
             continue;
         }
 
+        raise_warning("create route %s", key.toString().c_str());
         Variant tmp = yaf_route_instance(NULL, value);
         if (tmp.isNull()) {
             iter.next();
             continue;
         }
 
+        arr_routes.set(key, tmp.toObject());
+        /*
         if (key.isString()) {
             arr_routes.set(key.toString(), tmp.toObject());
         } else if(key.isInteger()) {
@@ -127,6 +144,7 @@ static int yaf_router_add_config(const Object* object, const Array& routes)
             iter.next();
             continue;
         }
+        */
 
         iter.next();
     }
@@ -219,6 +237,7 @@ static Variant HHVM_METHOD(Yaf_Router, addConfig,
         return false;
     }
 
+    raise_warning("begin add config");
     Array route;
     if (config.isArray()) {
         route = config;

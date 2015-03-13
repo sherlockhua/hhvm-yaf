@@ -59,18 +59,23 @@ Variant yaf_request_http_instance(const Object* object,
             tmp = php_global(S_SERVER).toArray()[String("REQUEST_URI")];
             raise_warning("debug: get request_uri:%s", tmp.toString().c_str());
             if (tmp.isString()) {
+                raise_warning("get request length:%d", tmp.toString().length());
                 std::string str_tmp = tmp.toString().toCppString();
+                raise_warning("after get request length:%d", tmp.toString().length());
                 if (strncasecmp(str_tmp.c_str(), "http", 4) == 0) {
                     //TODO use php_url_parse to get path
                     php_url* url_info = php_url_parse(str_tmp.c_str());
                     if (url_info && url_info->path) {
+                        raise_warning("after1 get request length:%d", tmp.toString().length());
                         uri = std::string(url_info->path);
+                        raise_warning("after2 get request length:%d", tmp.toString().length());
                     }
                     php_url_free(url_info);
                 } else {
-                    const char* pos = strstr(str_tmp.c_str(), "?");
+                    const char* tmp_str_tmp = str_tmp.c_str();
+                    const char* pos = strstr(tmp_str_tmp, "?");
                     if (pos) {
-                        uri = std::string(str_tmp.c_str(), pos - str_tmp.length());
+                        uri = std::string(str_tmp.c_str(), pos - tmp_str_tmp);
                     } else {
                         uri = str_tmp;
                     }
@@ -97,7 +102,16 @@ done:
         auto ptr_uri = o->o_realProp(YAF_REQUEST_PROPERTY_NAME_URI, 
                 ObjectData::RealPropUnchecked, "Yaf_Request_Http");
 
-        *ptr_uri = String(uri.c_str());
+        //TODO hhvm和php有兼容问题，request_uri hhvm取的是头部的,php
+        //取的是fastcgi
+#if 1
+       p = uri.c_str();
+       p++;
+       while (*p != '/') p++;
+       uri = std::string(p);
+#endif
+
+        *ptr_uri = String(uri);
 
         raise_warning("hhtp set base uri:%s", base_uri);
         yaf_request_set_base_uri(o, base_uri, uri.c_str());
