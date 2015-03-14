@@ -73,7 +73,9 @@ static Variant yaf_session_instance()
     auto ptr_member = instance->o_realProp(YAF_SESSION_PROPERTY_NAME_SESSION, 
             ObjectData::RealPropUnchecked, "Yaf_Session");
 
-    *ptr_member = php_global(s_SESSION);
+
+    auto tv = g_context->m_globalVarEnv->lookup(s_SESSION.get());
+    ptr_member->constructRefHelper(*(Variant*)(tv));
 
     set_instance(instance);
     return instance;

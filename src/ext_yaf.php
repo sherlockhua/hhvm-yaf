@@ -926,7 +926,7 @@ class Yaf_Session //implements  Iterator, Traversable, ArrayAccess, Countable
     protected $_started = NULL;
 
     <<__Native>>
-    private function __construct():void;
+    public function __construct():void;
 
     <<__Native>>
     private function __clone():void;
