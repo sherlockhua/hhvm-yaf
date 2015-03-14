@@ -91,14 +91,14 @@ static void HHVM_METHOD(Yaf_Session, __clone)
 static void HHVM_METHOD(Yaf_Session, __wakeup)
 {}
 
-static Variant HHVM_STATIC_METHOD(Yaf_Loader, getInstance)
+static Variant HHVM_STATIC_METHOD(Yaf_Session, getInstance)
 {
     Variant instance = get_instance();    
     if (instance.isObject() && instance.toObject()->o_instanceof("Yaf_Session")){
         return instance;
     }
 
-
+    return yaf_session_instance();
 }
 
 void YafExtension::_initYafSessionClass()
@@ -108,7 +108,7 @@ void YafExtension::_initYafSessionClass()
     HHVM_ME(Yaf_Session, __wakeup);
     HHVM_ME(Yaf_Session, __clone);
 
-    HHVM_STATIC_ME(Yaf_Loader, getInstance);
+    HHVM_STATIC_ME(Yaf_Session, getInstance);
 
 }
 
