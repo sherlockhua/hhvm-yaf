@@ -922,10 +922,31 @@ class Yaf_Exception_TypeError extends Yaf_Exception {
 class Yaf_Session //implements  Iterator, Traversable, ArrayAccess, Countable
 {
     static protected $_instance = NULL;
-    <<__Native>>
-    public function __construct():void;
+    protected  $_session = NULL;
+    protected $_started = NULL;
 
-    static public function getInstance() {
+    <<__Native>>
+    private function __construct():void;
+
+    <<__Native>>
+    private function __clone():void;
+
+    <<__Native>>
+    private function __sleep():void;
+
+    <<__Native>>
+    private function __wakeup():void;
+
+    <<__Native>>
+    static public function getInstance():mixed;
+
+    static public function  get_instance() {
         return self::$_instance;
     }
+
+    static public function set_instance($instance) {
+        self::$_instance = $instance;
+    }
+
 }
+
