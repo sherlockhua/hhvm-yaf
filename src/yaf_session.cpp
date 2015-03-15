@@ -17,6 +17,10 @@
 
 namespace HPHP {
 
+void yaf_session_cursor::sweep() {
+  Close();
+}
+
 static Variant get_instance()
 {
     Array func = Array::Create();
@@ -103,6 +107,238 @@ static Variant HHVM_STATIC_METHOD(Yaf_Session, getInstance)
     return yaf_session_instance();
 }
 
+static Variant HHVM_METHOD(Yaf_Session, start)
+{
+    yaf_session_start(this_);
+    return this_;
+}
+
+static Variant HHVM_METHOD(Yaf_Session, get, const Variant& name)
+{
+    auto ptr_session = this_->o_realProp(YAF_SESSION_PROPERTY_NAME_SESSION, 
+            ObjectData::RealPropUnchecked, "Yaf_Session");
+
+    if (!name.isString() || name.toString().length() == 0) {
+        return ptr_session->toArray();
+    }
+
+    Array& session = ptr_session->toArrRef();
+    if (!session.exists(name.toString())) {
+        return init_null_variant;
+    }
+
+    return session[name.toString()];
+}
+
+static Variant HHVM_METHOD(Yaf_Session, offsetGet, const Variant& name)
+{
+    auto ptr_session = this_->o_realProp(YAF_SESSION_PROPERTY_NAME_SESSION, 
+            ObjectData::RealPropUnchecked, "Yaf_Session");
+
+    if (!name.isString() || name.toString().length() == 0) {
+        return ptr_session->toArray();
+    }
+
+    Array& session = ptr_session->toArrRef();
+    if (!session.exists(name.toString())) {
+        return init_null_variant;
+    }
+
+    return session[name.toString()];
+}
+
+static Variant HHVM_METHOD(Yaf_Session, __get, const Variant& name)
+{
+    auto ptr_session = this_->o_realProp(YAF_SESSION_PROPERTY_NAME_SESSION, 
+            ObjectData::RealPropUnchecked, "Yaf_Session");
+
+    if (!name.isString() || name.toString().length() == 0) {
+        return ptr_session->toArray();
+    }
+
+    Array& session = ptr_session->toArrRef();
+    if (!session.exists(name.toString())) {
+        return init_null_variant;
+    }
+
+    return session[name.toString()];
+}
+
+static Variant HHVM_METHOD(Yaf_Session, has, const Variant& name)
+{
+    auto ptr_session = this_->o_realProp(YAF_SESSION_PROPERTY_NAME_SESSION, 
+            ObjectData::RealPropUnchecked, "Yaf_Session");
+
+    Array& session = ptr_session->toArrRef();
+    return session.exists(name.toString());
+}
+
+static Variant HHVM_METHOD(Yaf_Session, offsetExists, const Variant& name)
+{
+    auto ptr_session = this_->o_realProp(YAF_SESSION_PROPERTY_NAME_SESSION, 
+            ObjectData::RealPropUnchecked, "Yaf_Session");
+
+    Array& session = ptr_session->toArrRef();
+    return session.exists(name.toString());
+}
+
+static Variant HHVM_METHOD(Yaf_Session, __isset, const Variant& name)
+{
+    auto ptr_session = this_->o_realProp(YAF_SESSION_PROPERTY_NAME_SESSION, 
+            ObjectData::RealPropUnchecked, "Yaf_Session");
+
+    Array& session = ptr_session->toArrRef();
+    return session.exists(name.toString());
+}
+
+static Variant HHVM_METHOD(Yaf_Session, set, 
+        const Variant& name, const Variant& value)
+{
+    auto ptr_session = this_->o_realProp(YAF_SESSION_PROPERTY_NAME_SESSION, 
+            ObjectData::RealPropUnchecked, "Yaf_Session");
+
+    Array& session = ptr_session->toArrRef();
+    session.set(name, value);
+    return true;
+}
+
+static Variant HHVM_METHOD(Yaf_Session, offsetSet, 
+        const Variant& name, const Variant& value)
+{
+    auto ptr_session = this_->o_realProp(YAF_SESSION_PROPERTY_NAME_SESSION, 
+            ObjectData::RealPropUnchecked, "Yaf_Session");
+
+    Array& session = ptr_session->toArrRef();
+    session.set(name, value);
+    return true;
+}
+
+static Variant HHVM_METHOD(Yaf_Session, __set, 
+        const Variant& name, const Variant& value)
+{
+    auto ptr_session = this_->o_realProp(YAF_SESSION_PROPERTY_NAME_SESSION, 
+            ObjectData::RealPropUnchecked, "Yaf_Session");
+
+    Array& session = ptr_session->toArrRef();
+    session.set(name, value);
+    return true;
+}
+
+static Variant HHVM_METHOD(Yaf_Session, del, 
+        const Variant& name)
+{
+    auto ptr_session = this_->o_realProp(YAF_SESSION_PROPERTY_NAME_SESSION, 
+            ObjectData::RealPropUnchecked, "Yaf_Session");
+
+    Array& session = ptr_session->toArrRef();
+    session.remove(name);
+    return true;
+}
+
+static Variant HHVM_METHOD(Yaf_Session, offsetUnset, 
+        const Variant& name)
+{
+    auto ptr_session = this_->o_realProp(YAF_SESSION_PROPERTY_NAME_SESSION, 
+            ObjectData::RealPropUnchecked, "Yaf_Session");
+
+    Array& session = ptr_session->toArrRef();
+    session.remove(name);
+    return true;
+}
+
+static Variant HHVM_METHOD(Yaf_Session, __unset, 
+        const Variant& name)
+{
+    auto ptr_session = this_->o_realProp(YAF_SESSION_PROPERTY_NAME_SESSION, 
+            ObjectData::RealPropUnchecked, "Yaf_Session");
+
+    Array& session = ptr_session->toArrRef();
+    session.remove(name);
+    return true;
+}
+
+static Variant HHVM_METHOD(Yaf_Session, count) 
+{
+    auto ptr_session = this_->o_realProp(YAF_SESSION_PROPERTY_NAME_SESSION, 
+            ObjectData::RealPropUnchecked, "Yaf_Session");
+
+    Array& session = ptr_session->toArrRef();
+    return session.size();
+}
+
+static Variant HHVM_METHOD(Yaf_Session, rewind)
+{
+    auto ptr_session = this_->o_realProp(YAF_SESSION_PROPERTY_NAME_SESSION, 
+            ObjectData::RealPropUnchecked, "Yaf_Session");
+
+    Array& session = ptr_session->toArrRef();
+
+    auto ptr_cursor = this_->o_realProp(YAF_SESSION_PROPERT_NAME_CURSOR, 
+            ObjectData::RealPropUnchecked, "Yaf_Session");
+
+    *ptr_cursor = Variant(NEWOBJ(yaf_session_cursor)(session.begin()));
+    return true;
+}
+
+static Variant HHVM_METHOD(Yaf_Session, next)
+{
+    auto ptr_cursor = this_->o_realProp(YAF_SESSION_PROPERT_NAME_CURSOR, 
+            ObjectData::RealPropUnchecked, "Yaf_Session");
+
+    if (!ptr_cursor->isResource()) {
+        return false;
+    }
+
+    auto res = ptr_cursor->toResource();
+    ArrayIter& cursor = res.getTyped<yaf_session_cursor>()->cursor();
+    cursor.next();
+    return true;
+}
+
+static Variant HHVM_METHOD(Yaf_Session, current)
+{
+    auto ptr_cursor = this_->o_realProp(YAF_SESSION_PROPERT_NAME_CURSOR, 
+            ObjectData::RealPropUnchecked, "Yaf_Session");
+
+    if (!ptr_cursor->isResource()) {
+        return false;
+    }
+
+    auto res = ptr_cursor->toResource();
+    ArrayIter& cursor = res.getTyped<yaf_session_cursor>()->cursor();
+    return cursor.second();
+}
+
+static Variant HHVM_METHOD(Yaf_Session, key)
+{
+    auto ptr_cursor = this_->o_realProp(YAF_SESSION_PROPERT_NAME_CURSOR, 
+            ObjectData::RealPropUnchecked, "Yaf_Session");
+
+    if (!ptr_cursor->isResource()) {
+        return false;
+    }
+
+    auto res = ptr_cursor->toResource();
+    ArrayIter& cursor = res.getTyped<yaf_session_cursor>()->cursor();
+    return cursor.first();
+}
+
+static Variant HHVM_METHOD(Yaf_Session, valid)
+{
+    auto ptr_cursor = this_->o_realProp(YAF_SESSION_PROPERT_NAME_CURSOR, 
+            ObjectData::RealPropUnchecked, "Yaf_Session");
+
+    if (!ptr_cursor->isResource()) {
+        return false;
+    }
+
+    auto res = ptr_cursor->toResource();
+    ArrayIter& cursor = res.getTyped<yaf_session_cursor>()->cursor();
+    return cursor.end() == false;
+}
+
+
+
 void YafExtension::_initYafSessionClass()
 {
     HHVM_ME(Yaf_Session, __construct);
@@ -111,6 +347,31 @@ void YafExtension::_initYafSessionClass()
     HHVM_ME(Yaf_Session, __clone);
 
     HHVM_STATIC_ME(Yaf_Session, getInstance);
+
+    HHVM_ME(Yaf_Session, start);
+    HHVM_ME(Yaf_Session, get);
+    HHVM_ME(Yaf_Session, __get);
+    HHVM_ME(Yaf_Session, offsetGet);
+
+    HHVM_ME(Yaf_Session, has);
+    HHVM_ME(Yaf_Session, __isset);
+    HHVM_ME(Yaf_Session, offsetExists);
+
+    HHVM_ME(Yaf_Session, set);
+    HHVM_ME(Yaf_Session, __set);
+    HHVM_ME(Yaf_Session, offsetSet);
+
+    HHVM_ME(Yaf_Session, del);
+    HHVM_ME(Yaf_Session, __unset);
+    HHVM_ME(Yaf_Session, offsetUnset);
+
+    HHVM_ME(Yaf_Session, count);
+    HHVM_ME(Yaf_Session, next);
+    HHVM_ME(Yaf_Session, current);
+    HHVM_ME(Yaf_Session, key);
+    HHVM_ME(Yaf_Session, valid);
+
+    HHVM_ME(Yaf_Session, rewind);
 
 }
 

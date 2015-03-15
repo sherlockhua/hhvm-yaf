@@ -919,11 +919,12 @@ class Yaf_Exception_LoadFailed_View extends Yaf_Exception_LoadFailed{
 class Yaf_Exception_TypeError extends Yaf_Exception {
 }
 
-class Yaf_Session //implements  Iterator, Traversable, ArrayAccess, Countable
+class Yaf_Session implements  Iterator, Traversable, ArrayAccess, Countable
 {
     static protected $_instance = NULL;
     protected  $_session = NULL;
     protected $_started = NULL;
+    private $_cursor = NULL;
 
     <<__Native>>
     public function __construct():void;
@@ -948,5 +949,61 @@ class Yaf_Session //implements  Iterator, Traversable, ArrayAccess, Countable
         self::$_instance = $instance;
     }
 
+    <<__Native>>
+    public function start():mixed;
+
+    <<__Native>>
+    public function get(?mixed $name = NULL):mixed;
+
+    <<__Native>>
+    public function __get(?mixed $name = NULL):mixed;
+
+    <<__Native>>
+    public function offsetGet(?mixed $name = NULL):mixed;
+
+    <<__Native>>
+    public function has(mixed $name):mixed;
+
+    <<__Native>>
+    public function __isset(mixed $name):mixed;
+
+    <<__Native>>
+    public function offsetExists(mixed $name):mixed;
+
+    <<__Native>>
+    public function set(mixed $name, mixed $value):mixed;
+
+    <<__Native>>
+    public function __set(mixed $name, mixed $value):mixed;
+
+    <<__Native>>
+    public function offsetSet(mixed $name, mixed $value):mixed;
+
+    <<__Native>>
+    public function del(mixed $name):mixed;
+
+    <<__Native>>
+    public function __unset(mixed $name):mixed;
+
+    <<__Native>>
+    public function offsetUnset(mixed $name):mixed;
+
+    <<__Native>>
+    public function count():mixed;
+
+    <<__Native>>
+    public function rewind():mixed;
+
+    <<__Native>>
+    public function next():mixed;
+
+    <<__Native>>
+    public function current():mixed;
+
+    <<__Native>>
+    public function key():mixed;
+
+    <<__Native>>
+    public function valid():mixed;
 }
 
