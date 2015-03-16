@@ -496,8 +496,8 @@ found:
 #endif
 
     if (!g_yaf_local_data.get()->use_spl_autoload) {
-        raise_error("Failed opening script:%s: %s class:%s", 
-                directory, strerror(errno), class_name);
+        //raise_error("Failed opening script:%s: %s class:%s", 
+         //       directory, strerror(errno), class_name);
         return true;
     }
 
