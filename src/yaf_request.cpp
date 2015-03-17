@@ -17,6 +17,18 @@
 
 namespace HPHP{
 
+int yaf_request_set_params_single(const Object& object, 
+        const String& key, const Variant& value)
+{
+    auto ptr_params = object->o_realProp(YAF_REQUEST_PROPERTY_NAME_PARAMS, 
+                        ObjectData::RealPropUnchecked, "Yaf_Request_Abstract");
+    if (!ptr_params->isArray()) {
+        *ptr_params = Array::Create();
+    }
+
+    ptr_params->toArrRef().set(key, value);
+    return HHVM_YAF_SUCCESS;
+}
 
 int yaf_request_set_base_uri(const Object& request, 
         const char *base_uri, const char *request_uri) 

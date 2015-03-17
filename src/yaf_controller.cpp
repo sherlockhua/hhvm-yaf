@@ -73,12 +73,15 @@ int yaf_controller_construct(const Object& control, const Object& request,
     *var_module = *module;
 
     if (!control->o_instanceof("Yaf_Action_Abstract")) {
-        Array func = Array::Create();
-        func.append(control);
-        func.append(String("init"));
+        const Func* init_func = control->methodNamed(String("init").get());
+        if (init_func != nullptr) {
+            Array func = Array::Create();
+            func.append(control);
+            func.append(String("init"));
 
-        Array arr_params = Array::Create();
-        vm_call_user_func(func, arr_params);
+            Array arr_params = Array::Create();
+            vm_call_user_func(func, arr_params);
+        }
     }
 
     return HHVM_YAF_SUCCESS;;

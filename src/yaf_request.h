@@ -47,6 +47,9 @@ extern bool yaf_request_is_dispatched(const Object* request);
 extern int yaf_request_set_base_uri(const Object& request, 
         const char *base_uri, const char *request_uri) ;
 
+extern int yaf_request_set_params_single(const Object& object, 
+        const String& key, const Variant& value);
+
 }
 
 #endif //_YAF_REQUEST_H

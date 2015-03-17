@@ -561,9 +561,16 @@ static Variant HHVM_METHOD(Yaf_Application, run)
     auto ptr_dispatcher = this_->o_realProp(YAF_APPLICATION_PROPERTY_NAME_DISPATCHER, 
             ObjectData::RealPropUnchecked, "Yaf_Application");
     Object object = ptr_dispatcher->toObject();
+    try {
     Variant response = yaf_dispatcher_dispatch(&object);
     if (!response.isNull()) {
         return response;
+    }
+    } catch (Object& e) {
+        
+        raise_warning("catch object e");
+    } catch (Exception& e) {
+        raise_warning("catch exception e");
     }
 
     return false;

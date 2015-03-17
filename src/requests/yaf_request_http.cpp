@@ -104,7 +104,7 @@ done:
 
         //TODO hhvm和php有兼容问题，request_uri hhvm取的是头部的,php
         //取的是fastcgi
-#if 1
+#if 0
        p = uri.c_str();
        p++;
        while (*p != '/') p++;
