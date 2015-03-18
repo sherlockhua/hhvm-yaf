@@ -121,7 +121,6 @@ static Variant yaf_dispatcher_get_action(const char* app_dir,
         snprintf(action_path, sizeof(action_path), "%s%c%s", 
                 app_dir, DEFAULT_SLASH_CHAR, var_value.toString().c_str());
 
-        raise_warning("action class path is %s", action_path);
         if (!yaf_loader_import(action_path, strlen(action_path), 0)) {
             raise_warning("can't open action script:%s", action_path);
             return init_null_variant;
@@ -136,7 +135,6 @@ static Variant yaf_dispatcher_get_action(const char* app_dir,
                     g_yaf_local_data.get()->name_separator.c_str(), action_upper);
         }
 
-        raise_warning("action class name is %s", action_class);
 	    Object o = createObject(String(action_class), params);
         if (!o->o_instanceof("Yaf_Action_Abstract")) {
             raise_warning("Action must extends from Yaf_Action_Abstract");
@@ -224,8 +222,6 @@ static Variant yaf_dispatcher_get_controller(const char* app_dir,
                 YAF_CONTROLLER_DIRECTORY_NAME);
     }
 
-    raise_warning("get controller, module:%s control:%s def:%d",
-            module, controller, is_def_module);
 
 	char class_name[8192];
 	if (g_yaf_local_data.get()->name_suffix) {
@@ -288,7 +284,6 @@ static int yaf_dispatcher_get_call_parameters(const Object& request,
     Array& arr_args = ptr_args->toArrRef();
     uint32_t func_params_size = func->numNamedLocals();
 
-    raise_warning("get call parameters, count:%u", func_params_size);
 
     for (uint32_t i = 0; i < func_params_size; i++) {
 
@@ -406,7 +401,6 @@ static int yaf_dispatcher_handle(const Object& object, const Object& request,
     transform(action_lower.begin(), action_lower.end(), action_lower.begin(), tolower);
 
     std::string actionMethod = action_lower + "action";
-    raise_warning("start check func %s of controller", actionMethod.c_str());
 
     Variant* executor = NULL;
     Variant var_action;
@@ -422,7 +416,6 @@ static int yaf_dispatcher_handle(const Object& object, const Object& request,
          arr_func.append(method);
 
          executor = &tmp_controller;
-         raise_warning("parameter size:%d", func_params.size());
          if (func_params.size()) {
              yaf_dispatcher_get_call_parameters(request, action_func, params);
          } 
@@ -473,7 +466,6 @@ static int yaf_dispatcher_handle(const Object& object, const Object& request,
              arr_func.append(o_action);
              arr_func.append(method);
 
-             raise_warning("parameter size:%d", func_params.size());
              if (func_params.size()) {
                  yaf_dispatcher_get_call_parameters(request, action_func, params);
              } 
@@ -570,7 +562,6 @@ static Variant yaf_dispatcher_init_view(const Object* object,
 
 static int yaf_dispatcher_route(const Object* object, const Object& request)
 {
-    raise_warning("begin dispatcher route");
     auto ptr_router = (*object)->o_realProp(YAF_DISPATCHER_PROPERTY_NAME_ROUTER, 
             ObjectData::RealPropUnchecked, "Yaf_Dispatcher");
     if (!ptr_router->isObject()) {
@@ -580,7 +571,6 @@ static int yaf_dispatcher_route(const Object* object, const Object& request)
     
     Object o_router = ptr_router->toObject();
     String class_name = o_router->o_getClassName();
-    raise_warning("get dispatcher route class_name:%s", class_name.c_str());
     if (strncasecmp(class_name.c_str(), "Yaf_Router", 
                 sizeof("Yaf_Router") - 1) == 0) {
         yaf_router_route(&o_router, request);
@@ -668,10 +658,11 @@ static int yaf_dispatcher_fix_default(const Object* object, const Object& reques
         *ptr_action = String(str_action);
     }
 
-    raise_warning("module:%s ctrl:%s action:%s",
+    /*raise_warning("module:%s ctrl:%s action:%s",
             ptr_module->toString().c_str(),
             ptr_controller->toString().c_str(),
             ptr_action->toString().c_str());
+            */
 
     return HHVM_YAF_SUCCESS;
 }
@@ -781,10 +772,8 @@ Variant yaf_dispatcher_dispatch(const Object* object)
     Array& arr_plugin = ptr_plugin->toArrRef();
 
     try {
-        raise_warning("begin request route");
         if (!yaf_request_is_routed(&request)) {
 
-            raise_warning("in request route");
             yaf_dispatcher_call_router_hook(arr_plugin, request, response, 
                     String(YAF_PLUGIN_HOOK_ROUTESTARTUP));
 
@@ -854,7 +843,6 @@ Variant yaf_dispatcher_dispatch(const Object* object)
                 ObjectData::RealPropUnchecked, "Yaf_Dispatcher");
 
         if (!ptr_return_response->toBoolean()) {
-            raise_warning("begin send to client");
             (void)yaf_response_send(response);
             yaf_response_clear_body(&response, init_null_variant);
         }
@@ -864,7 +852,6 @@ Variant yaf_dispatcher_dispatch(const Object* object)
         yaf_dispatcher_cpp_exception_handler(*object, request, response, e);
     }
 
-    raise_warning("handle request finished, return it");
     return response;
 }
 

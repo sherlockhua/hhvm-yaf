@@ -31,14 +31,12 @@ Variant yaf_route_instance(const Object* object, const Variant& config)
     }
 
     String type = var_type.toString();
-    raise_warning("route type:%s", type.c_str());
     if (strncasecmp(type.c_str(), "regex", sizeof("regex") - 1) == 0) {
         if (arr.exists(String("match")) == false) { 
             raise_warning("not have match");
             return init_null_variant;
         }
 
-        raise_warning("have match");
         Variant var_match = arr[String("match")];
         if (var_match.isString() == false) {
             return init_null_variant;
@@ -49,7 +47,6 @@ Variant yaf_route_instance(const Object* object, const Variant& config)
             return init_null_variant;
         }
 
-        raise_warning("have route");
         Variant var_def = arr[String("route")];
         if (var_def.isArray() == false) {
             return init_null_variant;
@@ -60,13 +57,11 @@ Variant yaf_route_instance(const Object* object, const Variant& config)
             return init_null_variant;
         }
 
-        raise_warning("have map");
         Variant var_map = arr[String("map")];
         if (var_map.isArray() == false) {
             return init_null_variant;
         }
 
-        raise_warning("add regex, match");//":%s", var_match.toString().c_str());
         return yaf_route_regex_instance(NULL, var_match, var_def, var_map, init_null_variant);
     }
 

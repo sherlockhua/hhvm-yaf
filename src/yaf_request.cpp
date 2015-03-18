@@ -35,7 +35,6 @@ int yaf_request_set_base_uri(const Object& request,
 {
    // char *basename = NULL;
     //unsigned int basename_len = 0;
-    raise_warning(" in set baseuri base_uri:%s:%p, request_uri:%s", base_uri, base_uri, request_uri);
     String basename;
     Variant container = NULL;
 
@@ -97,7 +96,6 @@ int yaf_request_set_base_uri(const Object& request,
             }
         } while (0);
 
-        raise_warning("basename:%s",basename.c_str());
         if (basename.length() && strstr(request_uri, basename.c_str()) == request_uri) {
             unsigned basename_len = basename.length();
             if (basename[basename_len - 1] == '/') {

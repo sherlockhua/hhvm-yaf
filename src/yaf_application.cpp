@@ -47,9 +47,6 @@ bool yaf_application_is_module_name(const String& module)
             continue;
         }
 
-        raise_warning("application modules, key:%s value:%s", 
-                key.toString().c_str(), value.toString().c_str());
-
         String& str_value = value.toStrRef();
         if (strncasecmp(str_value.c_str(), module.c_str(), module.length()) == 0) {
             return true;
@@ -79,7 +76,6 @@ static int yaf_application_init_loader()
                  DEFAULT_SLASH_CHAR, YAF_LIBRARY_DIRECTORY_NAME);
         var_local_library = String(local_library);
 
-        raise_warning("local library:%s golobal:%s", local_library, g_yaf_local_data.get()->global_library.c_str());
     }
 
     loader = yaf_loader_instance(NULL, var_local_library, var_global_library);
@@ -131,7 +127,6 @@ static int yaf_application_parse_module(const Array& config)
         String str_module = String(g_yaf_local_data.get()->default_module);
         arr_modules.append(str_module);
 
-        raise_warning("parse application, def module:%s", str_module.c_str());
         g_yaf_local_data.get()->modules = arr_modules;
         return HHVM_YAF_SUCCESS;
     }
@@ -144,7 +139,6 @@ static int yaf_application_parse_module(const Array& config)
     char* seg = strtok_r(ptr_modules_dup, ",", &save_ptr);
     while (seg) {
         if (seg && strlen(seg)) {
-            raise_warning("parse application, module:%s", seg);
             arr_modules.append(String(seg));       
         }
 
@@ -423,7 +417,6 @@ static void set_app(const Object object)
 static void HHVM_METHOD(Yaf_Application, __construct, const Variant& config, 
         const Variant& section)
 {
-    raise_warning("begin initialize yaf_application succ");
     Variant var_app = get_app();
     if (!var_app.isNull()) {
         yaf_trigger_error(YAF_ERR_STARTUP_FAILED, 
@@ -520,8 +513,8 @@ static void HHVM_METHOD(Yaf_Application, __construct, const Variant& config,
     auto ptr_modules = this_->o_realProp(YAF_APPLICATION_PROPERTY_NAME_MODULES, 
             ObjectData::RealPropUnchecked, "Yaf_Application");
     if (g_yaf_local_data.get()->modules.isInitialized()) {
-        raise_warning("yaf_local_data: modules set");
-        Array& tmp = g_yaf_local_data.get()->modules.toArrRef();
+        /*Array& tmp = g_yaf_local_data.get()->modules.toArrRef();
+        
         ArrayIter iter = tmp.begin();
         while (!iter.end()) {
             Variant first = iter.first();
@@ -532,13 +525,14 @@ static void HHVM_METHOD(Yaf_Application, __construct, const Variant& config,
                     second.toString().c_str());
             iter.next();
         }
+        */
         *ptr_modules = g_yaf_local_data.get()->modules;
     } else {
         *ptr_modules = init_null_variant;
     }
 
 
-    raise_warning("initialize yaf_application succ");
+    //raise_warning("initialize yaf_application succ");
     //*ptr_app = this_;
     set_app(this_);
     return;

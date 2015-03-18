@@ -66,7 +66,6 @@ static bool yaf_loader_is_category(const char* class_name,
 bool yaf_loader_import(const char *path, int len, int use_path)
 { 
     //return require(String(path), true, g_context->getCwd().data(), true);
-    raise_warning("begin import path:%s, %s", path, g_yaf_local_data.get()->directory.c_str());
     String func("yaf_loader_import");
 
     Array params = Array::Create();
@@ -153,8 +152,6 @@ Variant yaf_loader_instance(const Object* object,
         return init_null_variant;
     }
 
-    raise_warning("create yaf_loader succ, global_path:%s library_path:%s",
-            global_path.toString().c_str(),library_path.toString().c_str());
     set_instance(o_instance);
     return instance;
 }
@@ -331,12 +328,10 @@ bool yaf_internal_autoload(char* ptr_file_name, int ptr_file_name_len, char** di
     buf.append(".");
     buf.append(g_yaf_local_data.get()->ext);
 
-    raise_warning("directory:%s", buf.c_str());
     if (directory) {
         //sprintf(*directory, "%s", buf.c_str());
     }
 
-    raise_warning("2222directory:%s", buf.c_str());
     bool status = yaf_loader_import(buf.c_str(), buf.length(), 0);
     if (!status) {
         return false;
@@ -373,7 +368,6 @@ static Variant HHVM_METHOD(Yaf_Loader, autoload, const String& str_class_name)
     char file_name[8192];
     int file_name_len = 0;
 
-    raise_warning("begin load class:%s", str_class_name.c_str());
 	size_t class_name_len = strlen(class_name);
 #ifdef YAF_HAVE_NAMESPACE
 	char* origin_lcname = strdup(origin_classname);
@@ -465,7 +459,6 @@ found:
     }
 
     char** ptr = (char**)&directory;
-    raise_warning("directory addr:%p, %p class:%s", directory, ptr_directory, class_name);
     if (yaf_internal_autoload(file_name, file_name_len, &ptr_directory)) {
 
         std::string tmp_class_name(origin_classname);
@@ -530,8 +523,6 @@ static Variant HHVM_METHOD(Yaf_Loader, registerLocalNamespace, const Variant& va
         return false;
     }
 
-    raise_warning("var_namespace must be string or array, "\
-            "in function registerLocalNamespace");
     return false;
 }
 

@@ -50,14 +50,12 @@ Array yaf_router_parse_parameters(const char* uri)
 
 int yaf_router_route (const Object* object, const Object& request)
 {
-    raise_warning("in yaf router route");
     auto ptr_routes = (*object)->o_realProp(YAF_ROUTER_PROPERTY_NAME_ROUTERS, 
             ObjectData::RealPropUnchecked, "Yaf_Router");
     if (!ptr_routes->isArray()) {
         return HHVM_YAF_FAILED;
     }
 
-    raise_warning("begin yaf router route");
 
     std::vector<std::string> reverse_vector;
 
@@ -86,7 +84,6 @@ int yaf_router_route (const Object* object, const Object& request)
         Array params = Array::Create();
         params.append(request);
 
-        raise_warning("run yaf router route,%s", key.toString().c_str());
         Variant ret = vm_call_user_func(func, params);
         if (!ret.isBoolean() || ret.toBoolean() == false) {
             raise_warning("run yaf router route failed");
@@ -113,7 +110,6 @@ static int yaf_router_add_config(const Object* object, const Array& routes)
         return HHVM_YAF_FAILED;
     }
 
-    raise_warning(" in begin add config");
     auto ptr_routes = (*object)->o_realProp(YAF_ROUTER_PROPERTY_NAME_ROUTERS, 
             ObjectData::RealPropUnchecked, "Yaf_Router");
 
@@ -127,7 +123,6 @@ static int yaf_router_add_config(const Object* object, const Array& routes)
             continue;
         }
 
-        raise_warning("create route %s", key.toString().c_str());
         Variant tmp = yaf_route_instance(NULL, value);
         if (tmp.isNull()) {
             iter.next();
@@ -237,7 +232,6 @@ static Variant HHVM_METHOD(Yaf_Router, addConfig,
         return false;
     }
 
-    raise_warning("begin add config");
     Array route;
     if (config.isArray()) {
         route = config;

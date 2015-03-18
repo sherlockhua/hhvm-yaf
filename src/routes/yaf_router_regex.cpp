@@ -30,17 +30,14 @@ static Variant yaf_route_regex_match(const Object& object, char* uri, int uri_le
     auto ptr_map = object->o_realProp(YAF_ROUTE_PROPETY_NAME_MAP, 
                         ObjectData::RealPropUnchecked, "Yaf_Route_Regex");
 
-    raise_warning("uri:%s match is %s", uri, ptr_match->toString().c_str());
 
     Variant matches;
     String str_search(std::string(uri, uri_length));
     Variant ret = preg_match_all(ptr_match->toString(), str_search, matches);
 
-    raise_warning("match failed, ret:%d", ret.toBoolean());
     int match = 0;
     if (ret.isIntVal() ) {
         match = ret.toInt32();
-        raise_warning("match count:%d", match);
     }
 
     if (match <= 0) {
@@ -61,15 +58,6 @@ static Variant yaf_route_regex_match(const Object& object, char* uri, int uri_le
         Variant key = iter.first();
         Variant value = iter.second();
 
-
-        raise_warning("+++++++++++++match,  key:%s value:%s",  key.toString().c_str(), value.toString().c_str());
-        Array& tmp = value.toArrRef();
-        ArrayIter iter_tmp = tmp.begin();
-        while (!iter_tmp.end()) {
-            raise_warning("++++++++++++ key:%s value:%s", iter_tmp.first().toString().c_str(), 
-                    iter_tmp.second().toString().c_str());
-            iter_tmp.next();
-        }
         if (arr_map.exists(key)) {
             Variant name = arr_map[key];
             result.set(name, value.toArrRef()[0]);
@@ -194,7 +182,6 @@ static Variant HHVM_METHOD(Yaf_Route_Regex, route, const Variant& request)
         return false;
     }
 
-    raise_warning("begin route in regex");
     int ret = yaf_route_regex_route(this_, request.toObject());
     if (ret != HHVM_YAF_SUCCESS) {
         return false;

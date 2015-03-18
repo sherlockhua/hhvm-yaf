@@ -86,7 +86,6 @@ static char* trim(char* line)
         return line;
     }
 
-    raise_warning("---------index:%c end:%c", line[index], line[len]);
     if (line[index] == '\"' && line[len - 1] == '\"') {
         index++;
         len--;
@@ -109,7 +108,6 @@ static char* trim(char* line)
     memmove(line, &line[index], len - index);
     line[len - index] = '\0';
 
-    raise_warning("aaaaaaaa trime result:%s", line);
     return line;
 }
 
@@ -196,8 +194,6 @@ static int parse_field(char* field, Array& config, const char* cur_section, cons
 
     trim(key);
     trim(value);
-
-    raise_warning("key:%s value:%s", key, value);
 
     if (strlen(key) == 0) {
         yaf_trigger_error(YAF_ERR_TYPE_WARN, 

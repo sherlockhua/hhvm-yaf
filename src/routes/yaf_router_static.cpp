@@ -141,9 +141,6 @@ static bool yaf_route_pathinfo_route(const Object& request,
         *ptr_action = String(action);
     }
 
-    raise_warning("module:%s controller:%s action:%s", 
-            module.c_str(), controller.c_str(), action.c_str());
-
     if (rest.length()) {
         params = yaf_router_parse_parameters(rest.c_str());
         (void)yaf_request_set_params_multi(&request, params);
@@ -187,7 +184,6 @@ static Variant HHVM_METHOD(Yaf_Route_Static, route, const Variant& request)
         return false;
     }
 
-    raise_warning("route implement, static");
     return yaf_route_static_route(this_, request.toObject());
 }
 

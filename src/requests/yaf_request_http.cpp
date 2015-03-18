@@ -57,18 +57,13 @@ Variant yaf_request_http_instance(const Object* object,
 
         if (php_global(S_SERVER).toArray().exists(String("REQUEST_URI"))) {
             tmp = php_global(S_SERVER).toArray()[String("REQUEST_URI")];
-            raise_warning("debug: get request_uri:%s", tmp.toString().c_str());
             if (tmp.isString()) {
-                raise_warning("get request length:%d", tmp.toString().length());
                 std::string str_tmp = tmp.toString().toCppString();
-                raise_warning("after get request length:%d", tmp.toString().length());
                 if (strncasecmp(str_tmp.c_str(), "http", 4) == 0) {
                     //TODO use php_url_parse to get path
                     php_url* url_info = php_url_parse(str_tmp.c_str());
                     if (url_info && url_info->path) {
-                        raise_warning("after1 get request length:%d", tmp.toString().length());
                         uri = std::string(url_info->path);
-                        raise_warning("after2 get request length:%d", tmp.toString().length());
                     }
                     php_url_free(url_info);
                 } else {
@@ -113,11 +108,9 @@ done:
 
         *ptr_uri = String(uri);
 
-        raise_warning("hhtp set base uri:%s", base_uri);
         yaf_request_set_base_uri(o, base_uri, uri.c_str());
     }
 
-    raise_warning("get request http uri:%s", uri.c_str());
     auto ptr_params = o->o_realProp(YAF_REQUEST_PROPERTY_NAME_PARAMS, 
             ObjectData::RealPropUnchecked, "Yaf_Request_Http");
     *ptr_params = Array::Create();
