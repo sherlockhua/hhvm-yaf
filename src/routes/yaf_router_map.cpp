@@ -69,7 +69,7 @@ static bool yaf_route_map_route(const Object& o, const Object& request)
     if (ptr_uri->isString() && 
         ptr_base_uri->isString()&&
         strncasecmp(ptr_uri->toString().c_str(), 
-            ptr_base_uri->toString().c_str(), ptr_uri->toString().length())) {
+            ptr_base_uri->toString().c_str(), ptr_uri->toString().length()) == 0) {
         req_uri = std::string(ptr_uri->toString().c_str() + ptr_base_uri->toString().length()); 
     } else {
         req_uri = std::string(ptr_uri->toString().c_str());

@@ -238,7 +238,7 @@ static bool HHVM_METHOD(Yaf_Request_Http, isXmlHttpRequest)
     }
 
     std::string str_header = header.toString().toCppString();
-    if (strncasecmp(str_header.c_str(), "XMLHttpRequest", str_header.length() == 0)) {
+    if (strncasecmp(str_header.c_str(), "XMLHttpRequest", str_header.length())) {
         return false;
     } 
 

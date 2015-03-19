@@ -198,7 +198,7 @@ static bool HHVM_METHOD(Yaf_Request_Abstract, isGet)
     String method = this_->o_realProp(YAF_REQUEST_PROPERTY_NAME_METHOD, 
             ObjectData::RealPropUnchecked, "Yaf_Request_Abstract")->toString();
 
-    if (strncasecmp(method.toCppString().c_str(), "GET", method.length())) {
+    if (strncasecmp(method.toCppString().c_str(), "GET", method.length()) == 0) {
         return true;
     }
 
@@ -210,7 +210,7 @@ static bool HHVM_METHOD(Yaf_Request_Abstract, isPost)
     String method = this_->o_realProp(YAF_REQUEST_PROPERTY_NAME_METHOD, 
             ObjectData::RealPropUnchecked, "Yaf_Request_Abstract")->toString();
 
-    if (strncasecmp(method.toCppString().c_str(), "POST", method.length())) {
+    if (strncasecmp(method.toCppString().c_str(), "POST", method.length()) == 0) {
         return true;
     }
 
@@ -222,7 +222,7 @@ static bool HHVM_METHOD(Yaf_Request_Abstract, isPut)
     String method = this_->o_realProp(YAF_REQUEST_PROPERTY_NAME_METHOD, 
             ObjectData::RealPropUnchecked, "Yaf_Request_Abstract")->toString();
 
-    if (strncasecmp(method.toCppString().c_str(), "PUT", method.length())) {
+    if (strncasecmp(method.toCppString().c_str(), "PUT", method.length()) == 0) {
         return true;
     }
 
@@ -234,7 +234,7 @@ static bool HHVM_METHOD(Yaf_Request_Abstract, isHead)
     String method = this_->o_realProp(YAF_REQUEST_PROPERTY_NAME_METHOD, 
             ObjectData::RealPropUnchecked, "Yaf_Request_Abstract")->toString();
 
-    if (strncasecmp(method.toCppString().c_str(), "HEAD", method.length())) {
+    if (strncasecmp(method.toCppString().c_str(), "HEAD", method.length()) == 0) {
         return true;
     }
 
@@ -246,7 +246,7 @@ static bool HHVM_METHOD(Yaf_Request_Abstract, isOptions)
     String method = this_->o_realProp(YAF_REQUEST_PROPERTY_NAME_METHOD, 
             ObjectData::RealPropUnchecked, "Yaf_Request_Abstract")->toString();
 
-    if (strncasecmp(method.toCppString().c_str(), "Options", method.length())) {
+    if (strncasecmp(method.toCppString().c_str(), "Options", method.length()) == 0) {
         return true;
     }
 
@@ -258,7 +258,7 @@ static bool HHVM_METHOD(Yaf_Request_Abstract, isCli)
     String method = this_->o_realProp(YAF_REQUEST_PROPERTY_NAME_METHOD, 
             ObjectData::RealPropUnchecked, "Yaf_Request_Abstract")->toString();
 
-    if (strncasecmp(method.toCppString().c_str(), "Cli", method.length())) {
+    if (strncasecmp(method.toCppString().c_str(), "Cli", method.length()) == 0) {
         return true;
     }
 

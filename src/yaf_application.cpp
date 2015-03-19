@@ -563,9 +563,9 @@ static Variant HHVM_METHOD(Yaf_Application, run)
     } catch (Object& e) {
         
         raise_warning("catch object e");
-    } catch (Exception& e) {
+    } /*catch (Exception& e) {
         raise_warning("catch exception e");
-    }
+    }*/
 
     return false;
 }

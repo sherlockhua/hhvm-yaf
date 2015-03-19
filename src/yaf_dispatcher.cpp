@@ -239,12 +239,20 @@ static Variant yaf_dispatcher_get_controller(const char* app_dir,
 	if (!o->o_instanceof("Yaf_Controller_Abstract")) {
 		int ret = yaf_internal_autoload(controller, strlen(controller), (char**)&directory);
 		if (ret != HHVM_YAF_SUCCESS) {
-            raise_warning("yaf_internal_autoload failed, ret:%d", ret);
+            yaf_trigger_error(YAF_ERR_NOTFOUND_CONTROLLER, 
+                    "Failed opening controller script %s: %s", directory, strerror(errno));
 			return init_null_variant;
 		}
 
 		o = createObject(String(class_name), args);
+        if (o.isNull()) {
+            yaf_trigger_error(YAF_ERR_AUTOLOAD_FAILED, 
+                    "Could not find class %s in controller script %s", class_name, directory);
+            return init_null_variant;
+        }
 		if (!o->o_instanceof("Yaf_Controller_Abstract")) {
+            yaf_trigger_error(YAF_ERR_TYPE_ERROR, 
+                    "Controller must be an instance of %s", o->o_getClassName().get());
 			return init_null_variant;
 		}
 	}
@@ -485,8 +493,9 @@ static int yaf_dispatcher_handle(const Object& object, const Object& request,
         auto ptr_flush = object->o_realProp(YAF_DISPATCHER_PROPERTY_NAME_FLUSH,
                                 ObjectData::RealPropUnchecked, "Yaf_Dispatcher");
 
-        /*
-        if (ptr_render->isNull()) {
+        
+        
+        if (ptr_render == NULL || ptr_render->isNull()) {
             ptr_render = object->o_realProp(YAF_DISPATCHER_PROPERTY_NAME_RENDER,
                                 ObjectData::RealPropUnchecked, "Yaf_Dispatcher");
             if (ptr_render->isBoolean()) {
@@ -495,7 +504,7 @@ static int yaf_dispatcher_handle(const Object& object, const Object& request,
         } else {
             auto_render = ptr_render->toBoolean();
         }
-        */
+        
         if (executor->toObject()->o_instanceof("Yaf_Action_Abstract")) {
             raise_warning("executor is extends from Yaf_Action_Abstract");
         } 
@@ -848,9 +857,12 @@ Variant yaf_dispatcher_dispatch(const Object* object)
         }
     } catch (Object& e) {
         yaf_dispatcher_php_exception_handler(*object, request, response, e);
-    } catch (Exception& e) {
-        yaf_dispatcher_cpp_exception_handler(*object, request, response, e);
-    }
+    } /*catch (...) {
+        raise_warning("catch exception");
+    }*//*catch (Exception& e) {
+        raise_warning("catch exception:%s", e.what());
+        //yaf_dispatcher_cpp_exception_handler(*object, request, response, e);
+    }*/
 
     return response;
 }

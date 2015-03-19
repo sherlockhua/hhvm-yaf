@@ -256,6 +256,7 @@ bool yaf_internal_autoload(char* ptr_file_name, int ptr_file_name_len, char** di
     unsigned int seg_len, directory_len;
     std::string buf;
 
+    raise_warning("debug, begin  import:%s", ptr_file_name);
     char file_name[8192];
     std::string tmp_str(ptr_file_name, ptr_file_name_len);
     snprintf(file_name, sizeof(file_name), "%s", tmp_str.c_str());
@@ -332,11 +333,15 @@ bool yaf_internal_autoload(char* ptr_file_name, int ptr_file_name_len, char** di
         //sprintf(*directory, "%s", buf.c_str());
     }
 
+
+    raise_warning("import %s ", buf.c_str());
     bool status = yaf_loader_import(buf.c_str(), buf.length(), 0);
     if (!status) {
+        raise_warning("import file %s failed", buf.c_str());
         return false;
     }
 
+    raise_warning("import file %s succ", buf.c_str());
     return true;
 }
 
@@ -464,7 +469,8 @@ found:
         std::string tmp_class_name(origin_classname);
         String str_class_name(tmp_class_name);
 
-        if (HHVM_FN(class_exists)(str_class_name)) {
+        if (HHVM_FN(class_exists)(str_class_name) || 
+                HHVM_FN(interface_exists)(str_class_name)) {
 #ifdef YAF_HAVE_NAMESPACE
             if (origin_lcname) {
                 free(origin_lcname);
