@@ -792,6 +792,18 @@ final class Yaf_Route_Supervar extends Yaf_Route_Interface {
     public function route(mixed $request):mixed;
 }
 
+final class Yaf_Route_Rewrite extends Yaf_Route_Interface {
+    protected $_route = null;
+    protected $_default = null;
+    protected $_verify = null;
+
+    <<__Native>>
+    public function __construct(mixed $match, array $route, ?mixed $verify = NULL):void;
+
+    <<__Native>>
+    public function route(mixed $request):mixed;
+}
+
 abstract class Yaf_Plugin_Abstract {
     <<__Native>>
     public function routerStartup(mixed $request, mixed $response):mixed; 

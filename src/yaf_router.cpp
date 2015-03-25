@@ -319,6 +319,7 @@ void YafExtension::_initYafRouterClass()
     _initYafRegexRouterClass();
     _initYafSimpleRouterClass();
     _initYafSupervarRouterClass();
+    _initYafRewriteRouterClass();
 }
  
 }

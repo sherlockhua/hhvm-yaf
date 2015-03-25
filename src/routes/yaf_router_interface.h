@@ -20,6 +20,7 @@
 
 #define YAF_ROUTER_URL_DELIMIETER    "/"                                                                          
 #define YAF_ROUTE_REGEX_DILIMITER    '#'
+#define YAF_ROUTE_REGEX_DILIMITER_STR    "#"
 
 
 

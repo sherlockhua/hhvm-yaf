@@ -84,6 +84,7 @@ private:
     void _initYafRegexRouterClass();
     void _initYafSimpleRouterClass();
     void _initYafSupervarRouterClass();
+    void _initYafRewriteRouterClass();
     
     //plugin
     void _initYafPluginClass();
