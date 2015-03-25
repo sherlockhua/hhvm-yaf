@@ -65,7 +65,7 @@ static Variant yaf_session_instance()
 {
     Array args = Array::Create();
     Object instance = createObject("Yaf_Session", args);
-    if (!instance->o_instanceof("Yaf_Session")) {
+    if (!instance.instanceof("Yaf_Session")) {
         return init_null_variant;
     }
 

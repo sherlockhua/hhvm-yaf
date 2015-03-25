@@ -285,7 +285,7 @@ abstract class Yaf_Response_Abstract {
     public function clearBody(?mixed $name=NULL):mixed;
 
     <<__Native>>
-    public function getBody(?mixed $name = NULL):mixed;
+    public function getBody(?mixed $name = ''):mixed;
 
     <<__Native>>
     public function setHeader():mixed;
@@ -575,7 +575,7 @@ abstract class Yaf_Config_Abstract {
     public function __construct():void;
 
     abstract public function get(?mixed $name):mixed;
-    abstract public function set(string $name, mixed $value):mixed;
+    abstract public function set(mixed $name, mixed $value):mixed;
     abstract public function readonly():mixed;
     abstract public function toArray():mixed;
 }
@@ -594,7 +594,7 @@ class Yaf_Config_Simple extends Yaf_Config_Abstract implements Iterator, Travers
     public function get(?mixed $name):mixed;
 
     <<__Native>>
-    public function set(string $name, mixed $value):mixed;
+    public function set(mixed $name, mixed $value):mixed;
 
     <<__Native>>
     public function count():mixed;
@@ -639,7 +639,7 @@ class Yaf_Config_Simple extends Yaf_Config_Abstract implements Iterator, Travers
     public function offsetSet(mixed $name, mixed $value):mixed;
 }
 
-class Yaf_Config_Ini extends Yaf_Config_Abstract 
+class Yaf_Config_Ini extends Yaf_Config_Abstract implements Iterator, Traversable, ArrayAccess, Countable 
 {
     private $_cursor = NULL;
     <<__Native>>
@@ -652,7 +652,7 @@ class Yaf_Config_Ini extends Yaf_Config_Abstract
     public function get(?mixed $name):mixed;
 
     <<__Native>>
-    public function set(string $name, mixed $value):mixed;
+    public function set(mixed $name, mixed $value):mixed;
 
     <<__Native>>
     public function count():mixed;
@@ -679,10 +679,10 @@ class Yaf_Config_Ini extends Yaf_Config_Abstract
     public function toArray():mixed;
 
     <<__Native>>
-    public function offsetUnset(string $name):mixed;
+    public function offsetUnset(mixed $name):mixed;
 
     <<__Native>>
-    public function __set(string $name, mixed $value):mixed;
+    public function __set(mixed $name, mixed $value):mixed;
 
     <<__Native>>
     public function __get(?mixed $name = NULL):mixed;
@@ -691,10 +691,10 @@ class Yaf_Config_Ini extends Yaf_Config_Abstract
     public function offsetGet(?mixed $name = NULL):mixed;
 
     <<__Native>>
-    public function offsetExists(string $name):bool;
+    public function offsetExists(mixed $name):bool;
 
     <<__Native>>
-    public function offsetSet(string $name, mixed $value):mixed;
+    public function offsetSet(mixed $name, mixed $value):mixed;
 
 }
 
@@ -766,6 +766,30 @@ final class Yaf_Route_Static extends Yaf_Route_Interface {
 
     <<__Native>>
     public function match():mixed;
+}
+
+final class Yaf_Route_Simple extends Yaf_Route_Interface {
+
+    protected $controller = null;
+    protected $module     = null;
+    protected $action     = null;
+
+    <<__Native>>
+    public function __construct(mixed $module, mixed $controller, 
+                                    mixed $action):void;
+
+    <<__Native>>
+    public function route(mixed $request):mixed;
+}
+
+final class Yaf_Route_Supervar extends Yaf_Route_Interface {
+    protected $_var_name = null;
+
+    <<__Native>>
+    public function __construct(mixed $var):void;
+
+    <<__Native>>
+    public function route(mixed $request):mixed;
 }
 
 abstract class Yaf_Plugin_Abstract {

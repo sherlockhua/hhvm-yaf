@@ -250,19 +250,20 @@ bool yaf_loader_is_local_namespace(const Object& loader, char *class_name, int l
     return false;
 }
 
-bool yaf_internal_autoload(char* ptr_file_name, int ptr_file_name_len, char** directory)
+int yaf_internal_autoload(const char* ptr_file_name, 
+        int ptr_file_name_len, std::string& directory)
 {
     char *q, *p, *seg;
     unsigned int seg_len, directory_len;
     std::string buf;
 
-    raise_warning("debug, begin  import:%s", ptr_file_name);
     char file_name[8192];
     std::string tmp_str(ptr_file_name, ptr_file_name_len);
+
     snprintf(file_name, sizeof(file_name), "%s", tmp_str.c_str());
     int file_name_len = strlen(file_name);
 
-    if (NULL == *directory) {
+    if (directory.length() == 0) {
         String library_path;
         Variant loader;
 
@@ -270,8 +271,7 @@ bool yaf_internal_autoload(char* ptr_file_name, int ptr_file_name_len, char** di
 
         if (loader.isNull()) {
             raise_warning("yaf_loader need to be initialize first");
-            return false;
-
+            return HHVM_YAF_FAILED;
         } else {
             Object o_loader = loader.toObject();
 
@@ -291,12 +291,12 @@ bool yaf_internal_autoload(char* ptr_file_name, int ptr_file_name_len, char** di
         if (library_path.length() == 0) {
             raise_warning("yaf_loader requires yaf_application(which set the library_directory) "\
                     "to be initialized first");
-            return false;
+            return HHVM_YAF_FAILED;
         }
 
         buf.append(library_path.c_str());
     } else {
-        buf.append(*directory);
+        buf.append(directory);
     }
 
     directory_len = buf.length();
@@ -322,27 +322,21 @@ bool yaf_internal_autoload(char* ptr_file_name, int ptr_file_name_len, char** di
 
     if (g_yaf_local_data.get()->lowcase_path) {
         /* all path of library is lowercase */
-        transform(buf.begin(), buf.end(), buf.begin(), tolower);
+        transform(buf.begin() + directory_len, buf.end(), 
+                buf.begin() + directory_len, tolower);
     }
 
     buf.append(std::string(p, strlen(p)));
     buf.append(".");
     buf.append(g_yaf_local_data.get()->ext);
 
-    if (directory) {
-        //sprintf(*directory, "%s", buf.c_str());
-    }
-
-
-    raise_warning("import %s ", buf.c_str());
+    directory = buf;
     bool status = yaf_loader_import(buf.c_str(), buf.length(), 0);
     if (!status) {
-        raise_warning("import file %s failed", buf.c_str());
-        return false;
+        return HHVM_YAF_FAILED;
     }
 
-    raise_warning("import file %s succ", buf.c_str());
-    return true;
+    return HHVM_YAF_SUCCESS;
 }
 
 static void HHVM_METHOD(Yaf_Loader, __clone)
@@ -368,7 +362,7 @@ static Variant HHVM_METHOD(Yaf_Loader, autoload, const String& str_class_name)
 	const char* origin_classname = str_class_name.c_str();
 	const char* class_name = origin_classname;
 
-    char* ptr_directory = NULL;
+    std::string str_directory;
     char directory[8192] = {'\0'};
     char file_name[8192];
     int file_name_len = 0;
@@ -402,7 +396,6 @@ static Variant HHVM_METHOD(Yaf_Loader, autoload, const String& str_class_name)
             strcpy(file_name, class_name + YAF_LOADER_LEN_MODEL + separator_len);
         }
 
-        ptr_directory = directory;
         goto found;
 	}
 
@@ -417,7 +410,6 @@ static Variant HHVM_METHOD(Yaf_Loader, autoload, const String& str_class_name)
             strcpy(file_name, class_name + YAF_LOADER_LEN_PLUGIN + separator_len);
         }
 
-        ptr_directory = directory;
         goto found;
     }
 
@@ -432,7 +424,6 @@ static Variant HHVM_METHOD(Yaf_Loader, autoload, const String& str_class_name)
             strcpy(file_name, class_name + YAF_LOADER_LEN_CONTROLLER + separator_len);
         }
 
-        ptr_directory = directory;
         goto found;
     }
 
@@ -442,8 +433,6 @@ static Variant HHVM_METHOD(Yaf_Loader, autoload, const String& str_class_name)
         
             snprintf(directory, sizeof(directory), "%s/%s", 
                     app_directory, YAF_MODEL_DIRECTORY_NAME);
-
-            ptr_directory = directory;
         }
     }
 
@@ -463,8 +452,8 @@ found:
         return false;
     }
 
-    char** ptr = (char**)&directory;
-    if (yaf_internal_autoload(file_name, file_name_len, &ptr_directory)) {
+    str_directory = directory;
+    if (yaf_internal_autoload(file_name, file_name_len, str_directory) == HHVM_YAF_SUCCESS) {
 
         std::string tmp_class_name(origin_classname);
         String str_class_name(tmp_class_name);
@@ -481,7 +470,7 @@ found:
 
         if (!g_yaf_local_data.get()->use_spl_autoload) {
             raise_error("count not found class %s in directory:%s", 
-                    class_name, directory);
+                    class_name, str_directory.c_str());
             return true;
         }
 
@@ -495,8 +484,8 @@ found:
 #endif
 
     if (!g_yaf_local_data.get()->use_spl_autoload) {
-        //raise_error("Failed opening script:%s: %s class:%s", 
-         //       directory, strerror(errno), class_name);
+        raise_warning("Failed opening script:%s: %s", 
+                str_directory.c_str(), strerror(errno));
         return true;
     }
 

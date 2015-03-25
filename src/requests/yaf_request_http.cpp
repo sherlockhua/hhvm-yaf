@@ -37,11 +37,18 @@ Variant yaf_request_http_instance(const Object* object,
         base_uri = var_base_uri.toString().c_str();
     }
 
+    auto tmp = o->o_realProp(YAF_REQUEST_PROPERTY_NAME_METHOD, 
+        ObjectData::RealPropUnchecked, "Yaf_Request_Http");
+
     if (php_global(S_SERVER).toArray().exists(String("HTTP_REQUEST_METHOD"))) {
         Variant request_method = php_global(S_SERVER).toArray()[String("HTTP_REQUEST_METHOD")];
-        auto tmp = o->o_realProp(YAF_REQUEST_PROPERTY_NAME_METHOD, 
-            ObjectData::RealPropUnchecked, "Yaf_Request_Http");
         *tmp = request_method;
+    }
+  
+    ExecutionContext *context = g_context.getNoCheck();
+    Transport *transport = context->getTransport();
+    if (!transport) {
+        *tmp = String("Cli");
     }
 
     //TODO php client mode, the request method may be 'Cli'

@@ -14,6 +14,11 @@
 
 namespace HPHP {
 
+#define YAF_ROUTE_SIMPLE_VAR_NAME_MODULE        "module" 
+#define YAF_ROUTE_SIMPLE_VAR_NAME_CONTROLLER    "controller"
+#define YAF_ROUTE_SIMPLE_VAR_NAME_ACTION        "action"
+
+
 }
 
 

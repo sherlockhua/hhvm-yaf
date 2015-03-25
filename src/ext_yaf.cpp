@@ -32,6 +32,12 @@ Object createObject(const String& obj_typename, Array args) {
     return create_object(obj_typename, args);
 }
 
+bool function_exists(const Object& o, const String& method)
+{
+    const Func* func = o->methodNamed(method.get());
+    return func != nullptr;
+}
+
 void YafExtension::moduleInit()
 {
     _initYafActionClass();

@@ -14,6 +14,8 @@
 
 namespace HPHP {
 
+#define YAF_ROUTE_SUPERVAR_PROPETY_NAME_VAR "_var_name"
+
 }
 
 

@@ -204,13 +204,14 @@ static Variant HHVM_METHOD(Yaf_Router, addRoute,
     }
 
     Object o = route.toObject();
-    if (!o->o_instanceof("Yaf_Route")) {
+    //if (!o->o_instanceof("Yaf_Route")) {
+    if (!function_exists(o, String("route"))) {
         yaf_trigger_error(YAF_ERR_ROUTE_FAILED, 
                 "Expect route extends from Yaf_Route");
         return false;
     }
 
-    auto ptr_routes = o->o_realProp(YAF_ROUTER_PROPERTY_NAME_ROUTERS, 
+    auto ptr_routes = this_->o_realProp(YAF_ROUTER_PROPERTY_NAME_ROUTERS, 
             ObjectData::RealPropUnchecked, "Yaf_Router");
 
     if (!ptr_routes->isArray()) {
@@ -316,6 +317,8 @@ void YafExtension::_initYafRouterClass()
     _initYafMapRouterClass();
     _initYafStaticRouterClass();
     _initYafRegexRouterClass();
+    _initYafSimpleRouterClass();
+    _initYafSupervarRouterClass();
 }
  
 }

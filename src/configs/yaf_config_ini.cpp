@@ -20,6 +20,20 @@
 
 namespace HPHP { 
 
+static void trim(std::string& str)
+{
+    std::string::size_type pos = str.find_last_not_of(" \t\r\n");
+    if (pos != std::string::npos) {
+        str.erase(pos+1);
+    } else {
+        str.clear();
+    }
+
+    pos = str.find_first_not_of(" \t\r\n");
+    if (pos != std::string::npos) {
+        str.erase(0, pos);
+    }
+}
 
 static std::vector<std::string> split(const char* line, char demi)
 {
@@ -29,6 +43,7 @@ static std::vector<std::string> split(const char* line, char demi)
     std::string field;
     for (; i < len; i++) {
         if (line[i] == demi){
+            trim(field);
             if (field.length()) {
                 vec.push_back(field);
             }
@@ -39,6 +54,7 @@ static std::vector<std::string> split(const char* line, char demi)
         field.push_back(line[i]);
     }
 
+    trim(field);
     if (field.length()) {
         vec.push_back(field);
     }
@@ -111,11 +127,7 @@ static char* trim(char* line)
     return line;
 }
 
-#ifdef HHVM_VERSION_3_2_NEW
-Variant yaf_config_ini_format(ObjectData* object, 
-#else
 Variant yaf_config_ini_format(const Object* object, 
-#endif
         const Variant& config)
 {
     auto ptr_readonly = (*object)->o_realProp(YAF_CONFIG_PROPERT_NAME_READONLY, 
@@ -134,13 +146,17 @@ static int build_array(Array& arr, std::vector<std::string>& vec,
     vec.erase(vec.begin());
 
     if (arr.exists(String(section))) {
-        Variant& cur_var = arr.lvalAt(String(section));
-        Array& cur = cur_var.toArrRef();
-
-        build_array(cur, vec, value);
+        if (vec.size() == 0) {
+            arr.set(String(section), String(value));
+            return 0;
+        } else {
+            Variant& cur_var = arr.lvalAt(String(section));
+            Array& cur = cur_var.toArrRef();
+            build_array(cur, vec, value);
+        }
     } else {
         if (vec.size() == 0) {
-            arr.set(String(section), value);
+            arr.set(String(section), String(value));
         } else {
             arr.set(String(section), Array::Create());
 
@@ -224,9 +240,10 @@ static int parse_section(char* line, Array& config, const char* filename, std::s
     char* ptr = line;
     trim(ptr);
     if (strlen(ptr) == 0) {
-        yaf_trigger_error(YAF_ERR_TYPE_ERROR, 
+        /*yaf_trigger_error(YAF_ERR_TYPE_ERROR, 
                 "invalid section:%s file:%s", 
                 line, filename);
+                */
         return -1;
     }
 
@@ -234,9 +251,9 @@ static int parse_section(char* line, Array& config, const char* filename, std::s
     if (ptr_multi == NULL) {
         cur_section = std::string(ptr);
         if (config.exists(String(cur_section.c_str()))) {
-            yaf_trigger_error(YAF_ERR_TYPE_ERROR, 
+            /*yaf_trigger_error(YAF_ERR_TYPE_ERROR, 
                     "duplicate section:%s file:%s", 
-                    line, filename);
+                    line, filename);*/
             return -2;
         }
 
@@ -246,9 +263,9 @@ static int parse_section(char* line, Array& config, const char* filename, std::s
         //inherit
         std::vector<std::string> vec = split(ptr, ':');
         if (vec.size() == 0) {
-            yaf_trigger_error(YAF_ERR_TYPE_ERROR, 
+            /*yaf_trigger_error(YAF_ERR_TYPE_ERROR, 
                     "invalid section:%s file:%s", 
-                    line, filename);
+                    line, filename);*/
             return -3;
         }
 
@@ -258,26 +275,36 @@ static int parse_section(char* line, Array& config, const char* filename, std::s
 
         cur_section = std::string(buf);
         if (config.exists(String(cur_section.c_str()))) {
-            yaf_trigger_error(YAF_ERR_TYPE_ERROR, 
+            /*yaf_trigger_error(YAF_ERR_TYPE_ERROR, 
                     "duplicate section:%s file:%s", 
-                    line, filename);
+                    line, filename);*/
             return -4;
         }
 
         Array tmp = Array::Create();
         for (int i = 1; i < vec.size(); i++) {
-            snprintf(buf, sizeof(buf), "%s", vec[0].c_str());
+            snprintf(buf, sizeof(buf), "%s", vec[1].c_str());
             trim(buf);
 
             if(!config.exists(String(buf))) {
-                yaf_trigger_error(YAF_ERR_TYPE_WARN, 
+                /*yaf_trigger_error(YAF_ERR_TYPE_WARN, 
                         "section:%s file:%s  not exists", 
-                        line, filename);
-
+                        line, filename);*/
                 continue;
             }
 
-            tmp.set(String(buf), config[String(buf)]);   
+            Variant base = config[String(buf)];
+            if (base.isArray()) {
+                ArrayIter iter = base.toArray().begin();
+                while (!iter.end()) {
+                    if (!tmp.exists(iter.first())) {
+                        tmp.set(iter.first(), iter.second());
+                    }
+                    iter.next();
+                }
+            } else {
+                tmp.append(base);
+            }
         }
         config.set(String(cur_section.c_str()), tmp);
     }
@@ -285,11 +312,176 @@ static int parse_section(char* line, Array& config, const char* filename, std::s
     return 0;
 }
 
-#ifdef HHVM_VERSION_3_2_NEW
-static  int parse_ini_file(const char* filename, ObjectData* object)
-#else 
+static void format_ini_field(Variant& key, Variant& value, Array& dest)
+{
+    std::string str_key;
+    std::string str_value;
+    if (key.isString()) {
+        str_key = key.toString().toCppString(); 
+    }
+
+    if (value.isString()) {
+        str_value = value.toString().toCppString();
+    }
+
+    if (str_key.length() == 0) {
+        dest.set(key, value);
+        return;
+    }
+
+    std::vector<std::string> vec = split((char*)str_key.c_str(), '.');
+    if (vec.size() == 1) {
+        dest.set(key, value);
+        return;
+    } else {
+        build_array(dest, vec, str_value);
+    }
+}
+
+static void format_ini_array(Array& config, Array& dest)
+{
+    ArrayIter iter = config.begin();
+
+    while (!iter.end()) {
+        Variant key = iter.first();
+        Variant value = iter.second();
+
+        if (value.isArray()) {
+            dest.set(key, Array::Create());
+            Variant& cur_var = dest.lvalAt(key.toString());
+            Array& cur_arr = cur_var.toArrRef();
+            format_ini_array(value.toArrRef(), cur_arr);
+        } else {
+            format_ini_field(key, value, dest);
+        }
+
+        iter.next();
+    }
+}
+
+static void merge_array(Array& dest, const Array& src)
+{
+    ArrayIter iter = src.begin();
+    while (!iter.end()) {
+        Variant key = iter.first();
+        Variant value = iter.second();
+
+        if (!dest.exists(key)) {
+            dest.set(key, value);
+        } else {
+            Variant dest_value = dest[key];
+            if (dest_value.isArray() && value.isArray()) {
+                merge_array(dest_value.toArrRef(), value.toCArrRef());
+                dest.set(key, dest_value);
+            } 
+        }
+        iter.next();
+    }
+}
+
+static Array filter_ini_array(Array& config)
+{
+    Array arr = Array::Create();
+    ArrayIter iter = config.begin();
+    char str_key[256];
+    char buf[256];
+
+    while (!iter.end()) {
+        Variant key = iter.first();
+        Variant value = iter.second();
+
+        snprintf(str_key, sizeof(str_key), "%s", key.toString().c_str());
+
+        std::vector<std::string> vec = split(str_key, ':');
+        if (vec.size() == 1) {
+            arr.set(key, value);
+        } else {
+            Array tmp = Array::Create();
+            for (int i = 1; i < vec.size(); i++) {
+                snprintf(buf, sizeof(buf), "%s", vec[1].c_str());
+                trim(buf);
+
+                Variant base;
+                if(config.exists(String(buf))) {
+                    base = config[String(buf)];
+                } else if (arr.exists(String(buf))){
+                    base = arr[String(buf)];
+                }else {
+                    continue;
+                }
+
+                //合并父节点的配置
+                if (base.isArray()) {
+                    ArrayIter iter = base.toArray().begin();
+                    while (!iter.end()) {
+                        tmp.set(iter.first(), iter.second());
+                        iter.next();
+                    }
+                } 
+            }
+
+            //合并自己的配置
+            if (!value.isArray()) {
+                value = Array::Create();
+            }
+
+            merge_array(value.toArrRef(), tmp);
+            arr.set(String(vec[0]), value);
+        }
+
+        iter.next();
+    }
+
+    return arr;
+}
+
+static  int parse_ini_file_ex(const char* filename, Object* object)
+{
+    if (filename == NULL || object == NULL) {
+        yaf_trigger_error(YAF_ERR_TYPE_ERROR, 
+                "invald file:%s object:%p", 
+                filename, object);
+        return HHVM_YAF_FAILED;
+    }
+
+    auto ptr_config = (*object)->o_realProp(YAF_CONFIG_PROPERT_NAME, 
+            ObjectData::RealPropUnchecked, "Yaf_Config_Ini");
+
+    String func("parse_ini_file");
+    Array args = Array::Create();
+    args.append(String(filename));
+    args.append(Variant(true));
+
+    Variant ret = vm_call_user_func(func, args);
+    if (!ret.isArray()) {
+        return HHVM_YAF_FAILED;
+    }
+
+    Array& config = ret.toArrRef();
+    Array dest = Array::Create();
+    
+    //把 a.b.c=d的格式转换成
+    //array(
+    //    "a"=>array(
+    //      "b" => "c"
+    //    )
+    //)
+    //
+    format_ini_array(config, dest);
+    //实现yaf配置继承特性
+    Array conf = filter_ini_array(dest);
+    if (g_yaf_local_data.get()->ini_wanted_section.length()) {
+        String tmp_section(g_yaf_local_data.get()->ini_wanted_section);
+        if (conf.exists(tmp_section)) {
+            *ptr_config = conf[tmp_section];
+        }
+    } else {
+        *ptr_config = conf;
+    }
+    return HHVM_YAF_SUCCESS;
+}
+
 static  int parse_ini_file(const char* filename, Object* object)
-#endif
 {
     if (filename == NULL || object == NULL) {
         yaf_trigger_error(YAF_ERR_TYPE_ERROR, 
@@ -366,11 +558,7 @@ static  int parse_ini_file(const char* filename, Object* object)
     return 0;
 }
 
-#ifdef HHVM_VERSION_3_2_NEW
-Variant yaf_config_ini_instance(ObjectData* object, 
-#else
 Variant yaf_config_ini_instance(const Object* object, 
-#endif
         const Variant& filename, const Variant& section)
 {
     Object o;
@@ -417,7 +605,12 @@ Variant yaf_config_ini_instance(const Object* object,
         return init_null_variant;
     }
 
-    ret = parse_ini_file(str_filename.c_str(), &o);
+    g_yaf_local_data.get()->ini_wanted_section.clear();
+    if (section.isString()) {
+        g_yaf_local_data.get()->ini_wanted_section = section.toString().toCppString();
+    }
+
+    ret = parse_ini_file_ex(str_filename.c_str(), &o);
     if (ret != 0) {
         yaf_trigger_error(YAF_ERR_TYPE_ERROR, 
                 "parse filename failed, file:%s ret:%d", 
@@ -443,7 +636,8 @@ static void HHVM_METHOD(Yaf_Config_Ini, __construct,
 
 static Variant HHVM_METHOD(Yaf_Config_Ini, get, const Variant& name)
 {
-    if (!name.isString() || (name.toString().length() == 0)) {
+    if (name.isNull() || 
+            (name.isString() && name.toString().length() == 0)) {
         return this_;
     }
 
@@ -487,7 +681,7 @@ static bool HHVM_METHOD(Yaf_Config_Ini, __isset, const Variant& name)
     return true;
 }
 
-static Variant HHVM_METHOD(Yaf_Config_Ini, set, const String& name, const Variant& value)
+static Variant HHVM_METHOD(Yaf_Config_Ini, set, const Variant& name, const Variant& value)
 {
     return false;
 }
@@ -610,29 +804,30 @@ static Variant HHVM_METHOD(Yaf_Config_Ini, readonly)
     return ptr_config->toBoolean();
 }
 
-static Variant HHVM_METHOD(Yaf_Config_Ini, offsetUnset, const String& name)
+static Variant HHVM_METHOD(Yaf_Config_Ini, offsetUnset, const Variant& name)
 {
     return false;
 }
 
-static Variant HHVM_METHOD(Yaf_Config_Ini, offsetGet, const String& name)
+static Variant HHVM_METHOD(Yaf_Config_Ini, offsetGet, const Variant& name)
 {
     return false;
 }
 
-static Variant HHVM_METHOD(Yaf_Config_Ini, offsetExists, const String& name)
+static Variant HHVM_METHOD(Yaf_Config_Ini, offsetExists, const Variant& name)
 {
     return false;
 }
  
-static Variant HHVM_METHOD(Yaf_Config_Ini, offsetSet, const String& name, const String& value)
+static Variant HHVM_METHOD(Yaf_Config_Ini, offsetSet, const Variant& name, const String& value)
 {
     return false;
 }
 
 static Variant HHVM_METHOD(Yaf_Config_Ini, __get, const Variant& name)
 {
-    if (!name.isString() || (name.toString().length() == 0)) {
+    if (name.isNull() || 
+            (name.isString() && name.toString().length() == 0)) {
         return this_;
     }
 
@@ -658,7 +853,7 @@ static Variant HHVM_METHOD(Yaf_Config_Ini, __get, const Variant& name)
     return value;
 }
 
-static Variant HHVM_METHOD(Yaf_Config_Ini, __set, const String& name, const Variant& value)
+static Variant HHVM_METHOD(Yaf_Config_Ini, __set, const Variant& name, const Variant& value)
 {
     return false;
 }

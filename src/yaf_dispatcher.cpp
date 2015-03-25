@@ -146,6 +146,7 @@ static Variant yaf_dispatcher_get_action(const char* app_dir,
 
     if (g_yaf_local_data.get()->st_compatible) {
         char *p;
+        std::string str_directory;
         char directory[1024];
         char class_name[1024];
         /**
@@ -187,11 +188,12 @@ static Variant yaf_dispatcher_get_action(const char* app_dir,
 
         Object o = createObject(String(class_name), params);
         if (!o->o_instanceof("Yaf_Action_Abstract")) {
+            str_directory = directory;
             int ret = yaf_internal_autoload(action_upper, (int)strlen(action_upper),
-                    (char**)&directory);
+                    str_directory);
             if (ret != HHVM_YAF_SUCCESS) {
                 raise_warning("yaf_internal_autoload failed, ret:%d, "\
-                        "failed open action script:%s", ret, directory);
+                        "failed open action script:%s", ret, str_directory.c_str());
                 return init_null_variant;
             }
 
@@ -222,7 +224,6 @@ static Variant yaf_dispatcher_get_controller(const char* app_dir,
                 YAF_CONTROLLER_DIRECTORY_NAME);
     }
 
-
 	char class_name[8192];
 	if (g_yaf_local_data.get()->name_suffix) {
 		snprintf(class_name, sizeof(class_name), "%s%s%s", 
@@ -231,23 +232,23 @@ static Variant yaf_dispatcher_get_controller(const char* app_dir,
 		snprintf(class_name, sizeof(class_name), "%s%s%s", 
 				"Controller", g_yaf_local_data.get()->name_separator.c_str(), controller);
 	}
-    //TODO
-    //
 
-	//Array params = Array::Create();
+    std::string str_directory = directory;
 	Object o = createObject(String(class_name), args);
-	if (!o->o_instanceof("Yaf_Controller_Abstract")) {
-		int ret = yaf_internal_autoload(controller, strlen(controller), (char**)&directory);
+	if (o.isNull() || !o->o_instanceof("Yaf_Controller_Abstract")) {
+		int ret = yaf_internal_autoload(controller, strlen(controller), str_directory);
 		if (ret != HHVM_YAF_SUCCESS) {
             yaf_trigger_error(YAF_ERR_NOTFOUND_CONTROLLER, 
-                    "Failed opening controller script %s: %s", directory, strerror(errno));
+                    "Failed opening controller script %s: %s", str_directory.c_str(), strerror(errno));
 			return init_null_variant;
 		}
 
+        //raise_warning("debug yaf_internal_autoload succ");
 		o = createObject(String(class_name), args);
         if (o.isNull()) {
             yaf_trigger_error(YAF_ERR_AUTOLOAD_FAILED, 
-                    "Could not find class %s in controller script %s", class_name, directory);
+                    "Could not find class %s in controller script %s", 
+                    class_name, str_directory.c_str());
             return init_null_variant;
         }
 		if (!o->o_instanceof("Yaf_Controller_Abstract")) {
@@ -705,6 +706,10 @@ static void yaf_dispatcher_php_exception_handler(
         const Object& dispatcher, const Object& request, 
         const Object& response, const Object& e)
 {
+    if (!g_yaf_local_data.get()->catch_exception) {
+        throw e;
+    }
+
     if (g_yaf_local_data.get()->in_exception) {
         return;
     } 

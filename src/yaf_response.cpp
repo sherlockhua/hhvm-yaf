@@ -142,7 +142,7 @@ int yaf_response_clear_body(const Object* object, const Variant& name)
 #ifdef HHVM_VERSION_3_2_NEW
 static Variant yaf_response_get_body(ObjectData* object, const Variant& name)
 #else
-static Variant yaf_response_get_body(Object object, const Variant& name)
+static Variant yaf_response_get_body(const Object& object, const Variant& name)
 #endif
 {
 
@@ -153,12 +153,17 @@ static Variant yaf_response_get_body(Object object, const Variant& name)
         return init_null_variant;
     }
 
-    if (!name.isString() || name.toString().length() == 0) {
+    if (!name.isString()) {
         return *ptr_body;
     }
 
-    if (ptr_body->toArray().exists(name.toString())) {
-        return ptr_body->toArrRef()[name.toString()];
+    String key = name.toString();
+    if (name.isString() && name.toString().length() == 0) {
+        key = String(YAF_RESPONSE_PROPERTY_NAME_DEFAULTBODY);
+    }
+
+    if (ptr_body->toArray().exists(key)) {
+        return ptr_body->toArray()[key];
     }
 
     return init_null_variant;
@@ -196,6 +201,7 @@ static String HHVM_METHOD(Yaf_Response_Abstract, __toString)
 //TODO check name for NULL
 static Variant HHVM_METHOD(Yaf_Response_Abstract, getBody, const Variant& name)
 {
+    /*
     String key;
     if (name.isNull()) {
         key = String(YAF_RESPONSE_PROPERTY_NAME_DEFAULTBODY);
@@ -203,8 +209,8 @@ static Variant HHVM_METHOD(Yaf_Response_Abstract, getBody, const Variant& name)
         key = name.toString();
     }
 
-    Variant value = yaf_response_get_body(this_, key);
-    return value;
+    */
+    return  yaf_response_get_body(this_, name);
 }
 
 static Variant HHVM_METHOD(Yaf_Response_Abstract, setBody, 

@@ -38,7 +38,8 @@ Variant yaf_config_simple_instance(const Object* object,
         auto ptr_config = o->o_realProp(YAF_CONFIG_PROPERT_NAME, 
                 ObjectData::RealPropUnchecked, "Yaf_Config_Simple");
         *ptr_config = config;
-        if (readonly.isBoolean()) {
+        if (!readonly.isNull()) {
+
             auto ptr_readonly = o->o_realProp(YAF_CONFIG_PROPERT_NAME_READONLY, 
                     ObjectData::RealPropUnchecked, "Yaf_Config_Simple");
             *ptr_readonly = readonly.toBoolean();
@@ -92,7 +93,7 @@ static bool HHVM_METHOD(Yaf_Config_Simple, __isset, const Variant& name)
 
 static Variant HHVM_METHOD(Yaf_Config_Simple, get, const Variant& name)
 {
-    if (!name.isString() || (name.toString().length() == 0)) {
+    if (name.isString() && (name.toString().length() == 0)) {
         return this_;
     }
 
@@ -299,7 +300,7 @@ static Variant HHVM_METHOD(Yaf_Config_Simple, __set,
 
 static Variant HHVM_METHOD(Yaf_Config_Simple, __get, const Variant& name)
 {
-    if (!name.isString() || (name.toString().length() == 0)) {
+    if (name.isString() && (name.toString().length() == 0)) {
         return this_;
     }
 

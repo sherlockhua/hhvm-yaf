@@ -15,6 +15,8 @@
 
 namespace HPHP {
 
+extern bool yaf_route_pathinfo_route(const Object& request, 
+        const char* str_req_uri, int str_req_uri_len);
 }
 
 

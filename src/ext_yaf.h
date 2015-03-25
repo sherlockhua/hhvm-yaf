@@ -32,8 +32,18 @@ namespace HPHP {
 #define IS_ABSOLUTE_PATH(x) \
     ((x).length() && IS_SLASH((x)[0]))
 
-        
+const StaticString  
+    S_HTTP_USER_AGENT("HTTP_USER_AGENT"),
+    S_ENV("_ENV"),
+    S_SERVER("_SERVER"),
+    S_GET("GET"),
+    S_REQUEST("_REQUEST"),
+    S_POST("_POST"),
+    S_COOKIE("_COOKIE"),
+    S_FILES("_FILES");
+
 extern Object createObject(const String& obj_typename, Array args);
+extern bool function_exists(const Object& o, const String& method);
 
 class YafExtension : public Extension {
 public:
@@ -72,6 +82,8 @@ private:
     void _initYafMapRouterClass();
     void _initYafStaticRouterClass();
     void _initYafRegexRouterClass();
+    void _initYafSimpleRouterClass();
+    void _initYafSupervarRouterClass();
     
     //plugin
     void _initYafPluginClass();
@@ -132,7 +144,7 @@ public:
 #endif
 */
     Variant     *active_ini_file_section;
-    Variant     *ini_wanted_section;
+    std::string ini_wanted_section;
     int         parsing_flag;
 #ifdef YAF_HAVE_NAMESPACE
     bool        use_namespace;
@@ -153,6 +165,7 @@ public:
             this->local_namespaces.clear();
             this->base_uri.clear();
             this->view_directory.clear();
+            this->ini_wanted_section.clear();
             //this->directory        = NULL;
             //this->bootstrap        = NULL;
             //this->local_library    = NULL;
