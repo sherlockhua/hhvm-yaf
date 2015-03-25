@@ -18,6 +18,29 @@
 
 namespace HPHP {
 
+Variant yaf_route_supervar_instance(const Object* object, const Variant& name)
+{
+    if (!name.isString() || 
+            name.isString() && name.toString().length() == 0) {
+        return init_null_variant;
+    }
+
+    Object o;
+    if (object) {
+        o = *object;
+    } else {
+        Array params = Array::Create();
+        params.append(name);
+
+        o = createObject("Yaf_Route_Supervar", params);
+    }
+
+    auto ptr_supervar = o->o_realProp(YAF_ROUTE_SUPERVAR_PROPETY_NAME_VAR, 
+                ObjectData::RealPropUnchecked, "Yaf_Route_Supervar");
+
+    *ptr_supervar = name;
+    return o;
+}
 
 static Variant yaf_route_supervar_route(const Object& o, const Object& request)
 {

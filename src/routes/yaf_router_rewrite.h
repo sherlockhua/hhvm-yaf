@@ -14,6 +14,9 @@
 
 namespace HPHP {
 
+extern Variant yaf_route_rewrite_instance( const Object* object,
+        const Variant& match, const Array& route, const Variant& verify);
+
 }
 
 

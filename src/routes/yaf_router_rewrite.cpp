@@ -154,7 +154,7 @@ static bool yaf_route_rewrite_route(const Object& o, const Object& request)
     return true;
 }
 
-static Variant yaf_route_rewrite_instance( const Object* object,
+Variant yaf_route_rewrite_instance( const Object* object,
         const Variant& match, const Array& route, const Variant& verify)
 {
     Object o;

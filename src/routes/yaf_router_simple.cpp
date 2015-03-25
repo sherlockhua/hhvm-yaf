@@ -18,7 +18,7 @@
 namespace HPHP {
 
 
-static Variant yaf_route_simple_instance(const Object* object, 
+Variant yaf_route_simple_instance(const Object* object, 
         const String& module, const String& controller, const String& action)
 {
     Object o;

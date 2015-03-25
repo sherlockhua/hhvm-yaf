@@ -30,11 +30,7 @@ static bool yaf_config_ini_modified(const Variant& filename, long ctime)
     return false;
 }
 
-#ifdef HHVM_VERSION_3_2_NEW
-Variant yaf_config_ini_unserialize(ObjectData* object, 
-#else
 Variant yaf_config_ini_unserialize(Object* object, 
-#endif
         const Variant& filename, const Variant& section)
 {
     Array& configs = g_yaf_local_data.get()->configs;
@@ -79,22 +75,14 @@ Variant yaf_config_ini_unserialize(Object* object,
     return init_null_variant;
 }
 
-#ifdef HHVM_VERSION_3_2_NEW
-Variant yaf_config_ini_serialize(ObjectData* object, 
-#else
 Variant yaf_config_ini_serialize(Object* object, 
-#endif
         const Variant& filename, const Variant& section)
 {
     return init_null_variant;
 }
 
 
-#ifdef HHVM_VERSION_3_2_NEW
-Variant yaf_config_instance(ObjectData* object, 
-#else
 Variant yaf_config_instance(Object* object, 
-#endif
         const Variant& filename, const Variant& section)
 {
     if (filename.isString()) {
@@ -103,7 +91,7 @@ Variant yaf_config_instance(Object* object,
             return yaf_config_ini_unserialize(object, filename, section);
         }
 
-        Variant o = yaf_config_ini_unserialize(object, filename, section);
+        Variant o = yaf_config_ini_instance(object, filename, section);
         if (cache) {
             yaf_config_ini_serialize(object, filename, section);
         }
