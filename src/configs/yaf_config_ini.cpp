@@ -474,6 +474,9 @@ static  int parse_ini_file_ex(const char* filename, Object* object)
         String tmp_section(g_yaf_local_data.get()->ini_wanted_section);
         if (conf.exists(tmp_section)) {
             *ptr_config = conf[tmp_section];
+        } else {
+             yaf_trigger_error(YAF_ERR_TYPE_ERROR, "There is no section '%s' in '%s'",
+                     tmp_section.c_str(), filename);
         }
     } else {
         *ptr_config = conf;

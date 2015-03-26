@@ -31,9 +31,9 @@ $app->execute("main");
 --EXPECTF--
 string(7) "product"
 int(2)
-
-Warning: Yaf_Application::execute(%sbe a valid callback%sin %s027.php on line %d
-
-Warning: Yaf_Loader::autoload(): Failed opening script %scontrollers%cNoExists.php: No such file or directory in %s027.php on line %d
-
-Fatal error: Class 'NoExistsController' not found in %s027.php on line %d
+%shphp%s
+Warning: Invalid argument: function: method '123' not found in %s027.php on line %d
+%shphp%s
+Warning: Failed opening script %scontrollers%cNoExists.php: No such file or directory in %s027.php on line %d
+%shphp%s
+Fatal error: Class undefined: NoExistsController in %s027.php on line %d

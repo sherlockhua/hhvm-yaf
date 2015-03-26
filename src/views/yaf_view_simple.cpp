@@ -146,11 +146,7 @@ static int yaf_view_simple_extract(const Variant& tpl_vars, const Variant& vars)
     return yaf_view_simple_extract_array(tpl_vars) + yaf_view_simple_extract_array(vars);
 }
 
-#ifdef HHVM_VERSION_3_2_NEW
-static int yaf_view_simple_clear_assign(ObjectData* object, const String &name)
-#else
-static int yaf_view_simple_clear_assign(Object object, const String &name)
-#endif
+static int yaf_view_simple_clear_assign(Object object, const Variant &name)
 {
     auto ptr_tplvars = object->o_realProp(YAF_VIEW_PROPERTY_NAME_TPLVARS, 
             ObjectData::RealPropUnchecked, "Yaf_View_Simple");
@@ -159,8 +155,8 @@ static int yaf_view_simple_clear_assign(Object object, const String &name)
     }
 
     Array& tplvars = ptr_tplvars->toArrRef();
-    if (name.length()) {
-        tplvars.remove(name, true);
+    if (name.isString()) {
+        tplvars.remove(name.toString(), true);
     } else {
         tplvars.clear();
     }
@@ -168,11 +164,7 @@ static int yaf_view_simple_clear_assign(Object object, const String &name)
     return 0;
 }
 
-#ifdef HHVM_VERSION_3_2_NEW
-static Variant yaf_view_simple_display(ObjectData* object, 
-#else
 static Variant yaf_view_simple_display(Object object, 
-#endif
         const Variant& tpl, const Variant& vars)
 {
     if (!tpl.isString()) {
@@ -431,7 +423,7 @@ static Variant HHVM_METHOD(Yaf_View_Simple, assignRef, const String& name, Varia
     return true;
 }
 
-static Variant HHVM_METHOD(Yaf_View_Simple, clear, const String& name)
+static Variant HHVM_METHOD(Yaf_View_Simple, clear, const Variant& name)
 {
     yaf_view_simple_clear_assign(this_, name);
     return this_;
