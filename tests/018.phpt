@@ -11,6 +11,7 @@ print_r($config);
 --EXPECTF--
 Yaf_Config_Ini Object
 (
+    [_cursor:Yaf_Config_Ini:private] => 
     [_config:protected] => Array
         (
             [application] => Array

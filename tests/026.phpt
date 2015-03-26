@@ -14,6 +14,8 @@ echo $response;
 --EXPECTF--
 Yaf_Response_Http Object
 (
+    [_sendheader:protected] => 1
+    [_response_code:protected] => 200
     [_header:protected] => Array
         (
         )
@@ -24,7 +26,5 @@ Yaf_Response_Http Object
             [footer] =>  World
         )
 
-    [_sendheader:protected] => 1
-    [_response_code:protected] => 200
 )
 Hello World

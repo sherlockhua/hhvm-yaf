@@ -233,9 +233,12 @@ static Variant yaf_dispatcher_get_controller(const char* app_dir,
 				"Controller", g_yaf_local_data.get()->name_separator.c_str(), controller);
 	}
 
+	Object o;
     std::string str_directory = directory;
-	Object o = createObject(String(class_name), args);
-	if (o.isNull() || !o->o_instanceof("Yaf_Controller_Abstract")) {
+	//Object o = createObject(String(class_name), args);
+    Class* cls = Unit::getClass(String(class_name).get(), false);
+	//if (o.isNull() || !o->o_instanceof("Yaf_Controller_Abstract")) {
+    if (cls == nullptr) {
 		int ret = yaf_internal_autoload(controller, strlen(controller), str_directory);
 		if (ret != HHVM_YAF_SUCCESS) {
             yaf_trigger_error(YAF_ERR_NOTFOUND_CONTROLLER, 
@@ -244,19 +247,30 @@ static Variant yaf_dispatcher_get_controller(const char* app_dir,
 		}
 
         //raise_warning("debug yaf_internal_autoload succ");
-		o = createObject(String(class_name), args);
-        if (o.isNull()) {
+        Class* cls = Unit::getClass(String(class_name).get(), false);
+        if (cls == nullptr) {
             yaf_trigger_error(YAF_ERR_AUTOLOAD_FAILED, 
                     "Could not find class %s in controller script %s", 
                     class_name, str_directory.c_str());
             return init_null_variant;
         }
-		if (!o->o_instanceof("Yaf_Controller_Abstract")) {
-            yaf_trigger_error(YAF_ERR_TYPE_ERROR, 
-                    "Controller must be an instance of %s", o->o_getClassName().get());
-			return init_null_variant;
-		}
+
 	}
+   
+    o = createObject(String(class_name), args);
+    if (o.isNull()) {
+        yaf_trigger_error(YAF_ERR_AUTOLOAD_FAILED, 
+                "Could not find class %s in controller script %s", 
+                class_name, str_directory.c_str());
+        return init_null_variant;
+    }
+
+    if (!o->o_instanceof("Yaf_Controller_Abstract")) {
+        yaf_trigger_error(YAF_ERR_TYPE_ERROR, 
+                "Controller must be an instance of %s", o->o_getClassName().get());
+        return init_null_variant;
+    }
+
 
     Object request = args[0].toObject();
     auto ptr_req_module = request->o_realProp(YAF_REQUEST_PROPERTY_NAME_MODULE, 
@@ -377,8 +391,6 @@ static int yaf_dispatcher_handle(const Object& object, const Object& request,
             ptr_module->toString().c_str(), ptr_controller->toString().c_str(), 
             is_def_module, arr_args);
     if (tmp_controller.isNull()) {
-        yaf_trigger_error(YAF_ERR_DISPATCH_FAILED, 
-                "get controller failed, dir:%s", app_dir.c_str());
         return HHVM_YAF_FAILED;
     }
 /*

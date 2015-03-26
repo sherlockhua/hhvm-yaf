@@ -310,14 +310,14 @@ class Yaf_Response_Http extends Yaf_Response_Abstract {
     protected bool $_sendheader = true;
     protected int  $_response_code = 200;
 
-    <<__Native>>
-    public function __construct():void;
+    //<<__Native>>
+    //public function __construct():void;
 }
 
 class Yaf_Response_Cli extends Yaf_Response_Abstract {
 
-    <<__Native>>
-    public function __construct():void;
+    //<<__Native>>
+    //public function __construct():void;
 }
 
 final class Yaf_Application {

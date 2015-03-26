@@ -98,7 +98,7 @@ void YafExtension::moduleLoad(Hdf config)
 
 void YafExtension::moduleLoad(const IniSetting::Map& ini, Hdf config)
 {
-    Hdf conf = config["ext_conf"]["xm_rpc"];
+    Hdf conf = config["ext_conf"]["yaf"];
     _loadYafConf(conf);
 }
 

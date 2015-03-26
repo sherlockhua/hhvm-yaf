@@ -9,5 +9,6 @@ $config = new Yaf_Config_Ini;
 var_dump($config->get("\0"));
 ?>
 --EXPECTF--
+%shphp%s
 Warning: Yaf_Config_Ini::__construct() expects at least 1 parameter, 0 given in %s on line %d
 NULL

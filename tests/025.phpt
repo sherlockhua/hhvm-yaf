@@ -26,6 +26,6 @@ var_dump(Yaf_Loader::getInstance()->isLocalName("Bar_Name"));
 Yaf_Loader Object
 (
     [_library:protected] => /tmp
-    [_global_library:protected] => /php/global/dir
+    [_global_library:protected] => /tmp
 )
 bool(true)

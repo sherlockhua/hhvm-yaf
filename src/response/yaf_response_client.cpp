@@ -13,14 +13,16 @@
 
 namespace HPHP {
 
+/*
 static void HHVM_METHOD(Yaf_Response_Cli, __construct)
 {
 
 }
+*/
 
 void YafExtension::_initYafResponseClientClass()
 {
-    HHVM_ME(Yaf_Response_Cli, __construct);
+    //HHVM_ME(Yaf_Response_Cli, __construct);
 }
 
 

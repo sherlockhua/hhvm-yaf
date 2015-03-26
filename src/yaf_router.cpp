@@ -57,22 +57,23 @@ int yaf_router_route (const Object* object, const Object& request)
     }
 
 
-    std::vector<std::string> reverse_vector;
+    std::vector<Variant> reverse_vector;
 
     Array& arr_routes = ptr_routes->toArrRef();
     ArrayIter iter = arr_routes.begin();
     while (!iter.end()) {
         Variant key = iter.first();
-        reverse_vector.push_back(key.toString().toCppString());
+        //reverse_vector.push_back(key.toString().toCppString());
+        reverse_vector.push_back(key);
         iter.next();
     }
 
     for (int i = reverse_vector.size() - 1; i >= 0; i--) {
-        if (!arr_routes.exists(String(reverse_vector[i]))) {
+        if (!arr_routes.exists(reverse_vector[i])) {
             continue;
         }
 
-        Variant key = String(reverse_vector[i]);
+        Variant key = reverse_vector[i];
         Variant value = arr_routes[key];
 
         Object route = value.toObject();
@@ -93,7 +94,11 @@ int yaf_router_route (const Object* object, const Object& request)
 
         auto ptr_routes = (*object)->o_realProp(YAF_ROUTER_PROPERTY_NAME_CURRENT_ROUTE, 
                 ObjectData::RealPropUnchecked, "Yaf_Router");
-        *ptr_routes = key;
+        if (key.isIntVal()) {
+            *ptr_routes = key.toInt64();
+        } else {
+            *ptr_routes = key;
+        }
 
         yaf_request_set_routed(&request, 1);
         

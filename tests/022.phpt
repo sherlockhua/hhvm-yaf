@@ -29,6 +29,7 @@ rmdir(dirname(__FILE__) . "/tmp");
 ?>
 --EXPECTF--
 string(%d) "%stests"
+%shphp%s
 string(%d) "%stmp"
-
-Catchable fatal error: Yaf_Application::run(): Failed opening controller script %stmp%ccontrollers%cIndex.php: No such file or directory in %s022.php on line %d
+%shphp%s
+Fatal error: Failed opening controller script %stmp%ccontrollers%cIndex.php: No such file or directory in %s022.php on line %d

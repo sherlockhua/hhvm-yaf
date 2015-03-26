@@ -646,7 +646,7 @@ static Variant HHVM_METHOD(Yaf_Config_Ini, get, const Variant& name)
 
     if (!ptr_config->isArray()) {
         *ptr_config = Array::Create();
-        return false;
+        return init_null_variant;
     } 
 
     Array& arr = ptr_config->toArrRef();

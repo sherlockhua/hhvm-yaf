@@ -156,7 +156,7 @@ Variant yaf_loader_instance(const Object* object,
     return instance;
 }
 
-bool yaf_loader_register_namespace_single(const char *prefix, unsigned int len) 
+bool yaf_loader_register_namespace_single(const char *prefix, int len) 
 {
     if (g_yaf_local_data.get()->local_namespaces.length()) {
         char buf[1024];
@@ -447,8 +447,8 @@ found:
             free(origin_lcname);
         }
 #endif
-        raise_error("Couldn't load a framework MVC class without "\
-                "an yaf_app initializing");
+        raise_warning("Couldn't load a framework MVC class without "\
+                "an Yaf_Application initializing");
         return false;
     }
 
@@ -484,7 +484,7 @@ found:
 #endif
 
     if (!g_yaf_local_data.get()->use_spl_autoload) {
-        raise_warning("Failed opening script:%s: %s", 
+        raise_warning("Failed opening script %s: %s", 
                 str_directory.c_str(), strerror(errno));
         return true;
     }

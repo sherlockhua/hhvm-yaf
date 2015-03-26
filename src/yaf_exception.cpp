@@ -10,6 +10,7 @@
 =============================================*/
 #include "yaf_exception.h"
 #include "ext_yaf.h"
+#include "yaf_application.h"
 #include "hphp/runtime/base/base-includes.h"
 #include "hphp/runtime/ext/std/ext_std_classobj.h"
 #include "hphp/runtime/ext/extension.h"
@@ -86,7 +87,20 @@ void yaf_trigger_error(int level, char* format, ...)
     if (g_yaf_local_data.get()->throw_exception) {
         yaf_throw_exception(level, msg_buf);
     } else {
-        raise_error("%s", msg_buf);
+        Variant app = get_app();
+        if (app.isObject()) {
+            Object o = app.toObject();
+            auto ptr_errno = o->o_realProp(YAF_APPLICATION_PROPERTY_NAME_ERRNO, 
+                                    ObjectData::RealPropUnchecked, "Yaf_Application");
+
+            auto ptr_msg = o->o_realProp(YAF_APPLICATION_PROPERTY_NAME_ERRMSG, 
+                                    ObjectData::RealPropUnchecked, "Yaf_Application");
+
+            *ptr_errno = Variant(level);
+            *ptr_msg = String(msg_buf);
+        }
+
+        raise_recoverable_error("%s", msg_buf);
     }
 }
 

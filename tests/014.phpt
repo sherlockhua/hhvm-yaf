@@ -17,19 +17,21 @@ Yaf_Application Object
 (
     [config:protected] => Yaf_Config_Ini Object
         (
+            [_cursor:Yaf_Config_Ini:private] => 
             [_config:protected] => Array
                 (
-                    [application] => Array
-                        (
-                            [directory] => %stests/applcation
-                        )
-
+                    [value] => 2
                     [name] => extra
                     [array] => Array
                         (
-                            [1] => 1
                             [name] => new_name
                             [2] => test
+                            [1] => 1
+                        )
+
+                    [application] => Array
+                        (
+                            [directory] => %stests/applcation
                         )
 
                     [5] => 5
@@ -82,7 +84,6 @@ Yaf_Application Object
 
                         )
 
-                    [value] => 2
                 )
 
             [_readonly:protected] => 1

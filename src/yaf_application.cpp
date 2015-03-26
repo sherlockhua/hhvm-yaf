@@ -265,7 +265,7 @@ static int yaf_application_parse_library(const Array& config)
                         str_tmp.push_back(str_src[i]);
                     }
                 }
-                yaf_loader_register_namespace_single(str_tmp);
+                yaf_loader_register_namespace_single(str_tmp.c_str(), str_tmp.length());
             }
         }
     }

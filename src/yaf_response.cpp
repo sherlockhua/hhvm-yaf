@@ -38,11 +38,11 @@ Variant yaf_response_instance(const Object* object, const char* sapi_name)
     }
 
     auto ptr_header = o->o_realProp(YAF_RESPONSE_PROPERTY_NAME_HEADER, 
-            ObjectData::RealPropUnchecked, class_name.c_str());
+            ObjectData::RealPropUnchecked, "Yaf_Response_Abstract");
     *ptr_header = Array::Create();
 
     auto ptr_body = o->o_realProp(YAF_RESPONSE_PROPERTY_NAME_BODY, 
-            ObjectData::RealPropUnchecked, class_name.c_str());
+            ObjectData::RealPropUnchecked, "Yaf_Response_Abstract");
     *ptr_body = Array::Create();
 
     return o;
@@ -175,7 +175,8 @@ static void HHVM_METHOD(Yaf_Response_Abstract, __clone)
 
 static void HHVM_METHOD(Yaf_Response_Abstract, __construct)
 {
-    
+    //TODO 需要判断是命令行还是web请求
+    yaf_response_instance(&this_, "Http");
 }
 
 static void HHVM_METHOD(Yaf_Response_Abstract, __destruct)
