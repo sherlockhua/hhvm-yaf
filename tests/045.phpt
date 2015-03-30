@@ -18,7 +18,7 @@ $config = array(
 );
 
 class Bootstrap extends Yaf_Bootstrap_Abstract {
-    protected function _initErrorHandler(Yaf_Dispatcher $dispatcher) {
+    public function _initErrorHandler(Yaf_Dispatcher $dispatcher) {
         $dispatcher->setErrorHandler(function($errorCode, $errorMessage, $file, $line) {
             throw new ErrorException($errorMessage, 0, $errorCode, $file, $line);
         });

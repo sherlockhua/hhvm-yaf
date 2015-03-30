@@ -33,4 +33,5 @@ require "build.inc";
 shutdown();
 ?>
 --EXPECTF--
-Parse error: syntax error, unexpected '{' in %sfoo.phtml on line %d
+%shphp%s
+Fatal error: syntax error, unexpected '{' in %sfoo.phtml on line %d

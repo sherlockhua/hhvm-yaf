@@ -14,7 +14,7 @@ short_open_tag = 0
 $view = new Yaf_View_Simple(dirname(__FILE__));
 $tpl = dirname(__FILE__) . '/short_tag_test.phtml';
 
-$content = "hello<?=\$name?>";
+$content = "<?=\$name?>";
 
 file_put_contents($tpl, $content);
 

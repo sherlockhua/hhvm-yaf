@@ -545,7 +545,7 @@ static int yaf_dispatcher_handle(const Object& object, const Object& request,
                 }
 
                 if (ret.isString() && ret.toString().length()) {
-                    raise_warning("render ret:%s", ret.toString().c_str());
+                    //raise_warning("render ret:%s", ret.toString().c_str());
                     yaf_response_alter_body(response, 
                             init_null_variant, ret.toString(), YAF_RESPONSE_APPEND);
                 }
@@ -797,9 +797,9 @@ Variant yaf_dispatcher_dispatch(const Object* object)
 
     Object response = var_response.toObject();
     Object request = ptr_request->toObject();
-    Array& arr_plugin = ptr_plugin->toArrRef();
 
     try {
+        Array& arr_plugin = ptr_plugin->toArrRef();
         if (!yaf_request_is_routed(&request)) {
 
             yaf_dispatcher_call_router_hook(arr_plugin, request, response, 
@@ -989,13 +989,16 @@ static Variant HHVM_METHOD(Yaf_Dispatcher, getRequest)
 }
 
 static Variant HHVM_METHOD(Yaf_Dispatcher, setErrorHandler,
-        const String& callback, const Variant& type) 
+        const Variant& callback, const Variant& type) 
 {
     Array params = Array::Create();
     params.append(callback);
-    params.append(type);
-    vm_call_user_func(String("set_error_handler"), params);
 
+    if (!type.isNull()) {
+        params.append(type);
+    }
+
+    vm_call_user_func(String("set_error_handler"), params);
     return this_;
 }
 

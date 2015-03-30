@@ -161,6 +161,11 @@ static bool yaf_route_static_route(const Object& route, const Object& request)
     auto ptr_base_uri = request->o_realProp(YAF_REQUEST_PROPERTY_NAME_BASE, 
             ObjectData::RealPropUnchecked, "Yaf_Request_Abstract");
 
+    if (ptr_uri == NULL) {
+        raise_warning("invalid ptr_uri:%p", ptr_uri);
+        return false;
+    }
+
     if (ptr_base_uri->isString() 
             && !strncasecmp(ptr_uri->toString().c_str(), 
                 ptr_base_uri->toString().c_str(), ptr_base_uri->toString().length())) {
@@ -179,8 +184,10 @@ static bool yaf_route_static_route(const Object& route, const Object& request)
 static Variant HHVM_METHOD(Yaf_Route_Static, route, const Variant& request)
 {
     if (!request.isObject()) {
-        yaf_trigger_error(YAF_ERR_ROUTE_FAILED, 
-                "trigger error failed, request is not object");
+        return false;
+    }
+
+    if (!request.toObject()->o_instanceof("Yaf_Request_Abstract")) {
         return false;
     }
 

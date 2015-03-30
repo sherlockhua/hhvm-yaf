@@ -171,14 +171,10 @@ Variant yaf_route_regex_instance(
 static Variant HHVM_METHOD(Yaf_Route_Regex, route, const Variant& request)
 {
     if (!request.isObject()) {
-        yaf_trigger_error(YAF_ERR_ROUTE_FAILED, 
-                "trigger error failed, request is not object");
         return false;
     }
 
     if (!request.toObject()->o_instanceof("Yaf_Request_Abstract")) {
-        yaf_trigger_error(YAF_ERR_ROUTE_FAILED, 
-                "request is not instance of Yaf_Request_Abstract");
         return false;
     }
 

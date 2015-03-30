@@ -48,7 +48,8 @@ bool yaf_application_is_module_name(const String& module)
         }
 
         String& str_value = value.toStrRef();
-        if (strncasecmp(str_value.c_str(), module.c_str(), module.length()) == 0) {
+        if (str_value.length() == module.length() &&
+                strncasecmp(str_value.c_str(), module.c_str(), module.length()) == 0) {
             return true;
         }
 
@@ -555,17 +556,10 @@ static Variant HHVM_METHOD(Yaf_Application, run)
     auto ptr_dispatcher = this_->o_realProp(YAF_APPLICATION_PROPERTY_NAME_DISPATCHER, 
             ObjectData::RealPropUnchecked, "Yaf_Application");
     Object object = ptr_dispatcher->toObject();
-    try {
     Variant response = yaf_dispatcher_dispatch(&object);
     if (!response.isNull()) {
         return response;
     }
-    } catch (Object& e) {
-        
-        raise_warning("catch object e");
-    } /*catch (Exception& e) {
-        raise_warning("catch exception e");
-    }*/
 
     return false;
 }
@@ -602,12 +596,15 @@ static Variant HHVM_METHOD(Yaf_Application, bootstrap)
             YAF_DEFAULT_BOOTSTRAP + "." +g_yaf_local_data.get()->ext;
     }
 
-    bool ret = yaf_loader_import(bootstrap_path.c_str(), 
-            bootstrap_path.length(), 0);
-    if (ret == false) {
-        yaf_trigger_error(YAF_ERR_STARTUP_FAILED, 
-                "yaf_loader_import %s failed", bootstrap_path.c_str());
-        return false;
+    Class* cls_bootstrap = Unit::getClass(String("Bootstrap").get(), false);
+    if (cls_bootstrap == nullptr) {
+        bool ret = yaf_loader_import(bootstrap_path.c_str(), 
+                bootstrap_path.length(), 0);
+        if (ret == false) {
+            yaf_trigger_error(YAF_ERR_STARTUP_FAILED, 
+                    "yaf_loader_import %s failed", bootstrap_path.c_str());
+            return false;
+        }
     }
 
     o = createObject("bootstrap", args);

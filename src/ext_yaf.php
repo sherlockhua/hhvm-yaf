@@ -450,7 +450,7 @@ final class Yaf_Dispatcher {
     public function getRequest():mixed;
 
     <<__Native>>
-    public function setErrorHandler(string $callback, ?mixed $type=NULL):mixed;
+    public function setErrorHandler(mixed $callback, ?mixed $type=NULL):mixed;
 
     <<__Native>>
     public function setDefaultModule(mixed $module):mixed;

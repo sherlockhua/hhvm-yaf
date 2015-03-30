@@ -20,7 +20,7 @@ file_put_contents($dir . "/Dummy.php", "");
 ini_set("open_basedir",  $odir);
 $loader = Yaf_Loader::getInstance($dir);
 $loader->import($dir . "/Dummy.php");
-$loader->autoload("Dummy");
+//$loader->autoload("Dummy");
 ?>
 --CLEAN--
 <?php

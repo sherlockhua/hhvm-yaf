@@ -117,8 +117,10 @@ static void HHVM_METHOD(Yaf_Route_Simple, __construct,
 static Variant HHVM_METHOD(Yaf_Route_Simple, route, const Variant& request)
 {
     if (!request.isObject()) {
-        yaf_trigger_error(YAF_ERR_ROUTE_FAILED, 
-                "trigger error failed, request is not object");
+        return false;
+    }
+
+    if (!request.toObject()->o_instanceof("Yaf_Request_Abstract")) {
         return false;
     }
 

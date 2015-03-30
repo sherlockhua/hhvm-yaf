@@ -86,7 +86,7 @@ void YafExtension::_loadYafConf(Hdf conf)
     g_yaf_local_data.get()->default_module     = YAF_ROUTER_DEFAULT_MODULE;
     g_yaf_local_data.get()->default_controller = YAF_ROUTER_DEFAULT_CONTROLLER;
     g_yaf_local_data.get()->default_action     = YAF_ROUTER_DEFAULT_ACTION;
-    g_yaf_local_data.get()->bootstrap          = YAF_DEFAULT_BOOTSTRAP;
+    //g_yaf_local_data.get()->bootstrap          = YAF_DEFAULT_BOOTSTRAP;
 
 }
 

@@ -13,6 +13,7 @@
 #include "yaf_loader.h"
 #include "hphp/runtime/ext/extension.h"
 #include "hphp/runtime/vm/runtime.h"
+#include "hphp/runtime/ext/ext_output.h"
 
 
 namespace HPHP {
@@ -134,7 +135,6 @@ static int yaf_view_simple_extract_array(const Variant& vars)
         }
 
         g_context->m_globalVarEnv->set(iter.first().toString().get(), iter.secondRef().asTypedValue());
-        //g_context->setVar(iter.first().toString().get(), iter.secondRef().asTypedValue());
         ++count;
     }
 
@@ -216,9 +216,10 @@ static Variant yaf_view_simple_render(Object object,
     auto ptr_tplvars = object->o_realProp(YAF_VIEW_PROPERTY_NAME_TPLVARS, 
             ObjectData::RealPropUnchecked, "Yaf_View_Simple");
 
+    yaf_ob_start();
+    //f_ob_start();
     yaf_view_simple_extract(*ptr_tplvars, vars);
 
-    yaf_ob_start();
     std::string script_path;
     const String& str_tpl = tpl.toCStrRef();
     if (IS_ABSOLUTE_PATH(str_tpl)) {
@@ -241,12 +242,16 @@ static Variant yaf_view_simple_render(Object object,
 
     //yaf_loader_import(script_path.c_str(), script_path.length(), 0);
     if (!yaf_loader_import(script_path.c_str(), script_path.length(), 0)) {
+        yaf_ob_end_clean();
         yaf_trigger_error(YAF_ERR_NOTFOUND_VIEW, 
                 "Failed opening template %s: %s", script_path.c_str(), strerror(errno)); 
         return false;
     }
 
+    //Variant ret = yaf_ob_get_content();
     //yaf_ob_end_clean();
+    //return f_ob_get_clean();
+    //return f_ob_end_clean();
     return yaf_ob_get_clean();
 }
 

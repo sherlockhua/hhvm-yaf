@@ -103,6 +103,7 @@ require "build.inc";
 shutdown();
 ?>
 --EXPECTF--
+%shphp%s
 string(13) "routerStartup"
 string(14) "routerShutdown"
 string(19) "dispatchLoopStartup"

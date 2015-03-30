@@ -65,8 +65,14 @@ static bool yaf_route_map_route(const Object& o, const Object& request)
     auto ptr_delim = o->o_realProp(YAF_ROUTE_MAP_VAR_NAME_DELIMETER, 
              ObjectData::RealPropUnchecked, "Yaf_Route_Map");
 
+    if (ptr_uri == NULL) {
+        raise_warning("invalid uri:%p", ptr_uri);
+        return false;
+    }
+
     std::string req_uri;
-    if (ptr_uri->isString() && 
+    if (ptr_uri && ptr_uri->isString() && 
+        ptr_base_uri && 
         ptr_base_uri->isString()&&
         strncasecmp(ptr_uri->toString().c_str(), 
             ptr_base_uri->toString().c_str(), ptr_uri->toString().length()) == 0) {
@@ -138,8 +144,10 @@ static bool yaf_route_map_route(const Object& o, const Object& request)
 static Variant HHVM_METHOD(Yaf_Route_Map, route, const Variant& request)
 {
     if (!request.isObject()) {
-        yaf_trigger_error(YAF_ERR_ROUTE_FAILED, 
-                "trigger error failed, request is not object");
+        return false;
+    }
+
+    if (!request.toObject()->o_instanceof("Yaf_Request_Abstract")) {
         return false;
     }
 

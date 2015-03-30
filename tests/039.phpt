@@ -40,4 +40,5 @@ require "build.inc";
 shutdown();
 ?>
 --EXPECTF--
+%shphp%s
 Parse error: syntax error, unexpected '{' in %sfoo2.phtml on line %d
