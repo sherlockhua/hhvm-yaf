@@ -37,7 +37,7 @@ var_dump($request->getPost("xxx", NULL));
 var_dump($request->getCookie("xxx"), false);
 var_dump($request->getEnv("xxx"), "2.13232");
 echo "------params-------\n";
-var_dump($request->setParam("xxxx"));
+//var_dump($request->setParam("xxxx"));
 var_dump($request->getParam("xxxx"));
 var_dump($request->getParams());
 
@@ -48,7 +48,7 @@ Yaf_Request_Simple Object
     [module] => index
     [controller] => dummy
     [action] => index
-    [method] => CLI
+    [method] => Cli
     [params:protected] => Array
         (
         )
@@ -87,9 +87,6 @@ bool(false)
 NULL
 string(7) "2.13232"
 ------params-------
-
-Warning: Yaf_Request_Abstract::setParam() expects parameter 1 to be array, string given in %s002.php on line %d
-NULL
 NULL
 array(1) {
   ["name"]=>

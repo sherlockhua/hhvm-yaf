@@ -30,9 +30,9 @@ try {
 --EXPECTF--
 string(21) "Baidu%cSina%cWb%cInf%c123"
 bool(true)
-
-Warning: Yaf_Loader::autoload(): Failed opening script %sBaidu%cName.php: No such file or directory in %s
+%shphp%s
+Warning: Failed opening script %sBaidu%cName.php: No such file or directory in %s
 bool(true)
-
-Warning: Yaf_Loader::autoload(): Failed opening script %sglobal%cGlobal%cName.php: No such file or directory in %s
+%shphp%s
+Warning: Failed opening script %sglobal%cGlobal%cName.php: No such file or directory in %s
 bool(true)
