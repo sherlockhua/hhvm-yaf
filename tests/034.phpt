@@ -18,7 +18,7 @@ foreach(\$entry as \$list) {
 PHP;
 
 $view->assign("entry", array('a', 'b', 'c'));
-echo $view->eval($tpl, array('name' => 'template'));
+echo $view->evaler($tpl, array('name' => 'template'));
 
 ?>
 --EXPECTF--

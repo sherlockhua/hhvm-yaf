@@ -97,11 +97,11 @@ Variant yaf_route_instance(const Object* object, const Variant& config)
     if (strncasecmp(type.c_str(), "map", sizeof("map") - 1) == 0) {
         Variant prefer(false);
         Variant delim(init_null_variant);
-        if (arr.exists(String("controllerPrefer")) == false) { 
+        if (arr.exists(String("controllerPrefer"))) { 
             prefer = arr[String("controllerPrefer")].toBoolean();
         }
 
-        if (arr.exists(String("delimiter")) == false) {
+        if (arr.exists(String("delimiter"))) {
             delim = arr[String("delimiter")];
         }
 

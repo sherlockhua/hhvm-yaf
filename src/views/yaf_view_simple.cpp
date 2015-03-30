@@ -168,6 +168,7 @@ static Variant yaf_view_simple_display(Object object,
         const Variant& tpl, const Variant& vars)
 {
     if (!tpl.isString()) {
+        raise_warning("invalid begin display");
         return false;
     }
 
@@ -197,22 +198,15 @@ static Variant yaf_view_simple_display(Object object,
 
     //yaf_loader_import(script_path.c_str(), script_path.length(), 0);
     if (!yaf_loader_import(script_path.c_str(), script_path.length(), 0)) {
-        raise_error("Failed opening template %s: %d", script_path.c_str(), errno); 
+        yaf_trigger_error(YAF_ERR_NOTFOUND_VIEW, 
+                "Failed opening template %s: %s", script_path.c_str(), strerror(errno)); 
+        return false;
     }
-
-    //yaf_ob_end_clean();
 
     return true;
 }
 
-
-
-
-#ifdef HHVM_VERSION_3_2_NEW
-static Variant yaf_view_simple_render(ObjectData* object, 
-#else
 static Variant yaf_view_simple_render(Object object, 
-#endif
         const Variant& tpl, const Variant& vars)
 {
     if (!tpl.isString()) {
@@ -247,19 +241,16 @@ static Variant yaf_view_simple_render(Object object,
 
     //yaf_loader_import(script_path.c_str(), script_path.length(), 0);
     if (!yaf_loader_import(script_path.c_str(), script_path.length(), 0)) {
-        raise_error("Failed opening template %s: %d", script_path.c_str(), errno); 
+        yaf_trigger_error(YAF_ERR_NOTFOUND_VIEW, 
+                "Failed opening template %s: %s", script_path.c_str(), strerror(errno)); 
+        return false;
     }
 
     //yaf_ob_end_clean();
-
     return yaf_ob_get_clean();
 }
 
-#ifdef HHVM_VERSION_3_2_NEW
-static Variant yaf_view_simple_eval(ObjectData* object, 
-#else
 static Variant yaf_view_simple_eval(Object object, 
-#endif
         const Variant& tpl, const Variant& vars)
 {
     if (!tpl.isString()) {

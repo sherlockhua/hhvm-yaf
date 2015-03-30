@@ -95,7 +95,7 @@ static Variant HHVM_METHOD(Yaf_Controller_Abstract, test)
 static Variant HHVM_METHOD(Yaf_Controller_Abstract, render, const String& tpl, 
         const Variant& parameters)
 {
-    raise_warning("start render in controller!");
+    //raise_warning("start render in controller!");
     auto _viewTmp = this_->o_realProp("_view", 
             ObjectData::RealPropUnchecked, "Yaf_Controller_Abstract");
     if (_viewTmp->isNull()) {
@@ -320,7 +320,7 @@ static Variant HHVM_METHOD(Yaf_Controller_Abstract, forward,
         const Variant& module, const Variant& controller, 
         const Variant& action, const Variant& parameters)
 {
-    auto tmp = this_->o_realProp("_request", 
+    auto tmp = this_->o_realProp(YAF_CONTROLLER_PROPERTY_NAME_REQUEST, 
             ObjectData::RealPropUnchecked, "Yaf_Controller_Abstract");
     if (tmp->isNull()) {
         return false;

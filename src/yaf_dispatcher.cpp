@@ -276,7 +276,7 @@ static Variant yaf_dispatcher_get_controller(const char* app_dir,
     auto ptr_req_module = request->o_realProp(YAF_REQUEST_PROPERTY_NAME_MODULE, 
             ObjectData::RealPropUnchecked, "Yaf_Request_Abstract");
 
-    auto ptr_ctl_module = o->o_realProp(YAF_CONTROLLER_PROPERTY_NAME_REQUEST, 
+    auto ptr_ctl_module = o->o_realProp(YAF_CONTROLLER_PROPERTY_NAME_MODULE, 
             ObjectData::RealPropUnchecked, "Yaf_Controller_Abstract");
     *ptr_ctl_module = *ptr_req_module;
 
@@ -518,6 +518,7 @@ static int yaf_dispatcher_handle(const Object& object, const Object& request,
             auto_render = ptr_render->toBoolean();
         }
         
+        /*
         if (executor->toObject()->o_instanceof("Yaf_Action_Abstract")) {
             raise_warning("executor is extends from Yaf_Action_Abstract");
         } 
@@ -525,6 +526,7 @@ static int yaf_dispatcher_handle(const Object& object, const Object& request,
         if (executor->toObject()->o_instanceof("Yaf_Controller_Abstract")) {
             raise_warning("executor is extends from Yaf_Controller_Abstract");
         }
+        */
 
         if (auto_render) {
             if (!ptr_flush->toBoolean()) {

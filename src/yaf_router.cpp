@@ -178,6 +178,8 @@ static_route:
                     ", use other instead");
            goto static_route; 
         }
+
+        route = tmp.toObject();
     }
 
     routes.set(String("_default"), route);
