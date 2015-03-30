@@ -603,8 +603,8 @@ Variant yaf_config_ini_instance(const Object* object,
  
     if (!S_ISREG(buf.st_mode)) {
         yaf_trigger_error(YAF_ERR_TYPE_ERROR, 
-                "expect filename to a regular file" \
-                " file:%s errno:%d", str_filename.c_str(), errno);
+                "Argument is not a valid ini file '%s'", 
+                str_filename.c_str(), errno);
         return init_null_variant;
     }
 
@@ -772,8 +772,8 @@ static Variant HHVM_METHOD(Yaf_Config_Ini, key)
         }
 
         Array& arr = ptr_config->toArrRef();
-        auto ptr_cursor = this_->o_realProp(YAF_CONFIG_PROPERT_NAME_CURSOR, 
-                ObjectData::RealPropUnchecked, "Yaf_Config_Ini");
+        //auto ptr_cursor = this_->o_realProp(YAF_CONFIG_PROPERT_NAME_CURSOR, 
+        //        ObjectData::RealPropUnchecked, "Yaf_Config_Ini");
         *ptr_cursor = Variant(NEWOBJ(yaf_config_cursor)(arr.begin()));
     } 
 

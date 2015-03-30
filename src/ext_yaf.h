@@ -36,7 +36,7 @@ const StaticString
     S_HTTP_USER_AGENT("HTTP_USER_AGENT"),
     S_ENV("_ENV"),
     S_SERVER("_SERVER"),
-    S_GET("GET"),
+    S_GET("_GET"),
     S_REQUEST("_REQUEST"),
     S_POST("_POST"),
     S_COOKIE("_COOKIE"),

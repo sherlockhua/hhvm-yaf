@@ -246,7 +246,7 @@ static bool HHVM_METHOD(Yaf_Request_Abstract, isOptions)
     String method = this_->o_realProp(YAF_REQUEST_PROPERTY_NAME_METHOD, 
             ObjectData::RealPropUnchecked, "Yaf_Request_Abstract")->toString();
 
-    if (strncasecmp(method.toCppString().c_str(), "Options", method.length()) == 0) {
+    if (strncasecmp("Options", method.c_str(), method.length()) == 0) {
         return true;
     }
 

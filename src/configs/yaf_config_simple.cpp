@@ -16,11 +16,7 @@
 
 namespace HPHP { 
 
-#ifdef HHVM_VERSION_3_2_NEW
-Variant yaf_config_simple_instance(ObjectData* object, 
-#else
 Variant yaf_config_simple_instance(const Object* object, 
-#endif
         const Variant& config, const Variant& readonly)
 {
     Object o;
@@ -52,11 +48,7 @@ Variant yaf_config_simple_instance(const Object* object,
     return o;
 }
 
-#ifdef HHVM_VERSION_3_2_NEW
-static Variant yaf_config_simple_format(ObjectData* object, 
-#else
 static Variant yaf_config_simple_format(const Object* object, 
-#endif
         const Variant& config)
 {
     auto ptr_readonly = (*object)->o_realProp(YAF_CONFIG_PROPERT_NAME_READONLY, 
@@ -361,14 +353,16 @@ static Variant HHVM_METHOD(Yaf_Config_Simple, key)
 
     if (ptr_cursor->isNull()) {
         auto ptr_config = this_->o_realProp(YAF_CONFIG_PROPERT_NAME, 
-                ObjectData::RealPropUnchecked, "Yaf_Config_Ini");
+                ObjectData::RealPropUnchecked, "Yaf_Config_Simple");
         if (!ptr_config->isArray()) {
             return false;
         }
 
         Array& arr = ptr_config->toArrRef();
-        auto ptr_cursor = this_->o_realProp(YAF_CONFIG_PROPERT_NAME_CURSOR, 
-                ObjectData::RealPropUnchecked, "Yaf_Config_Ini");
+        if (arr.size() == 0) {
+            return false;
+        }
+
         *ptr_cursor = Variant(NEWOBJ(yaf_config_cursor)(arr.begin()));
     } 
 
