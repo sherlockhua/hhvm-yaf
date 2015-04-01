@@ -40,7 +40,7 @@ bool yaf_loader_register(const Object& loader)
 static bool yaf_loader_is_category(const char* class_name, 
 		unsigned int class_name_len, const char* category, unsigned int category_len)
 {
-	unsigned int separator_len = g_yaf_local_data.get()->name_separator_len;
+	unsigned int separator_len = g_yaf_local_data.get()->name_separator.length();
 	if (g_yaf_local_data.get()->name_suffix) {
 		if (class_name_len > category_len && 
 				strncmp(class_name + class_name_len - category_len, category, category_len) == 0) {
@@ -303,7 +303,6 @@ int yaf_internal_autoload(const char* ptr_file_name,
 
     /* aussume all the path is not end in slash */
     buf.append(DEFAULT_SLASH_STR);
-
     p = file_name;
     q = p;
 
@@ -312,8 +311,10 @@ int yaf_internal_autoload(const char* ptr_file_name,
 
         if (*q != '\0') {
             seg_len = q - p;
-            buf.append(std::string(p, seg_len));
-            buf.append(DEFAULT_SLASH_STR);
+            if (seg_len) {
+                buf.append(std::string(p, seg_len));
+                buf.append(DEFAULT_SLASH_STR);
+            }
             p       = q + 1;
         } else {
             break;
@@ -358,7 +359,7 @@ static void HHVM_METHOD(Yaf_Loader, __wakeup)
 static Variant HHVM_METHOD(Yaf_Loader, autoload, const String& str_class_name)
 {
 	const char* app_directory = g_yaf_local_data.get()->directory.c_str();
-	unsigned int separator_len = g_yaf_local_data.get()->name_separator_len;
+	unsigned int separator_len = g_yaf_local_data.get()->name_separator.length();
 	const char* origin_classname = str_class_name.c_str();
 	const char* class_name = origin_classname;
 
@@ -384,6 +385,7 @@ static Variant HHVM_METHOD(Yaf_Loader, autoload, const String& str_class_name)
 		raise_error("You should not use '%s' as class name prefix", YAF_LOADER_RESERVERD);
 		return init_null_variant;
 	}
+
 		
 	if (yaf_loader_is_category(class_name, class_name_len, 
 				YAF_LOADER_MODEL,YAF_LOADER_LEN_MODEL )) {

@@ -1132,7 +1132,7 @@ static Variant HHVM_METHOD(Yaf_Dispatcher, throwException, const Variant& flag)
         return this_;
     } 
 
-    return g_yaf_local_data.get()->throw_exception;
+    return g_yaf_local_data.get()->throw_exception != 0;
 }
 
 static Variant HHVM_METHOD(Yaf_Dispatcher, catchException, const Variant& flag) 
@@ -1142,7 +1142,7 @@ static Variant HHVM_METHOD(Yaf_Dispatcher, catchException, const Variant& flag)
         return this_;
     } 
 
-    return g_yaf_local_data.get()->catch_exception;
+    return g_yaf_local_data.get()->catch_exception != 0;
 }
 
 static Variant HHVM_METHOD(Yaf_Dispatcher, registerPlugin, const Variant& plugin) 

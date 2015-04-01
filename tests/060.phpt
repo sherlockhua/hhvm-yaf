@@ -7,6 +7,10 @@ yaf.use_spl_autoload=1
 yaf.lowcase_path=0
 --FILE--
 <?php 
+
+ini_set("yaf.use_spl_autoload", 1);
+ini_set("yaf.lowcase_path", 0);
+
 require "build.inc";
 startup();
 

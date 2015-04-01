@@ -10,6 +10,7 @@
 =============================================*/
 #include "hphp/runtime/base/class-info.h"
 #include "hphp/runtime/ext/std/ext_std_classobj.h"
+#include "hphp/runtime/ext/std/ext_std_options.h"
 
 #include "yaf_application.h"
 #include "yaf_config.h"
@@ -107,11 +108,12 @@ static int yaf_application_parse_system(const Array& config)
     while(!iter.end()) {
         Variant first = iter.first();
         Variant second = iter.second();
-        snprintf(name, sizeof(name), "%s.yaf", first.toString().c_str());
+        snprintf(name, sizeof(name), "yaf.%s", first.toString().c_str());
 
         String value = second.toString();
         //TODO modify runtime ini config
         // zend_alter_ini_entry(name, len + 1, Z_STRVAL_PP(value), Z_STRLEN_PP(value), PHP_INI_USER, PHP_INI_STAGE_RUNTIME);
+        HHVM_FN(ini_set)(name, value);
         iter.next();
     }
 

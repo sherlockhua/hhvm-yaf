@@ -11,6 +11,7 @@ if (version_compare(PHP_VERSION, '5.4.0') >= 0) {
 short_open_tag = 0
 --FILE--
 <?php 
+ini_set("yaf.short_open_tag", 0);
 $view = new Yaf_View_Simple(dirname(__FILE__));
 $tpl = dirname(__FILE__) . '/short_tag_test.phtml';
 

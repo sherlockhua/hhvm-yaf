@@ -131,7 +131,7 @@ void YafExtension::threadInit() {
                      &data->name_suffix);
 
     IniSetting::Bind(ext, IniSetting::PHP_INI_ALL,
-                     "yaf.name_separator", "0",
+                     "yaf.name_separator", "",
                      &data->name_separator);
 
     IniSetting::Bind(ext, IniSetting::PHP_INI_ALL,
