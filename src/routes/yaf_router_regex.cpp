@@ -41,7 +41,6 @@ static Variant yaf_route_regex_match(const Object& object, char* uri, int uri_le
     }
 
     if (match <= 0) {
-        raise_warning("match failed");
         return init_null_variant;
     }
 
@@ -90,7 +89,6 @@ static int yaf_route_regex_route(const Object& object, const Object& request)
     Variant ret = yaf_route_regex_match(object, request_uri, strlen(request_uri));
     if (ret.isNull()) {
         free(request_uri);
-        raise_warning("match failed");
         return HHVM_YAF_FAILED;
     }
 

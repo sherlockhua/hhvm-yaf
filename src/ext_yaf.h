@@ -49,6 +49,7 @@ class YafExtension : public Extension {
 public:
     YafExtension():Extension("yaf"){}
     virtual void moduleInit();
+    virtual void threadInit();
     void moduleLoad(Hdf config);
     void moduleLoad(const IniSetting::Map& ini, Hdf config);
 
@@ -120,19 +121,19 @@ public:
     std::string bootstrap;
     std::string name_separator;
     long        name_separator_len;
-    bool   lowcase_path;
-    bool   use_spl_autoload;
-    bool   throw_exception;
-    bool   cache_config;
-    bool   action_prefer;
-    bool   name_suffix;
-    bool   autoload_started;
-    bool   running;
-    bool   in_exception;
-    bool   catch_exception;
-    bool   suppressing_warning;
+    int   lowcase_path;
+    int   use_spl_autoload;
+    int   throw_exception;
+    int   cache_config;
+    int   action_prefer;
+    int   name_suffix;
+    int   autoload_started;
+    int   running;
+    int   in_exception;
+    int   catch_exception;
+    int   suppressing_warning;
     /* {{{ This only effects internally */
-    bool   st_compatible;
+    int   st_compatible;
     /* }}} */
     long        forward_limit;
     Array       configs;

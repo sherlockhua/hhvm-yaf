@@ -75,7 +75,7 @@ static bool yaf_route_map_route(const Object& o, const Object& request)
         ptr_base_uri && 
         ptr_base_uri->isString()&&
         strncasecmp(ptr_uri->toString().c_str(), 
-            ptr_base_uri->toString().c_str(), ptr_uri->toString().length()) == 0) {
+            ptr_base_uri->toString().c_str(), ptr_base_uri->toString().length()) == 0) {
         req_uri = std::string(ptr_uri->toString().c_str() + ptr_base_uri->toString().length()); 
     } else {
         req_uri = std::string(ptr_uri->toString().c_str());
@@ -122,6 +122,10 @@ static bool yaf_route_map_route(const Object& o, const Object& request)
 
     free(tmp);
     if (route_result.length()) {
+        if (route_result[route_result.length() - 1] == '_') {
+            route_result.pop_back();
+        }
+
         if (ptr_ctl_prefer->toBoolean()) {
             auto ptr_controller = request->o_realProp(YAF_REQUEST_PROPERTY_NAME_CONTROLLER, 
                         ObjectData::RealPropUnchecked, "Yaf_Request_Abstract");

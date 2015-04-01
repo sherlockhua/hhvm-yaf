@@ -16,6 +16,7 @@ $config = array(
 	),
 );
 
+ini_set("yaf.library", "/php/global/dir");
 $app = new Yaf_Application($config);
 var_dump($loader->getLibraryPath());
 var_dump($loader->getLibraryPath(TRUE));
@@ -24,4 +25,4 @@ var_dump($loader->getLibraryPath(TRUE));
 string(4) "/foo"
 string(4) "/bar"
 string(%d) "%slibrary"
-string(4) "/bar"
+string(15) "/php/global/dir"

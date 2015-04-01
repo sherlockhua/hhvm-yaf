@@ -102,6 +102,57 @@ void YafExtension::moduleLoad(const IniSetting::Map& ini, Hdf config)
     _loadYafConf(conf);
 }
 
+void YafExtension::threadInit() {
+    Extension* ext = Extension::GetExtension("yaf");
+    assert(ext);
+    YafRequestData* data = g_yaf_local_data.get();
+    IniSetting::Bind(ext, IniSetting::PHP_INI_ALL,
+                     "yaf.action_prefer", "0",
+                     &data->action_prefer);
+
+    IniSetting::Bind(ext, IniSetting::PHP_INI_ALL,
+                     "yaf.library", "",
+                     &data->global_library);
+
+    IniSetting::Bind(ext, IniSetting::PHP_INI_ALL,
+                     "yaf.lowcase_path", "0",
+                     &data->lowcase_path);
+
+    IniSetting::Bind(ext, IniSetting::PHP_INI_ALL,
+                     "yaf.use_spl_autoload", "0",
+                     &data->use_spl_autoload);
+
+    IniSetting::Bind(ext, IniSetting::PHP_INI_ALL,
+                     "yaf.forward_limit", "5",
+                     &data->forward_limit);
+
+    IniSetting::Bind(ext, IniSetting::PHP_INI_ALL,
+                     "yaf.name_suffix", "1",
+                     &data->name_suffix);
+
+    IniSetting::Bind(ext, IniSetting::PHP_INI_ALL,
+                     "yaf.name_separator", "0",
+                     &data->name_separator);
+
+    IniSetting::Bind(ext, IniSetting::PHP_INI_ALL,
+                     "yaf.cache_config", "0",
+                     &data->cache_config);
+
+    IniSetting::Bind(ext, IniSetting::PHP_INI_ALL,
+                     "yaf.st_compatible", "0",
+                     &data->st_compatible);
+
+    IniSetting::Bind(ext, IniSetting::PHP_INI_ALL,
+                     "yaf.environ", "product",
+                     &data->environ);
+
+#ifdef YAF_HAVE_NAMESPACE
+    IniSetting::Bind(ext, IniSetting::PHP_INI_ALL,
+                     "yaf.use_namespace", "0",
+                     &data->use_namespace);
+#endif
+}
+
 YafExtension s_yaf_extension;
 HHVM_GET_MODULE(yaf);
 

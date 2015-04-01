@@ -17,9 +17,10 @@ print_r($config);
 --EXPECTF--
 Yaf_Config_Simple Object
 (
+    [_readonly:protected] => 
+    [_cursor:Yaf_Config_Simple:private] => 
     [_config:protected] => Array
         (
         )
 
-    [_readonly:protected] => 
 )

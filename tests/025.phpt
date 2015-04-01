@@ -16,6 +16,7 @@ $config = array(
 	),
 );
 
+ini_set("yaf.library", "/php/global/dir");
 $app = new Yaf_Application($config);
 Yaf_Loader::getInstance()->registerLocalNamespace("Dummy");
 print_r(Yaf_Loader::getInstance());
@@ -26,6 +27,6 @@ var_dump(Yaf_Loader::getInstance()->isLocalName("Bar_Name"));
 Yaf_Loader Object
 (
     [_library:protected] => /tmp
-    [_global_library:protected] => /tmp
+    [_global_library:protected] => /php/global/dir
 )
 bool(true)

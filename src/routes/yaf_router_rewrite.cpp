@@ -68,7 +68,6 @@ static Variant yaf_route_rewrite_match(const Object& o,
     }
 
     if (match_count <= 0) {
-        raise_warning("match failed");
         return init_null_variant;
     }
 

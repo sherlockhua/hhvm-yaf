@@ -27,12 +27,12 @@ var_dump(ini_get("short_open_tag"));
 $view->display($tpl, array('name' => 'template'));
 echo "\n";
 print_r($view);
-//unlink($tpl);
+unlink($tpl);
 ?>
 --EXPECTF--
 template
 template
-string(0) ""
+string(1) "0"
 <?=$name?>
 Yaf_View_Simple Object
 (
