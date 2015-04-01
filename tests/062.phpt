@@ -24,5 +24,5 @@ $view = Yaf_Dispatcher::getInstance()->initView(array());
 var_dump($view->getScriptPath());
 ?>
 --EXPECTF--
-string(%d) "Expects an absolute path for templates directory"
+string(%d) "Expects an absolute path for templates directory%s"
 NULL

@@ -305,10 +305,13 @@ Variant yaf_view_simple_instance(const Object* object, const Variant& tpl_dir,
         if (str_tpl_dir.length()) {
             if (IS_ABSOLUTE_PATH(str_tpl_dir)) {
                 *ptr_tpldir = str_tpl_dir;
-            } else {
-                raise_error("template_dir expect a absolute path:%s", str_tpl_dir.toCppString().c_str());
-                return init_null_variant;
             }
+
+        } else {
+                yaf_trigger_error(YAF_ERR_TYPE_ERROR, "Expects an absolute"\
+                        " path for templates directory:%s",
+                        str_tpl_dir.toCppString().c_str());
+                return init_null_variant;
         }
     }
 

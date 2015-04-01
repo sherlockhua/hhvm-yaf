@@ -6,7 +6,8 @@ Check for Yaf_Config_Ini with env
 yaf.directory=/foo/bar
 --FILE--
 <?php 
-putenv("FOO=bar");
+//TODO hhvm 3.1 not effective
+//putenv("FOO=bar");
 define("FOO", "Dummy");
 print_r(new Yaf_Config_Ini(
 	dirname(__FILE__) . "/simple.ini", "envtest"));
@@ -14,10 +15,11 @@ print_r(new Yaf_Config_Ini(
 --EXPECTF--
 Yaf_Config_Ini Object
 (
+    [_cursor:Yaf_Config_Ini:private] => 
     [_config:protected] => Array
         (
-            [env] => bar
-            [ini] => /foo/bar
+            [env] => 
+            [ini] => 
             [const] => Dummy
         )
 

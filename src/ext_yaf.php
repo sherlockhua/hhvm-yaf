@@ -432,7 +432,7 @@ final class Yaf_Dispatcher {
     public function disableView():mixed;
 
     <<__Native>>
-    public function initView(mixed $tpl_dir, ?mixed $options):mixed;
+    public function initView(mixed $tpl_dir, ?mixed $options = NULL):mixed;
 
     <<__Native>>
     public function setView(mixed $view):mixed;
