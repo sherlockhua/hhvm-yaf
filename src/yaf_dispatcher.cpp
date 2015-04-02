@@ -418,6 +418,7 @@ static int yaf_dispatcher_handle(const Object& object, const Object& request,
     auto ptr_action = request->o_realProp(YAF_REQUEST_PROPERTY_NAME_ACTION, 
             ObjectData::RealPropUnchecked, "Yaf_Request_Abstract");
 
+    String origin_action = ptr_action->toString();
     std::string action_lower = ptr_action->toString().toCppString();
     transform(action_lower.begin(), action_lower.end(), action_lower.begin(), tolower);
 
@@ -537,7 +538,7 @@ static int yaf_dispatcher_handle(const Object& object, const Object& request,
                 arr_func.append(executor->toObject());
                 arr_func.append(method);
 
-                params.append(ptr_action->toString());
+                params.append(origin_action);
 
                 Variant ret = vm_call_user_func(arr_func, params);
                 if (ret.isBoolean() && !ret.toBoolean()) {
@@ -557,7 +558,7 @@ static int yaf_dispatcher_handle(const Object& object, const Object& request,
                 arr_func.append(*executor);
                 arr_func.append(method);
 
-                params.append(ptr_action->toString());
+                params.append(origin_action);
 
                 Variant ret = vm_call_user_func(arr_func, params);
                 if (ret.isBoolean() && !ret.toBoolean()) {

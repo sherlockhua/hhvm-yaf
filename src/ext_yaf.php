@@ -560,7 +560,8 @@ function yaf_loader_import(string $path)
 {
     if ( file_exists($path) ) { 
         extract($GLOBALS);
-        require_once $path;
+        //require_once $path;
+        require $path;
         return true;
     } 
 

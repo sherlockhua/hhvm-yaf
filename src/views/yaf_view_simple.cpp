@@ -141,6 +141,37 @@ static int yaf_view_simple_extract_array(const Variant& vars)
     return count;
 }
 
+static int yaf_view_simple_extract_eval(Variant& tpl_vars, const Variant& vars)
+{
+    Variant tmp(vars);
+    Variant ret;
+    int count = 0;
+
+    String func("extract");
+    Array params = Array::Create();
+    if (tpl_vars.isArray()) {
+        params.appendRef(tpl_vars);
+
+        ret = vm_call_user_func(func, params);
+        if (ret.isInteger()) {
+            count += ret.toInt64();
+        }
+    }
+    
+    if (vars.isArray()) {
+        Array params2 = Array::Create();
+        params2.appendRef(tmp);
+        ret = vm_call_user_func(func, params2);
+        if (ret.isInteger()) {
+            count += ret.toInt64();
+        }
+    }
+
+    return count;
+}
+
+
+
 static int yaf_view_simple_extract(const Variant& tpl_vars, const Variant& vars)
 {
     return yaf_view_simple_extract_array(tpl_vars) + yaf_view_simple_extract_array(vars);
@@ -216,9 +247,9 @@ static Variant yaf_view_simple_render(Object object,
     auto ptr_tplvars = object->o_realProp(YAF_VIEW_PROPERTY_NAME_TPLVARS, 
             ObjectData::RealPropUnchecked, "Yaf_View_Simple");
 
+    yaf_view_simple_extract(*ptr_tplvars, vars);
     yaf_ob_start();
     //f_ob_start();
-    yaf_view_simple_extract(*ptr_tplvars, vars);
 
     std::string script_path;
     const String& str_tpl = tpl.toCStrRef();
@@ -265,15 +296,16 @@ static Variant yaf_view_simple_eval(Object object,
     auto ptr_tplvars = object->o_realProp(YAF_VIEW_PROPERTY_NAME_TPLVARS, 
             ObjectData::RealPropUnchecked, "Yaf_View_Simple");
 
-    yaf_view_simple_extract(*ptr_tplvars, vars);
-
     yaf_ob_start();
+    yaf_view_simple_extract_eval(*ptr_tplvars, vars);
     Unit* unit = compile_string(tpl.toString().data(), tpl.toString().length());
 
     Variant v;
+    ActRec *fp = g_context->getFP(); 
     g_context->invokeFunc((TypedValue*)&v, unit->getMain(),                                                                                                             
                           //init_null_variant, nullptr, nullptr, g_context->m_globalVarEnv, nullptr,
-                          init_null_variant, nullptr, nullptr, nullptr, nullptr,
+                          //init_null_variant, nullptr, nullptr, nullptr, nullptr,
+                          init_null_variant, nullptr, nullptr, fp->getVarEnv(), nullptr,
                           ExecutionContext::InvokePseudoMain);
 
     return yaf_ob_get_clean();

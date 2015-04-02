@@ -11,7 +11,7 @@ if (version_compare(PHP_VERSION, '5.4.0') >= 0) {
 short_open_tag = 0
 --FILE--
 <?php 
-ini_set("yaf.short_open_tag", 0);
+ini_set("short_open_tag", 0);
 $view = new Yaf_View_Simple(dirname(__FILE__));
 $tpl = dirname(__FILE__) . '/short_tag_test.phtml';
 
@@ -33,8 +33,8 @@ unlink($tpl);
 --EXPECTF--
 template
 template
-string(1) "0"
-<?=$name?>
+string(0) ""
+template
 Yaf_View_Simple Object
 (
     [_tpl_vars:protected] => Array
