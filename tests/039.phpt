@@ -41,4 +41,4 @@ shutdown();
 ?>
 --EXPECTF--
 %shphp%s
-Parse error: syntax error, unexpected '{' in %sfoo2.phtml on line %d
+Fatal error: syntax error, unexpected '{' in %sfoo2.phtml on line %d

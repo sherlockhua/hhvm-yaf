@@ -226,15 +226,18 @@ static Variant yaf_view_simple_display(Object object,
             script_path = ptr_tpldir->toString().toCppString() + DEFAULT_SLASH_STR + str_tpl.toCppString(); 
         }
     }
+    
+    String method("render_help");
 
-    //yaf_loader_import(script_path.c_str(), script_path.length(), 0);
-    if (!yaf_loader_import(script_path.c_str(), script_path.length(), 0)) {
-        yaf_trigger_error(YAF_ERR_NOTFOUND_VIEW, 
-                "Failed opening template %s: %s", script_path.c_str(), strerror(errno)); 
-        return false;
-    }
+    Array func = Array::Create();
+    func.append(object);
+    func.append(method);
 
-    return true;
+    Array params = Array::Create();
+    params.append(String(script_path));
+    params.append(vars);
+
+    return vm_call_user_func(func, params);
 }
 
 static Variant yaf_view_simple_render(Object object, 
@@ -246,10 +249,6 @@ static Variant yaf_view_simple_render(Object object,
 
     auto ptr_tplvars = object->o_realProp(YAF_VIEW_PROPERTY_NAME_TPLVARS, 
             ObjectData::RealPropUnchecked, "Yaf_View_Simple");
-
-    yaf_view_simple_extract(*ptr_tplvars, vars);
-    yaf_ob_start();
-    //f_ob_start();
 
     std::string script_path;
     const String& str_tpl = tpl.toCStrRef();
@@ -270,20 +269,19 @@ static Variant yaf_view_simple_render(Object object,
             script_path = ptr_tpldir->toString().toCppString() + DEFAULT_SLASH_STR + str_tpl.toCppString(); 
         }
     }
+    
+    String method("render_help");
 
-    //yaf_loader_import(script_path.c_str(), script_path.length(), 0);
-    if (!yaf_loader_import(script_path.c_str(), script_path.length(), 0)) {
-        yaf_ob_end_clean();
-        yaf_trigger_error(YAF_ERR_NOTFOUND_VIEW, 
-                "Failed opening template %s: %s", script_path.c_str(), strerror(errno)); 
-        return false;
-    }
+    Array func = Array::Create();
+    func.append(object);
+    func.append(method);
 
-    //Variant ret = yaf_ob_get_content();
-    //yaf_ob_end_clean();
-    //return f_ob_get_clean();
-    //return f_ob_end_clean();
-    return yaf_ob_get_clean();
+    Array params = Array::Create();
+    params.append(String(script_path));
+    params.append(vars);
+    params.append(false);
+
+    return vm_call_user_func(func, params);
 }
 
 static Variant yaf_view_simple_eval(Object object, 
@@ -409,10 +407,12 @@ static Variant HHVM_METHOD(Yaf_View_Simple, assign, const Variant& name, const V
     return false;
 }
 
+
 static Variant HHVM_METHOD(Yaf_View_Simple, render, const Variant& tpl, const Variant& vars)
 {
     return yaf_view_simple_render(this_, tpl, vars);
 }
+
 
 const StaticString s_GLOBALS("GLOBALS");
 
@@ -430,10 +430,12 @@ static Variant HHVM_METHOD(Yaf_View_Simple, test)
     return v;
 }
 
+
 static Variant HHVM_METHOD(Yaf_View_Simple, evaler, const Variant& tpl, const Variant& vars)
 {
     return yaf_view_simple_eval(this_, tpl, vars);
 }
+
 
 static Variant HHVM_METHOD(Yaf_View_Simple, display, const Variant& tpl, const Variant& vars)
 {

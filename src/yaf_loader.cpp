@@ -65,12 +65,11 @@ static bool yaf_loader_is_category(const char* class_name,
 
 bool yaf_loader_import(const char *path, int len, int use_path)
 { 
-    //return require(String(path), true, g_context->getCwd().data(), true);
     String func("yaf_loader_import");
 
     Array params = Array::Create();
     params.append(String(std::string(path, len)));
-    Variant ret = vm_call_user_func(func, params);
+    Variant ret = vm_call_user_func(func, params, true);
     return ret.toBoolean();
 }
 

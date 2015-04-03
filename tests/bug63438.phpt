@@ -25,15 +25,15 @@ file_put_contents(dirname(__FILE__) . '/outer.phtml', "1 <?php print view('inner
 file_put_contents(dirname(__FILE__) . '/inner.phtml', "2");
 print (view('outer.phtml'));
 
-file_put_contents(dirname(__FILE__) . '/outer.phtml', "1 <?php \$this->display('inner.phtml');?> 3\n");
-print (view('outer.phtml'));
+file_put_contents(dirname(__FILE__) . '/outer1.phtml', "1 <?php \$this->display('inner.phtml');?> 3\n");
+print (view('outer1.phtml'));
 
-file_put_contents(dirname(__FILE__) . '/outer.phtml', "1 <?php echo \$this->eval('2');?> 3\n");
-print (view('outer.phtml'));
+file_put_contents(dirname(__FILE__) . '/outer2.phtml', "1 <?php echo \$this->evaler('2');?> 3\n");
+print (view('outer2.phtml'));
 
-file_put_contents(dirname(__FILE__) . '/outer.phtml', "1 <?php \$this->display('inner.phtml');?> 3\n");
-file_put_contents(dirname(__FILE__) . '/inner.phtml', "<?php undefined_function(); ?>");
-print (view('outer.phtml'));
+file_put_contents(dirname(__FILE__) . '/outer3.phtml', "1 <?php \$this->display('inner3.phtml');?> 3\n");
+file_put_contents(dirname(__FILE__) . '/inner3.phtml', "<?php undefined_function(); ?>");
+print (view('outer3.phtml'));
 ?>
 --CLEAN--
 <?php
@@ -44,6 +44,6 @@ print (view('outer.phtml'));
 1 2 3
 1 2 3
 1 2 3
-1 
-Fatal error: Call to undefined function undefined_function() in %sinner.phtml on line %d
-done
+%shphp%s
+Fatal error: Call to undefined function undefined_function() in %sinner3.phtml on line %d
+1 done

@@ -555,7 +555,7 @@ static int yaf_dispatcher_handle(const Object& object, const Object& request,
                 String method("display");
                 Array arr_func = Array::Create();
 
-                arr_func.append(*executor);
+                arr_func.append(executor->toObject());
                 arr_func.append(method);
 
                 params.append(origin_action);

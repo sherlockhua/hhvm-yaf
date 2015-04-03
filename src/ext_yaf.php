@@ -18,7 +18,7 @@ abstract class Yaf_Controller_Abstract {
     public function test():mixed;
 
     <<__Native>>
-    protected function display(string $tpl, ?array $parameters = NULL):mixed;
+    public function display(string $tpl, ?array $parameters = NULL):mixed;
 
     <<__Native>>
     public function getRequest():mixed;
@@ -527,6 +527,74 @@ class Yaf_View_Simple extends Yaf_View_Interface {
 
     <<__Native>>
     public function render(mixed $tpl, ?mixed $vars = NULL):mixed;
+    
+    public function render_help($tpl, $vars = null, $output = true) 
+    {
+        if ($vars == null && count($this->_tpl_vars)>0) {
+            $vars = $this->_tpl_vars;
+        } else {
+            if ($vars != null) {
+                $vars = array_merge($vars, $this->_tpl_vars); 
+            } else {
+                $vars = $this->_tpl_vars;
+            }
+        }   
+
+        if ($vars!=null) {
+            extract($vars, EXTR_REFS);
+        }   
+
+        if (!file_exists($tpl)) {
+            echo "Failed opening template ". $tpl. ": No such file or directory\n";
+            return false;
+        }
+
+        ob_start();
+        require $tpl;
+        $content = ob_get_clean();
+        if ($output) {
+            echo $content;
+            return true;
+        }
+
+        return $content;
+    }
+
+
+   /* 
+    public function render($tpl, $vars = null) 
+    {
+        echo "templte:".$tpl."\n";
+        if ($vars == null && count($this->_tpl_vars)>0) {
+            $vars = $this->_tpl_vars;
+        } else {
+            if ($vars != null) {
+                $vars = array_merge($vars, $this->_tpl_vars); 
+            } else {
+                $vars = $this->_tpl_vars;
+            }
+        }   
+
+        if ($vars!=null) {
+            extract($vars);
+        }   
+
+        $template = $tpl; 
+        if ($tpl[0] != '/' && $tpl[0] != '\\') {
+            $template =  $this->_tpl_dir . DIRECTORY_SEPARATOR . $tpl; 
+        }
+
+        if (!file_exists($template)) {
+            echo "Failed opening template ". $template. ": No such file or directory\n";
+            return false;
+        }
+
+        ob_start();
+        require $template;
+        $content = ob_get_clean();
+        return $content;
+    }
+    */
 
     <<__Native>>
     public function test():mixed;
