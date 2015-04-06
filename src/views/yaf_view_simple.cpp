@@ -206,8 +206,6 @@ static Variant yaf_view_simple_display(Object object,
     auto ptr_tplvars = object->o_realProp(YAF_VIEW_PROPERTY_NAME_TPLVARS, 
             ObjectData::RealPropUnchecked, "Yaf_View_Simple");
 
-    yaf_view_simple_extract(*ptr_tplvars, vars);
-
     std::string script_path;
     const String& str_tpl = tpl.toCStrRef();
     if (IS_ABSOLUTE_PATH(str_tpl)) {
