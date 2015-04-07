@@ -26,17 +26,47 @@
 #endif
 #endif
 
+
+#if (HHVM_API_VERSION > 20131007L) 
+#include "hphp/runtime/vm/vm-regs.h"
+#endif
+
 #if (HHVM_VERSION_MAJOR == 3) && (HHVM_VERSION_MINOR >= 7) 
 #include "hphp/runtime/ext/extension-registry.h"
 #include "hphp/runtime/base/actrec-args.h"
+#include "hphp/runtime/base/string-util.h"
 #endif
 
 namespace HPHP
 {
 
+const int64_t k_PHP_OUTPUT_HANDLER_CONT = 0; 
+const int64_t k_PHP_OUTPUT_HANDLER_WRITE = 0;
+const int64_t k_PHP_OUTPUT_HANDLER_START = 1;
+const int64_t k_PHP_OUTPUT_HANDLER_CLEAN = 2;
+const int64_t k_PHP_OUTPUT_HANDLER_FLUSH = 4;
+const int64_t k_PHP_OUTPUT_HANDLER_END = 8;
+const int64_t k_PHP_OUTPUT_HANDLER_FINAL = 8;
+const int64_t k_PHP_OUTPUT_HANDLER_CLEANABLE = 16;
+const int64_t k_PHP_OUTPUT_HANDLER_FLUSHABLE = 32;
+const int64_t k_PHP_OUTPUT_HANDLER_REMOVABLE = 64;
+const int64_t k_PHP_OUTPUT_HANDLER_STDFLAGS =
+      k_PHP_OUTPUT_HANDLER_CLEANABLE | k_PHP_OUTPUT_HANDLER_FLUSHABLE |
+      k_PHP_OUTPUT_HANDLER_REMOVABLE;
+
+
 extern Extension* Yaf_Common_GetExtension(const String& ext_name);
 
 extern bool Yaf_Common_InstanceOf(const Object& object, const String& class_name);
+
+extern StrNR Yaf_Common_GetClassName(const Object& object);
+
+extern bool yaf_ob_start();
+extern bool yaf_ob_end_clean();
+extern Variant yaf_ob_get_content();
+extern Variant yaf_ob_get_clean();
+
+extern ActRec* Yaf_Common_GetTP();
 
 }
 

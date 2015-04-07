@@ -34,6 +34,7 @@ Variant yaf_route_instance(const Object* object, const Variant& config)
         return init_null_variant;
     }
 
+    Object tmp_null = null_object;
     String type = var_type.toString();
     if (strncasecmp(type.c_str(), "regex", sizeof("regex") - 1) == 0) {
         if (arr.exists(String("match")) == false) { 
@@ -66,7 +67,7 @@ Variant yaf_route_instance(const Object* object, const Variant& config)
             return init_null_variant;
         }
 
-        return yaf_route_regex_instance(NULL, var_match, var_def, 
+        return yaf_route_regex_instance(tmp_null, var_match, var_def, 
                 var_map, init_null_variant);
     }
 
@@ -91,7 +92,7 @@ Variant yaf_route_instance(const Object* object, const Variant& config)
             return init_null_variant;
         }
 
-        return yaf_route_rewrite_instance(NULL, var_match, var_def.toArray(), init_null_variant);
+        return yaf_route_rewrite_instance(tmp_null, var_match, var_def.toArray(), init_null_variant);
     }
 
     if (strncasecmp(type.c_str(), "map", sizeof("map") - 1) == 0) {
@@ -105,7 +106,7 @@ Variant yaf_route_instance(const Object* object, const Variant& config)
             delim = arr[String("delimiter")];
         }
 
-        return yaf_route_map_instance(NULL, prefer, delim);
+        return yaf_route_map_instance(tmp_null, prefer, delim);
     }
 
     if (strncasecmp(type.c_str(), "simple", sizeof("simple") - 1) == 0) {
@@ -140,7 +141,7 @@ Variant yaf_route_instance(const Object* object, const Variant& config)
             return init_null_variant;
         }
 
-        return yaf_route_simple_instance(NULL, module.toString(), 
+        return yaf_route_simple_instance(tmp_null, module.toString(), 
                 controller.toString(), action.toString());
     }
 
@@ -152,7 +153,7 @@ Variant yaf_route_instance(const Object* object, const Variant& config)
         }
 
         supervar = arr[String("varname")];
-        return yaf_route_supervar_instance(NULL, supervar.toString());
+        return yaf_route_supervar_instance(tmp_null, supervar.toString());
     }
 
     return  init_null_variant;

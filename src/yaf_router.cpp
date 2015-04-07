@@ -48,9 +48,9 @@ Array yaf_router_parse_parameters(const char* uri)
     return params;
 }
 
-int yaf_router_route (const Object* object, const Object& request)
+int yaf_router_route (const Object& object, const Object& request)
 {
-    auto ptr_routes = (*object)->o_realProp(YAF_ROUTER_PROPERTY_NAME_ROUTERS, 
+    auto ptr_routes = object->o_realProp(YAF_ROUTER_PROPERTY_NAME_ROUTERS, 
             ObjectData::RealPropUnchecked, "Yaf_Router");
     if (!ptr_routes->isArray()) {
         return HHVM_YAF_FAILED;
@@ -92,7 +92,7 @@ int yaf_router_route (const Object* object, const Object& request)
             continue;
         }
 
-        auto ptr_routes = (*object)->o_realProp(YAF_ROUTER_PROPERTY_NAME_CURRENT_ROUTE, 
+        auto ptr_routes = object->o_realProp(YAF_ROUTER_PROPERTY_NAME_CURRENT_ROUTE, 
                 ObjectData::RealPropUnchecked, "Yaf_Router");
         if (key.isIntVal()) {
             *ptr_routes = key.toInt64();
@@ -109,13 +109,13 @@ int yaf_router_route (const Object* object, const Object& request)
     return HHVM_YAF_SUCCESS;
 }
 
-static int yaf_router_add_config(const Object* object, const Array& routes)
+static int yaf_router_add_config(const Object& object, const Array& routes)
 {
-    if (object == NULL) {
+    if (object.isNull()) {
         return HHVM_YAF_FAILED;
     }
 
-    auto ptr_routes = (*object)->o_realProp(YAF_ROUTER_PROPERTY_NAME_ROUTERS, 
+    auto ptr_routes = object->o_realProp(YAF_ROUTER_PROPERTY_NAME_ROUTERS, 
             ObjectData::RealPropUnchecked, "Yaf_Router");
 
     Array& arr_routes = ptr_routes->toArrRef();
@@ -152,14 +152,14 @@ static int yaf_router_add_config(const Object* object, const Array& routes)
     return HHVM_YAF_SUCCESS;
 }
 
-Variant yaf_router_instance(const Object* object)
+Variant yaf_router_instance(const Object& object)
 {
     Object o;
-    if (object == NULL) {
+    if (object.isNull()) {
         Array arr = Array::Create();
         o = createObject("Yaf_Router", arr) ;
     } else {
-        o = *object;
+        o = object;
     }
 
     Object route;
@@ -194,7 +194,7 @@ static_route:
 
 static void HHVM_METHOD(Yaf_Router, __construct)
 {
-    (void)yaf_router_instance(&this_);
+    (void)yaf_router_instance(this_);
 }
 
 static Variant HHVM_METHOD(Yaf_Router, addRoute, 
@@ -245,7 +245,7 @@ static Variant HHVM_METHOD(Yaf_Router, addConfig,
         route = config;
     } else {
         Object o = config.toObject();
-        if (!o->o_instanceof("Yaf_Config_Abstract")) {
+        if (!Yaf_Common_InstanceOf(o, String("Yaf_Config_Abstract"))) {
             yaf_trigger_error(YAF_ERR_ROUTE_FAILED, 
                 "Expect config extends from Yaf_Config_Abstract");
             return false;
@@ -258,7 +258,7 @@ static Variant HHVM_METHOD(Yaf_Router, addConfig,
         }
     }
 
-    int ret = yaf_router_add_config(&this_, route);
+    int ret = yaf_router_add_config(this_, route);
     if (ret != HHVM_YAF_SUCCESS) {
         yaf_trigger_error(YAF_ERR_ROUTE_FAILED, 
             "yaf_router_add_config failed, ret:%d", ret);
@@ -271,7 +271,7 @@ static Variant HHVM_METHOD(Yaf_Router, addConfig,
 static Variant HHVM_METHOD(Yaf_Router, route, 
         const Variant& request)
 {
-    int ret = yaf_router_route(&this_, request.toObject());
+    int ret = yaf_router_route(this_, request.toObject());
     if (ret != HHVM_YAF_SUCCESS) {
         return false;
     }

@@ -127,12 +127,13 @@ static char* trim(char* line)
     return line;
 }
 
-Variant yaf_config_ini_format(const Object* object, 
+Variant yaf_config_ini_format(const Object& object, 
         const Variant& config)
 {
-    auto ptr_readonly = (*object)->o_realProp(YAF_CONFIG_PROPERT_NAME_READONLY, 
+    auto ptr_readonly = object->o_realProp(YAF_CONFIG_PROPERT_NAME_READONLY, 
             ObjectData::RealPropUnchecked, "Yaf_Config_Ini");
-    return yaf_config_ini_instance(NULL, config, *ptr_readonly);
+    Object tmp_null = null_object;
+    return yaf_config_ini_instance(tmp_null, config, *ptr_readonly);
 }
 
 static int build_array(Array& arr, std::vector<std::string>& vec,
@@ -561,18 +562,18 @@ static  int parse_ini_file(const char* filename, Object* object)
     return 0;
 }
 
-Variant yaf_config_ini_instance(const Object* object, 
+Variant yaf_config_ini_instance(const Object& object, 
         const Variant& filename, const Variant& section)
 {
     Object o;
-    if (object == NULL) {
+    if (object.isNull()) {
         Array arr = Array::Create();
         arr.append(filename);
         arr.append(section);
 
         o = createObject("Yaf_Config_Ini", arr) ;
     } else {
-        o = *object;
+        o = object;
     }
 
     auto ptr_config = o->o_realProp(YAF_CONFIG_PROPERT_NAME, 
@@ -634,7 +635,7 @@ static void HHVM_METHOD(Yaf_Config_Ini, __construct,
         *ptr_config = Array::Create();
     }
 
-    (void)yaf_config_ini_instance(&this_, filename, section);
+    (void)yaf_config_ini_instance(this_, filename, section);
 }
 
 static Variant HHVM_METHOD(Yaf_Config_Ini, get, const Variant& name)
@@ -659,7 +660,7 @@ static Variant HHVM_METHOD(Yaf_Config_Ini, get, const Variant& name)
 
     Variant value = arr[name.toString()];
     if (value.isArray()) {
-        Variant instance = yaf_config_ini_format(&this_, value);
+        Variant instance = yaf_config_ini_format(this_, value);
         return instance;
     }
 
@@ -729,7 +730,7 @@ static Variant HHVM_METHOD(Yaf_Config_Ini, current)
         return value;
     }
 
-    return yaf_config_ini_format(&this_, value);
+    return yaf_config_ini_format(this_, value);
 }
 
 static Variant HHVM_METHOD(Yaf_Config_Ini, next) 
@@ -849,7 +850,7 @@ static Variant HHVM_METHOD(Yaf_Config_Ini, __get, const Variant& name)
 
     Variant value = arr[name.toString()];
     if (value.isArray()) {
-        Variant instance = yaf_config_ini_format(&this_, value);
+        Variant instance = yaf_config_ini_format(this_, value);
         return instance;
     }
 

@@ -158,11 +158,11 @@ static bool yaf_route_rewrite_route(const Object& o, const Object& request)
     return true;
 }
 
-Variant yaf_route_rewrite_instance( const Object* object,
+Variant yaf_route_rewrite_instance( const Object& object,
         const Variant& match, const Array& route, const Variant& verify)
 {
     Object o;
-    if (object == NULL) {
+    if (object.isNull()) {
         Array params = Array::Create();
         params.append(match);
         params.append(route);
@@ -170,7 +170,7 @@ Variant yaf_route_rewrite_instance( const Object* object,
 
         o = createObject("Yaf_Route_Rewrite", params);
     }  else {
-        o = *object;
+        o = object;
     }
 
     auto ptr_match = o->o_realProp(YAF_ROUTE_PROPETY_NAME_MATCH,
@@ -206,7 +206,7 @@ static void HHVM_METHOD(Yaf_Route_Rewrite, __construct,
         return;
     }
 
-    (void)yaf_route_rewrite_instance(&this_, match, route, verify);
+    (void)yaf_route_rewrite_instance(this_, match, route, verify);
 }
 
 static Variant HHVM_METHOD(Yaf_Route_Rewrite, route, const Variant& request)
@@ -215,7 +215,7 @@ static Variant HHVM_METHOD(Yaf_Route_Rewrite, route, const Variant& request)
         return false;
     }
 
-    if (!request.toObject()->o_instanceof("Yaf_Request_Abstract")) {
+    if (!Yaf_Common_InstanceOf(request.toObject(), String("Yaf_Request_Abstract"))) {
         return false;
     }
 

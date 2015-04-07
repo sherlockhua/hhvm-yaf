@@ -18,12 +18,12 @@
 namespace HPHP {
 
 
-Variant yaf_route_simple_instance(const Object* object, 
+Variant yaf_route_simple_instance(const Object& object, 
         const String& module, const String& controller, const String& action)
 {
     Object o;
-    if (object != NULL) {
-        o = *object;
+    if (!object.isNull()) {
+        o = object;
     } else {
         Array params = Array::Create();
         params.append(module);
@@ -110,7 +110,7 @@ static void HHVM_METHOD(Yaf_Route_Simple, __construct,
         return;
     }
 
-    (void)yaf_route_simple_instance(&this_, module.toString(), 
+    (void)yaf_route_simple_instance(this_, module.toString(), 
             controller.toString(), action.toString());
 }
 
@@ -120,7 +120,7 @@ static Variant HHVM_METHOD(Yaf_Route_Simple, route, const Variant& request)
         return false;
     }
 
-    if (!request.toObject()->o_instanceof("Yaf_Request_Abstract")) {
+    if (!Yaf_Common_InstanceOf(request.toObject(), String("Yaf_Request_Abstract"))) {
         return false;
     }
 

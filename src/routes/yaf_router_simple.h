@@ -19,7 +19,7 @@ namespace HPHP {
 #define YAF_ROUTE_SIMPLE_VAR_NAME_CONTROLLER    "controller"
 #define YAF_ROUTE_SIMPLE_VAR_NAME_ACTION        "action"
 
-extern Variant yaf_route_simple_instance(const Object* object, 
+extern Variant yaf_route_simple_instance(const Object& object, 
         const String& module, const String& controller, const String& action);
 
 }

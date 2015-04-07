@@ -13,67 +13,10 @@
 #include "yaf_loader.h"
 #include "hphp/runtime/ext/extension.h"
 #include "hphp/runtime/vm/runtime.h"
-#include "hphp/runtime/ext/ext_output.h"
+//#include "hphp/runtime/ext/ext_output.h"
 
 
 namespace HPHP {
-
-const int64_t k_PHP_OUTPUT_HANDLER_CONT = 0; 
-const int64_t k_PHP_OUTPUT_HANDLER_WRITE = 0;
-const int64_t k_PHP_OUTPUT_HANDLER_START = 1;
-const int64_t k_PHP_OUTPUT_HANDLER_CLEAN = 2;
-const int64_t k_PHP_OUTPUT_HANDLER_FLUSH = 4;
-const int64_t k_PHP_OUTPUT_HANDLER_END = 8;
-const int64_t k_PHP_OUTPUT_HANDLER_FINAL = 8;
-const int64_t k_PHP_OUTPUT_HANDLER_CLEANABLE = 16;
-const int64_t k_PHP_OUTPUT_HANDLER_FLUSHABLE = 32;
-const int64_t k_PHP_OUTPUT_HANDLER_REMOVABLE = 64;
-const int64_t k_PHP_OUTPUT_HANDLER_STDFLAGS =
-      k_PHP_OUTPUT_HANDLER_CLEANABLE | k_PHP_OUTPUT_HANDLER_FLUSHABLE |
-      k_PHP_OUTPUT_HANDLER_REMOVABLE;
-
-static bool yaf_ob_start();
-static bool yaf_ob_end_clean();
-static Variant yaf_ob_get_content();
-
-static bool yaf_ob_start()
-{
-    g_context->obStart(); 
-    return true;
-}
-
-static bool yaf_ob_end_clean()
-{
-#ifdef HHVM_VERSION_3_2_NEW
-    g_context->obClean(k_PHP_OUTPUT_HANDLER_START |
-                       k_PHP_OUTPUT_HANDLER_CLEAN |
-                       k_PHP_OUTPUT_HANDLER_END);
-#else
-    g_context->obClean();
-#endif
-
-    return g_context->obEnd(); 
-}
-
-static Variant yaf_ob_get_content()
-{
-    if (g_context->obGetLevel() == false) {
-        raise_warning("get level failed");
-        return false;
-    }
-
-    return g_context->obCopyContents();
-}
-
-Variant yaf_ob_get_clean()
-{
-  String output = yaf_ob_get_content();
-  if (!yaf_ob_end_clean()) {
-    return false;
-  }
-
-  return output;
-}
 
 
 static int yaf_view_simple_valid_var_name(const char *var_name, int len) /* {{{ */
@@ -297,7 +240,8 @@ static Variant yaf_view_simple_eval(Object object,
     Unit* unit = compile_string(tpl.toString().data(), tpl.toString().length());
 
     Variant v;
-    ActRec *fp = g_context->getFP(); 
+    //ActRec *fp = g_context->getFP(); 
+    ActRec *fp = Yaf_Common_GetTP();
     g_context->invokeFunc((TypedValue*)&v, unit->getMain(),                                                                                                             
                           //init_null_variant, nullptr, nullptr, g_context->m_globalVarEnv, nullptr,
                           //init_null_variant, nullptr, nullptr, nullptr, nullptr,
@@ -307,18 +251,18 @@ static Variant yaf_view_simple_eval(Object object,
     return yaf_ob_get_clean();
 }
 
-Variant yaf_view_simple_instance(const Object* object, const Variant& tpl_dir,
+Variant yaf_view_simple_instance(const Object& object, const Variant& tpl_dir,
         const Variant& options)
 {
     Object o;
-    if (object == NULL) {
+    if (object.isNull()) {
         Array params = Array::Create();
         params.append(tpl_dir);
         params.append(options);
 
         o = createObject("Yaf_View_Simple", params);
     } else {
-        o = *object;
+        o = object;
     }
 
     auto ptr_tplvars = o->o_realProp(YAF_VIEW_PROPERTY_NAME_TPLVARS, 
@@ -355,7 +299,7 @@ Variant yaf_view_simple_instance(const Object* object, const Variant& tpl_dir,
 static void HHVM_METHOD(Yaf_View_Simple, __construct, const Variant& tpl_dir,
         const Variant& options)
 {
-    yaf_view_simple_instance(&this_, tpl_dir, options);
+    yaf_view_simple_instance(this_, tpl_dir, options);
 }
 
 static bool HHVM_METHOD(Yaf_View_Simple, __isset, const String& name)

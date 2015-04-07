@@ -16,7 +16,7 @@
 namespace HPHP {
 
 extern Variant yaf_route_regex_instance(
-        const Object* object, const Variant& route, const Variant& def,
+        const Object& object, const Variant& route, const Variant& def,
         const Variant& map, const Variant& verify
         );
 

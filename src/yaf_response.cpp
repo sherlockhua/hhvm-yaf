@@ -16,7 +16,7 @@
 
 namespace HPHP{
 
-Variant yaf_response_instance(const Object* object, const char* sapi_name)
+Variant yaf_response_instance(const Object& object, const char* sapi_name)
 {
     Object o;
     String class_name;
@@ -26,7 +26,7 @@ Variant yaf_response_instance(const Object* object, const char* sapi_name)
         class_name = String("Yaf_Response_Http");
     }
 
-    if (object == NULL) {
+    if (object.isNull()) {
         Array arr = Array::Create();
         if (strncasecmp(sapi_name, "cli", 3) == 0) {
             o = createObject("Yaf_Response_Cli", arr) ;
@@ -34,7 +34,7 @@ Variant yaf_response_instance(const Object* object, const char* sapi_name)
             o = createObject("Yaf_Response_Http", arr) ;
         }
     } else {
-        o = *object;
+        o = object;
     }
 
     auto ptr_header = o->o_realProp(YAF_RESPONSE_PROPERTY_NAME_HEADER, 
@@ -120,10 +120,10 @@ int yaf_response_alter_body(const Object& object,
     return 0;
 }
 
-int yaf_response_clear_body(const Object* object, const Variant& name)
+int yaf_response_clear_body(const Object& object, const Variant& name)
 {
 
-    auto ptr_body = (*object)->o_realProp(YAF_RESPONSE_PROPERTY_NAME_BODY, 
+    auto ptr_body = object->o_realProp(YAF_RESPONSE_PROPERTY_NAME_BODY, 
             ObjectData::RealPropUnchecked, "Yaf_Response_Abstract");
 
     if (!ptr_body->isArray()) {
@@ -176,7 +176,7 @@ static void HHVM_METHOD(Yaf_Response_Abstract, __clone)
 static void HHVM_METHOD(Yaf_Response_Abstract, __construct)
 {
     //TODO 需要判断是命令行还是web请求
-    yaf_response_instance(&this_, "Http");
+    yaf_response_instance(this_, "Http");
 }
 
 static void HHVM_METHOD(Yaf_Response_Abstract, __destruct)
@@ -249,7 +249,7 @@ static Variant HHVM_METHOD(Yaf_Response_Abstract, prependBody,
 
 static Variant HHVM_METHOD(Yaf_Response_Abstract, clearBody, const Variant& name)
 {
-    int ret = yaf_response_clear_body(&this_, name);
+    int ret = yaf_response_clear_body(this_, name);
     if (ret != 0) {
         return false;
     }

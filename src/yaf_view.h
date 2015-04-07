@@ -23,7 +23,7 @@
 
 namespace HPHP {
 
-extern Variant yaf_view_simple_instance(const Object* object, const Variant& tpl_dir,
+extern Variant yaf_view_simple_instance(const Object& object, const Variant& tpl_dir,
         const Variant& options);
 }
 

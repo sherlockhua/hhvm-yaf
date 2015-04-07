@@ -18,7 +18,7 @@
 
 namespace HPHP {
 
-extern Variant yaf_route_map_instance(const Object* data, 
+extern Variant yaf_route_map_instance(const Object& data, 
         const Variant& controller_prefer, const Variant& delim);
 
 }

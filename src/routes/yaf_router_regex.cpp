@@ -129,13 +129,13 @@ static int yaf_route_regex_route(const Object& object, const Object& request)
 }
 
 Variant yaf_route_regex_instance(
-        const Object* object, const Variant& route, const Variant& def,
+        const Object& object, const Variant& route, const Variant& def,
         const Variant& map, const Variant& verify
         )
 {
     Object o;
-    if (object != NULL) {
-        o = *object;
+    if (!object.isNull()) {
+        o = object;
     } else {
         Array params = Array::Create();
         params.append(route);
@@ -172,7 +172,7 @@ static Variant HHVM_METHOD(Yaf_Route_Regex, route, const Variant& request)
         return false;
     }
 
-    if (!request.toObject()->o_instanceof("Yaf_Request_Abstract")) {
+    if (!Yaf_Common_InstanceOf(request.toObject(), String("Yaf_Request_Abstract"))) {
         return false;
     }
 
@@ -194,7 +194,7 @@ static void HHVM_METHOD(Yaf_Route_Regex, __construct,
         return;
     }
 
-    (void)yaf_route_regex_instance(&this_, match, route, map, verify);
+    (void)yaf_route_regex_instance(this_, match, route, map, verify);
 }
 
 void YafExtension::_initYafRegexRouterClass()

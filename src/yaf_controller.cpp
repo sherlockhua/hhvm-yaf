@@ -72,7 +72,7 @@ int yaf_controller_construct(const Object& control, const Object& request,
             ObjectData::RealPropUnchecked, "Yaf_Controller_Abstract");
     *var_module = *module;
 
-    if (!control->o_instanceof("Yaf_Action_Abstract")) {
+    if (!Yaf_Common_InstanceOf(control, String("Yaf_Action_Abstract"))) {
         const Func* init_func = control->methodNamed(String("init").get());
         if (init_func != nullptr) {
             Array func = Array::Create();
@@ -263,8 +263,8 @@ static bool HHVM_METHOD(Yaf_Controller_Abstract, setViewpath,
         return false;
     }
 
-    auto _view = _viewTmp->toObject();
-    if (_view->o_instanceof(String("Yaf_View_Simple"))) {
+    Object _view = _viewTmp->toObject();
+    if (Yaf_Common_InstanceOf(_view, String("Yaf_View_Simple"))) {
 
         auto tpl_dir = _view->o_realProp("_tpl_dir", 
             ObjectData::RealPropUnchecked, "Yaf_View_Simple");
@@ -294,7 +294,7 @@ static Variant HHVM_METHOD(Yaf_Controller_Abstract, getViewpath,
 
     Variant output;
     auto _view = _viewTmp->toObject();
-    if (_view->o_instanceof(String("Yaf_View_Simple"))) {
+    if (Yaf_Common_InstanceOf(_view, String("Yaf_View_Simple"))) {
 
         auto tpl_dir = _view->o_realProp("_tpl_dir", 
             ObjectData::RealPropUnchecked, "Yaf_View_Simple");
@@ -326,8 +326,8 @@ static Variant HHVM_METHOD(Yaf_Controller_Abstract, forward,
         return false;
     }
 
-    auto request = tmp->toObject();
-    if (!request->o_instanceof(String("Yaf_Request_Abstract"))) {
+    Object request = tmp->toObject();
+    if (!Yaf_Common_InstanceOf(request, String("Yaf_Request_Abstract"))) {
         return false;
     }
     

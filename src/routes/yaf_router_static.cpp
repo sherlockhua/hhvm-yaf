@@ -187,7 +187,7 @@ static Variant HHVM_METHOD(Yaf_Route_Static, route, const Variant& request)
         return false;
     }
 
-    if (!request.toObject()->o_instanceof("Yaf_Request_Abstract")) {
+    if (!Yaf_Common_InstanceOf(request.toObject(), String("Yaf_Request_Abstract"))) {
         return false;
     }
 

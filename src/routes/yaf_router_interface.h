@@ -27,7 +27,7 @@
 namespace HPHP
 {
 
-extern Variant yaf_route_instance(const Object* object, 
+extern Variant yaf_route_instance(const Object& object, 
         const Variant& config);
 
 }

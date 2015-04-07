@@ -18,7 +18,7 @@
 
 namespace HPHP {
 
-Variant yaf_route_supervar_instance(const Object* object, const Variant& name)
+Variant yaf_route_supervar_instance(const Object& object, const Variant& name)
 {
     if (!name.isString() || 
             name.isString() && name.toString().length() == 0) {
@@ -26,8 +26,8 @@ Variant yaf_route_supervar_instance(const Object* object, const Variant& name)
     }
 
     Object o;
-    if (object) {
-        o = *object;
+    if (!object.isNull()) {
+        o = object;
     } else {
         Array params = Array::Create();
         params.append(name);
@@ -79,7 +79,7 @@ static Variant HHVM_METHOD(Yaf_Route_Supervar, route, const Variant& request)
         return false;
     }
 
-    if (!request.toObject()->o_instanceof("Yaf_Request_Abstract")) {
+    if (!Yaf_Common_InstanceOf(request.toObject(), String("Yaf_Request_Abstract"))) {
         return false;
     }
 

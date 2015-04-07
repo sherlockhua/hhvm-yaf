@@ -23,25 +23,13 @@ namespace HPHP {
 #define YAF_CONFIG_CACHE_CTIME "ctime"
 #define YAF_CONFIG_CACHE_DATA  "data"
 
-#ifdef HHVM_VERSION_3_2_NEW
-extern Variant yaf_config_instance(const ObjectData* object, 
-#else
-extern Variant yaf_config_instance(Object* object, 
-#endif
+extern Variant yaf_config_instance(Object& object, 
         const Variant& filename, const Variant& section);
 
-#ifdef HHVM_VERSION_3_2_NEW
-Variant yaf_config_simple_instance(const ObjectData* object, 
-#else
-Variant yaf_config_simple_instance(const Object* object, 
-#endif
+Variant yaf_config_simple_instance(const Object& object, 
         const Variant& config, const Variant& readonly);
 
-#ifdef HHVM_VERSION_3_2_NEW
-extern Variant yaf_config_ini_instance(const ObjectData* object, 
-#else
-extern Variant yaf_config_ini_instance(const Object* object, 
-#endif
+extern Variant yaf_config_ini_instance(const Object& object, 
         const Variant& filename, const Variant& section);
 
 

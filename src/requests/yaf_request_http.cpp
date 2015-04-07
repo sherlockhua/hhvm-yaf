@@ -18,18 +18,18 @@
 namespace HPHP{
 
 
-Variant yaf_request_http_instance(const Object* object, 
+Variant yaf_request_http_instance(const Object& object, 
         const Variant& request_uri, const Variant& var_base_uri)
 {
     Object o;
-    if (object == NULL) {
+    if (object.isNull()) {
         Array arr = Array::Create();
         arr.append(request_uri);
         arr.append(var_base_uri);
 
         o = createObject("Yaf_Request_Http", arr) ;
     } else {
-        o = *object;
+        o = object;
     }
 
     const char* base_uri = NULL;
@@ -255,7 +255,7 @@ static bool HHVM_METHOD(Yaf_Request_Http, isXmlHttpRequest)
 static void HHVM_METHOD(Yaf_Request_Http, __construct, 
         const Variant& request_uri, const Variant& base_uri)
 {
-    (void)yaf_request_http_instance(&this_, request_uri, base_uri);
+    (void)yaf_request_http_instance(this_, request_uri, base_uri);
 }
 
 static void HHVM_METHOD(Yaf_Request_Http, __clone)

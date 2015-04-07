@@ -15,18 +15,18 @@
 
 namespace HPHP {
 
-Variant yaf_route_map_instance(const Object* data, 
+Variant yaf_route_map_instance(const Object& data, 
         const Variant& controller_prefer, const Variant& delim)
 {
     Object o;
-    if (data == NULL) {
+    if (data.isNull()) {
         Array arr = Array::Create();
         arr.append(controller_prefer);
         arr.append(delim);
 
         o = createObject("Yaf_Route_Map", arr) ;
     } else {
-        o = *data;
+        o = data;
     }
 
     if (controller_prefer.isBoolean()) {
@@ -47,7 +47,7 @@ Variant yaf_route_map_instance(const Object* data,
 static void HHVM_METHOD(Yaf_Route_Map, __construct, 
         const Variant& controller_prefer, const Variant& delim)
 {
-    (void)yaf_route_map_instance(&this_, controller_prefer, delim);
+    (void)yaf_route_map_instance(this_, controller_prefer, delim);
 }
 
 
@@ -151,7 +151,7 @@ static Variant HHVM_METHOD(Yaf_Route_Map, route, const Variant& request)
         return false;
     }
 
-    if (!request.toObject()->o_instanceof("Yaf_Request_Abstract")) {
+    if (!Yaf_Common_InstanceOf(request.toObject(), String("Yaf_Request_Abstract"))) {
         return false;
     }
 

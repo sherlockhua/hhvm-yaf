@@ -16,18 +16,18 @@
 
 namespace HPHP { 
 
-Variant yaf_config_simple_instance(const Object* object, 
+Variant yaf_config_simple_instance(const Object& object, 
         const Variant& config, const Variant& readonly)
 {
     Object o;
-    if (object == NULL) {
+    if (object.isNull()) {
         Array arr = Array::Create();
         arr.append(Array::Create());
         arr.append(Variant(true));
 
         o = createObject("Yaf_Config_Simple", arr) ;
     } else {
-        o = *object;
+        o = object;
     }
 
     if (config.isArray()) {
@@ -48,12 +48,13 @@ Variant yaf_config_simple_instance(const Object* object,
     return o;
 }
 
-static Variant yaf_config_simple_format(const Object* object, 
+static Variant yaf_config_simple_format(const Object& object, 
         const Variant& config)
 {
-    auto ptr_readonly = (*object)->o_realProp(YAF_CONFIG_PROPERT_NAME_READONLY, 
+    auto ptr_readonly = object->o_realProp(YAF_CONFIG_PROPERT_NAME_READONLY, 
             ObjectData::RealPropUnchecked, "Yaf_Config_Simple");
-    return yaf_config_simple_instance(NULL, config, *ptr_readonly);
+    Object tmp_null = null_object;
+    return yaf_config_simple_instance(tmp_null, config, *ptr_readonly);
 }
 
 static void HHVM_METHOD(Yaf_Config_Simple, __construct, 
@@ -66,7 +67,7 @@ static void HHVM_METHOD(Yaf_Config_Simple, __construct,
         *ptr_config = Array::Create();
     }
 
-    (void)yaf_config_simple_instance(&this_, config, readonly);
+    (void)yaf_config_simple_instance(this_, config, readonly);
 }
 
 static bool HHVM_METHOD(Yaf_Config_Simple, __isset, const Variant& name)
@@ -104,7 +105,7 @@ static Variant HHVM_METHOD(Yaf_Config_Simple, get, const Variant& name)
 
     Variant value = arr[name.toString()];
     if (value.isArray()) {
-        Variant instance = yaf_config_simple_format(&this_, value);
+        Variant instance = yaf_config_simple_format(this_, value);
         return instance;
     }
 
@@ -188,7 +189,7 @@ static Variant HHVM_METHOD(Yaf_Config_Simple, current)
         return value;
     }
 
-    return yaf_config_simple_format(&this_, value);
+    return yaf_config_simple_format(this_, value);
 }
 
 static Variant HHVM_METHOD(Yaf_Config_Simple, next) 
@@ -311,7 +312,7 @@ static Variant HHVM_METHOD(Yaf_Config_Simple, __get, const Variant& name)
 
     Variant value = arr[name.toString()];
     if (value.isArray()) {
-        Variant instance = yaf_config_simple_format(&this_, value);
+        Variant instance = yaf_config_simple_format(this_, value);
         return instance;
     }
 
@@ -339,7 +340,7 @@ static Variant HHVM_METHOD(Yaf_Config_Simple, offsetGet, const Variant& name)
 
     Variant value = arr[name.toString()];
     if (value.isArray()) {
-        Variant instance = yaf_config_simple_format(&this_, value);
+        Variant instance = yaf_config_simple_format(this_, value);
         return instance;
     }
 

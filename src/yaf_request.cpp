@@ -36,7 +36,7 @@ int yaf_request_set_base_uri(const Object& request,
    // char *basename = NULL;
     //unsigned int basename_len = 0;
     String basename;
-    Variant container = NULL;
+    Variant container = init_null_variant;
 
     if (!base_uri) {
         Variant script_filename = init_null_variant;
@@ -163,7 +163,7 @@ int yaf_request_set_params_multi(const Object* request, const Array& params)
     return HHVM_YAF_SUCCESS;
 }
 
-Variant yaf_request_instance(const Object* object, const char* base_uri)
+Variant yaf_request_instance(const Object& object, const char* base_uri)
 {
     Variant str_base_uri = String(base_uri);
     Variant tmp = init_null_variant;
@@ -357,8 +357,8 @@ static Variant HHVM_METHOD(Yaf_Request_Abstract, getException)
         return *tmp;
     }
 
-    auto exception = tmp->toObject();
-    if (exception->o_instanceof(String("Exception"))) {
+    Object exception = tmp->toObject();
+    if (Yaf_Common_InstanceOf(exception, String("Exception"))) {
         return exception;
     }
 

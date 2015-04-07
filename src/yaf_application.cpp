@@ -435,7 +435,8 @@ static void HHVM_METHOD(Yaf_Application, __construct, const Variant& config,
         str_section = section.toString();
     }
 
-    Variant var_config = yaf_config_instance(NULL, config, str_section);
+    Object tmp_null_conf = null_object;
+    Variant var_config = yaf_config_instance(tmp_null_conf, config, str_section);
     if (var_config.isNull() || !var_config.isObject()) {
         yaf_trigger_error(YAF_ERR_STARTUP_FAILED, 
                 "initialize yaf application config failed");
@@ -462,7 +463,8 @@ static void HHVM_METHOD(Yaf_Application, __construct, const Variant& config,
         return;
     }
 
-    Variant request = yaf_request_instance(NULL, 
+    Object tmp_null(null_object);
+    Variant request = yaf_request_instance(tmp_null, 
             g_yaf_local_data.get()->base_uri.c_str());
     if (request.isNull()) {
         yaf_trigger_error(YAF_ERR_STARTUP_FAILED, 
@@ -488,7 +490,7 @@ static void HHVM_METHOD(Yaf_Application, __construct, const Variant& config,
     }
 
     Object o_dispatcher = dispatcher.toObject();
-    yaf_dispatcher_set_request(&o_dispatcher,request);
+    yaf_dispatcher_set_request(o_dispatcher.get(),request);
 
     auto ptr_app_config = this_->o_realProp(YAF_APPLICATION_PROPERTY_NAME_CONFIG, 
             ObjectData::RealPropUnchecked, "Yaf_Application");
@@ -558,7 +560,7 @@ static Variant HHVM_METHOD(Yaf_Application, run)
     auto ptr_dispatcher = this_->o_realProp(YAF_APPLICATION_PROPERTY_NAME_DISPATCHER, 
             ObjectData::RealPropUnchecked, "Yaf_Application");
     Object object = ptr_dispatcher->toObject();
-    Variant response = yaf_dispatcher_dispatch(&object);
+    Variant response = yaf_dispatcher_dispatch(object);
     if (!response.isNull()) {
         return response;
     }
