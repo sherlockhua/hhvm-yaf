@@ -17,7 +17,6 @@
 #include "hphp/runtime/base/request-local.h"
 #include "hphp/runtime/base/builtin-functions.h"
 #include "hphp/system/constants.h"
-#include "hphp/runtime/base/actrec-args.h"
 
 #if (HHVM_VERSION_MAJOR == 3) && (HHVM_VERSION_MINOR >= 5) 
 #include "hphp/runtime/version.h"
@@ -29,6 +28,7 @@
 
 #if (HHVM_VERSION_MAJOR == 3) && (HHVM_VERSION_MINOR >= 7) 
 #include "hphp/runtime/ext/extension-registry.h"
+#include "hphp/runtime/base/actrec-args.h"
 #endif
 
 namespace HPHP
