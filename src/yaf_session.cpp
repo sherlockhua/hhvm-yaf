@@ -279,8 +279,8 @@ static Variant HHVM_METHOD(Yaf_Session, rewind)
     auto ptr_cursor = this_->o_realProp(YAF_SESSION_PROPERT_NAME_CURSOR, 
             ObjectData::RealPropUnchecked, "Yaf_Session");
 
-    //*ptr_cursor = Variant(NEWOBJ(yaf_session_cursor)(session.begin()));
-    *ptr_cursor = Variant(newres<yaf_session_cursor>(session.begin()));
+    *ptr_cursor = Variant(NEWOBJ(yaf_session_cursor)(session.begin()));
+    //*ptr_cursor = Variant(newres<yaf_session_cursor>(session.begin()));
     return true;
 }
 
