@@ -18,6 +18,7 @@
 
 namespace HPHP { 
 
+YafRequestData g_tmp_yaf_local_data;
 
 IMPLEMENT_REQUEST_LOCAL(YafRequestData,
                       g_yaf_local_data);
@@ -64,31 +65,30 @@ void YafExtension::moduleInit()
 
 void YafExtension::_loadYafConf(Hdf conf)
 {
-    g_yaf_local_data.get()->global_library = conf["library"].configGetString("");
-    g_yaf_local_data.get()->action_prefer = conf["action_prefer"].configGetBool(false);
-    g_yaf_local_data.get()->lowcase_path = conf["lowcase_path"].configGetBool(false);
-    g_yaf_local_data.get()->use_spl_autoload = conf["use_spl_autoload"].configGetBool(false);
-    g_yaf_local_data.get()->forward_limit = conf["forward_limit"].configGetInt32(5);
-    g_yaf_local_data.get()->name_suffix = conf["name_suffix"].configGetBool(true);
-    g_yaf_local_data.get()->name_separator = conf["name_separator"].configGetString("");
-    g_yaf_local_data.get()->cache_config = conf["cache_config"].configGetBool(false);
-    g_yaf_local_data.get()->st_compatible = conf["st_compatible"].configGetBool(false);
+    g_tmp_yaf_local_data.global_library = conf["library"].configGetString("");
+    g_tmp_yaf_local_data.action_prefer = conf["action_prefer"].configGetBool(false);
+    g_tmp_yaf_local_data.lowcase_path = conf["lowcase_path"].configGetBool(false);
+    g_tmp_yaf_local_data.use_spl_autoload = conf["use_spl_autoload"].configGetBool(false);
+    g_tmp_yaf_local_data.forward_limit = conf["forward_limit"].configGetInt32(5);
+    g_tmp_yaf_local_data.name_suffix = conf["name_suffix"].configGetBool(true);
+    g_tmp_yaf_local_data.name_separator = conf["name_separator"].configGetString("");
+    g_tmp_yaf_local_data.cache_config = conf["cache_config"].configGetBool(false);
+    g_tmp_yaf_local_data.st_compatible = conf["st_compatible"].configGetBool(false);
 /* {{{ This only effects internally */
-    g_yaf_local_data.get()->st_compatible = conf["st_compatible"].configGetBool(false);
+    g_tmp_yaf_local_data.st_compatible = conf["st_compatible"].configGetBool(false);
 /* }}} */
-    g_yaf_local_data.get()->environ = conf["environ"].configGetString("product");
+    g_tmp_yaf_local_data.environ = conf["environ"].configGetString("product");
 
 #ifdef YAF_HAVE_NAMESPACE
-    g_yaf_local_data.get()->use_namespace = conf["use_namespace"].configGetBool(false);
+    g_tmp_yaf_local_data.use_namespace = conf["use_namespace"].configGetBool(false);
 #endif
 
-    g_yaf_local_data.get()->ext                = YAF_DEFAULT_EXT; 
-    g_yaf_local_data.get()->view_ext           = YAF_DEFAULT_VIEW_EXT;
-    g_yaf_local_data.get()->default_module     = YAF_ROUTER_DEFAULT_MODULE;
-    g_yaf_local_data.get()->default_controller = YAF_ROUTER_DEFAULT_CONTROLLER;
-    g_yaf_local_data.get()->default_action     = YAF_ROUTER_DEFAULT_ACTION;
-    //g_yaf_local_data.get()->bootstrap          = YAF_DEFAULT_BOOTSTRAP;
-
+    g_tmp_yaf_local_data.ext                = YAF_DEFAULT_EXT; 
+    g_tmp_yaf_local_data.view_ext           = YAF_DEFAULT_VIEW_EXT;
+    g_tmp_yaf_local_data.default_module     = YAF_ROUTER_DEFAULT_MODULE;
+    g_tmp_yaf_local_data.default_controller = YAF_ROUTER_DEFAULT_CONTROLLER;
+    g_tmp_yaf_local_data.default_action     = YAF_ROUTER_DEFAULT_ACTION;
+    //g_tmp_yaf_local_data.bootstrap          = YAF_DEFAULT_BOOTSTRAP;
 }
 
 void YafExtension::moduleLoad(Hdf config)
@@ -106,6 +106,32 @@ void YafExtension::moduleLoad(const IniSetting::Map& ini, Hdf config)
 void YafExtension::threadInit() {
     Extension* ext = Yaf_Common_GetExtension(String("yaf"));
     //Extension* ext = ExtensionRegistry::get("yaf");
+
+    g_yaf_local_data.get()->global_library = g_tmp_yaf_local_data.global_library;
+    g_yaf_local_data.get()->action_prefer = g_tmp_yaf_local_data.action_prefer;
+    g_yaf_local_data.get()->lowcase_path = g_tmp_yaf_local_data.lowcase_path;
+    g_yaf_local_data.get()->use_spl_autoload = g_tmp_yaf_local_data.use_spl_autoload;
+    g_yaf_local_data.get()->forward_limit = g_tmp_yaf_local_data.forward_limit;
+    g_yaf_local_data.get()->name_suffix = g_tmp_yaf_local_data.name_suffix;
+    g_yaf_local_data.get()->name_separator = g_tmp_yaf_local_data.name_separator;
+    g_yaf_local_data.get()->cache_config = g_tmp_yaf_local_data.cache_config;
+    g_yaf_local_data.get()->st_compatible = g_tmp_yaf_local_data.st_compatible;
+/* {{{ This only effects internally */
+    g_yaf_local_data.get()->environ = g_tmp_yaf_local_data.environ;
+/* }}} */
+
+#ifdef YAF_HAVE_NAMESPACE
+    g_yaf_local_data.get()->use_namespace = g_tmp_yaf_local_data.use_namespace;
+#endif
+
+    g_yaf_local_data.get()->ext                = YAF_DEFAULT_EXT; 
+    g_yaf_local_data.get()->view_ext           = YAF_DEFAULT_VIEW_EXT;
+    g_yaf_local_data.get()->default_module     = YAF_ROUTER_DEFAULT_MODULE;
+    g_yaf_local_data.get()->default_controller = YAF_ROUTER_DEFAULT_CONTROLLER;
+    g_yaf_local_data.get()->default_action     = YAF_ROUTER_DEFAULT_ACTION;
+    //g_yaf_local_data.get()->bootstrap          = YAF_DEFAULT_BOOTSTRAP;
+
+
 
     assert(ext);
     YafRequestData* data = g_yaf_local_data.get();
@@ -156,7 +182,9 @@ void YafExtension::threadInit() {
 #endif
 }
 
+
 YafExtension s_yaf_extension;
 HHVM_GET_MODULE(yaf);
+
 
 }

@@ -192,6 +192,8 @@ public:
         virtual ~YafRequestData(){}
 };
 
+extern YafRequestData g_tmp_yaf_local_data;
+
 DECLARE_EXTERN_REQUEST_LOCAL(YafRequestData, g_yaf_local_data);
 
 }

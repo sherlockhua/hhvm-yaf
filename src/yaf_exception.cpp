@@ -104,6 +104,7 @@ void yaf_trigger_error(int level, char* format, ...)
     }
 }
 
+/*
 static void HHVM_METHOD(Yaf_Exception, __construct,
         const Variant& message, const Variant& code,
         const Variant& previous)
@@ -120,14 +121,16 @@ static void HHVM_METHOD(Yaf_Exception, __construct,
         *ptr_code = code;
     }
 
+        raise_warning("set previous1");
     if (!previous.isNull()) {
+        raise_warning("set previous");
         auto ptr_previous = this_->o_realProp("previous",
                             ObjectData::RealPropUnchecked, "Yaf_Exception");
         *ptr_previous = previous;
     }
 }
 
-/*
+
 static Variant HHVM_METHOD(Yaf_Exception, getPrevious)
 {
     auto ptr_previous = this_->o_realProp("previous",
@@ -136,9 +139,10 @@ static Variant HHVM_METHOD(Yaf_Exception, getPrevious)
 }
 */
 
+
 void YafExtension::_initYafExceptionClass()
 {
-    HHVM_ME(Yaf_Exception, __construct);
+    //HHVM_ME(Yaf_Exception, __construct);
     //HHVM_ME(Yaf_Exception, getPrevious);
 }
 

@@ -985,6 +985,7 @@ final class Yaf_Registry {
 
 class Yaf_Exception extends Exception 
 {
+    /*
     protected $message = NULL;
     protected $code = 0; 
     protected $previous = NULL;
@@ -993,8 +994,9 @@ class Yaf_Exception extends Exception
     public function __construct(?mixed $message = NULL, 
         ?mixed $code = NULL, ?mixed $previous = NULL):void;
 
-    //<<__Native>>
-    //public function getPrevious():mixed;
+    <<__Native>>
+    public function getPrevious():mixed;
+     */
 }
 
 class Yaf_Exception_StartupError extends Yaf_Exception{
