@@ -11,12 +11,24 @@
 #ifndef _YAF_COMMON_H_
 #define _YAF_COMMON_H_
 
-#include "ext_yaf.h"
+#include "hphp/runtime/base/base-includes.h"
+#include "hphp/runtime/ext/extension.h"
+#include "hphp/runtime/base/request-event-handler.h"
+#include "hphp/runtime/base/request-local.h"
+#include "hphp/runtime/base/builtin-functions.h"
+
+#if (HHVM_VERSION_MAJOR == 3) && (HHVM_VERSION_MINOR >= 5) 
+#include "hphp/runtime/version.h"
+#endif
+
+#if (HHVM_VERSION_MAJOR == 3) && (HHVM_VERSION_MINOR >= 7) 
+#include "hphp/runtime/ext/extension-registry.h"
+#endif
 
 namespace HPHP
 {
 
-extern Extension* GetExtension(const String& ext_name);
+extern Extension* Yaf_Common_GetExtension(const String& ext_name);
 
 }
 

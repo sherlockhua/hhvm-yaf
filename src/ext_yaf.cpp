@@ -104,8 +104,9 @@ void YafExtension::moduleLoad(const IniSetting::Map& ini, Hdf config)
 }
 
 void YafExtension::threadInit() {
-    //Extension* ext = Extension::GetExtension("yaf");
-    Extension* ext = ExtensionRegistry::get("yaf");
+    Extension* ext = Yaf_Common_GetExtension(String("yaf"));
+    //Extension* ext = ExtensionRegistry::get("yaf");
+
     assert(ext);
     YafRequestData* data = g_yaf_local_data.get();
     IniSetting::Bind(ext, IniSetting::PHP_INI_ALL,

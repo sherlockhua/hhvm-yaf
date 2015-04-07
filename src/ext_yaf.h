@@ -12,13 +12,8 @@
 #define _EXT_EXAMPLE_H_
 
 #include <string>
-#include "hphp/runtime/base/base-includes.h"
-#include "hphp/runtime/ext/extension.h"
-#include "hphp/runtime/base/request-event-handler.h"
-#include "hphp/runtime/base/request-local.h"
-#include "hphp/runtime/base/builtin-functions.h"
-#include "hphp/runtime/ext/extension-registry.h"
-#include "hphp/runtime/version.h"
+#include "yaf_common.h"
+
 #include "yaf_exception.h"
 #include "error.h"
 #include "yaf_loader.h"

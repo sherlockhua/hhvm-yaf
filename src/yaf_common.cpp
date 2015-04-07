@@ -12,7 +12,7 @@
 
 namespace HPHP {
 
-Extension* GetExtension(const String& name)
+Extension* Yaf_Common_GetExtension(const String& name)
 {
 #if (HHVM_VERSION_MAJOR == 3) && (HHVM_VERSION_MINOR >= 7) 
     return ExtensionRegistry::get(name);
