@@ -18,7 +18,7 @@
 namespace HPHP
 {
 
-Variant yaf_route_instance(const Object* object, const Variant& config)
+Variant yaf_route_instance(const Object& object, const Variant& config)
 {
     if (!config.isArray()) {
         return init_null_variant;

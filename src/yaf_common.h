@@ -40,20 +40,6 @@
 namespace HPHP
 {
 
-const int64_t k_PHP_OUTPUT_HANDLER_CONT = 0; 
-const int64_t k_PHP_OUTPUT_HANDLER_WRITE = 0;
-const int64_t k_PHP_OUTPUT_HANDLER_START = 1;
-const int64_t k_PHP_OUTPUT_HANDLER_CLEAN = 2;
-const int64_t k_PHP_OUTPUT_HANDLER_FLUSH = 4;
-const int64_t k_PHP_OUTPUT_HANDLER_END = 8;
-const int64_t k_PHP_OUTPUT_HANDLER_FINAL = 8;
-const int64_t k_PHP_OUTPUT_HANDLER_CLEANABLE = 16;
-const int64_t k_PHP_OUTPUT_HANDLER_FLUSHABLE = 32;
-const int64_t k_PHP_OUTPUT_HANDLER_REMOVABLE = 64;
-const int64_t k_PHP_OUTPUT_HANDLER_STDFLAGS =
-      k_PHP_OUTPUT_HANDLER_CLEANABLE | k_PHP_OUTPUT_HANDLER_FLUSHABLE |
-      k_PHP_OUTPUT_HANDLER_REMOVABLE;
-
 
 extern Extension* Yaf_Common_GetExtension(const String& ext_name);
 
