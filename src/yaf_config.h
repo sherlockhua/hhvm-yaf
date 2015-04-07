@@ -11,7 +11,7 @@
 #ifndef _YAF_CONFIG_H_
 #define _YAF_CONFIG_H_
 
-#include "hphp/runtime/base/base-includes.h"
+#include "yaf_common.h"
 
 namespace HPHP {
 
