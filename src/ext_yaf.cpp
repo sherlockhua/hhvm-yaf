@@ -14,6 +14,7 @@
 #include "ext_yaf.h"
 #include "yaf_router.h"
 #include "yaf_bootstrap.h"
+#include "yaf_common.h"
 
 namespace HPHP { 
 
@@ -103,7 +104,8 @@ void YafExtension::moduleLoad(const IniSetting::Map& ini, Hdf config)
 }
 
 void YafExtension::threadInit() {
-    Extension* ext = Extension::GetExtension("yaf");
+    //Extension* ext = Extension::GetExtension("yaf");
+    Extension* ext = ExtensionRegistry::get("yaf");
     assert(ext);
     YafRequestData* data = g_yaf_local_data.get();
     IniSetting::Bind(ext, IniSetting::PHP_INI_ALL,
