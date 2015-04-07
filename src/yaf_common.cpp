@@ -21,4 +21,15 @@ Extension* Yaf_Common_GetExtension(const String& name)
 #endif
 }
 
+
+bool Yaf_Common_InstanceOf(const Object& object, const String& class_name)
+{
+#if (HHVM_VERSION_MAJOR == 3) && (HHVM_VERSION_MINOR >= 5) 
+    return object->instanceof(class_name);
+#else
+    return object->o_instanceof(class_name);
+#endif
+
+}
+
 }

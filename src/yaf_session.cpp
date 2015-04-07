@@ -51,8 +51,10 @@ static int yaf_session_start(const Object& session)
         return HHVM_YAF_SUCCESS;
     }
 
-    bool ret = f_session_start();
-    if (!ret) {
+    Array params = Array::Create();
+    Variant ret = vm_call_user_func(String("session_start"), params);
+    //bool ret = f_session_start();
+    if (ret.isBoolean() && ret.toBoolean() == false) {
         raise_warning("f_session_start failed");
         return HHVM_YAF_FAILED;
     }
@@ -100,7 +102,8 @@ static void HHVM_METHOD(Yaf_Session, __wakeup)
 static Variant HHVM_STATIC_METHOD(Yaf_Session, getInstance)
 {
     Variant instance = get_instance();    
-    if (instance.isObject() && instance.toObject()->o_instanceof("Yaf_Session")){
+    if (instance.isObject() && 
+            Yaf_Common_InstanceOf(instance.toObject(), String("Yaf_Session"))){
         return instance;
     }
 
@@ -276,7 +279,8 @@ static Variant HHVM_METHOD(Yaf_Session, rewind)
     auto ptr_cursor = this_->o_realProp(YAF_SESSION_PROPERT_NAME_CURSOR, 
             ObjectData::RealPropUnchecked, "Yaf_Session");
 
-    *ptr_cursor = Variant(NEWOBJ(yaf_session_cursor)(session.begin()));
+    //*ptr_cursor = Variant(NEWOBJ(yaf_session_cursor)(session.begin()));
+    *ptr_cursor = Variant(newres<yaf_session_cursor>(session.begin()));
     return true;
 }
 

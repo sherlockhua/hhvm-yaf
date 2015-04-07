@@ -16,6 +16,7 @@
 #include "hphp/runtime/base/request-event-handler.h"
 #include "hphp/runtime/base/request-local.h"
 #include "hphp/runtime/base/builtin-functions.h"
+#include "hphp/system/constants.h"
 
 #if (HHVM_VERSION_MAJOR == 3) && (HHVM_VERSION_MINOR >= 5) 
 #include "hphp/runtime/version.h"
@@ -29,6 +30,8 @@ namespace HPHP
 {
 
 extern Extension* Yaf_Common_GetExtension(const String& ext_name);
+
+extern bool Yaf_Common_InstanceOf(const Object& object, const String& class_name);
 
 }
 

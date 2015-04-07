@@ -442,8 +442,8 @@ static void HHVM_METHOD(Yaf_Application, __construct, const Variant& config,
         return;
     }
 
-    auto ob_config = var_config.toObject();
-    if (!ob_config->o_instanceof("Yaf_Config_Abstract")) {
+    Object ob_config = var_config.toObject();
+    if (!Yaf_Common_InstanceOf(ob_config, String("Yaf_Config_Abstract"))) {
         yaf_trigger_error(YAF_ERR_STARTUP_FAILED, 
                 "initialize yaf application config failed, not Yaf_config");
         return;
@@ -481,7 +481,7 @@ static void HHVM_METHOD(Yaf_Application, __construct, const Variant& config,
         return;
     }
 
-    if (!dispatcher.toObject()->o_instanceof("Yaf_Dispatcher")) {
+    if (!Yaf_Common_InstanceOf(dispatcher.toObject(), String("Yaf_Dispatcher"))) {
         yaf_trigger_error(YAF_ERR_STARTUP_FAILED, 
                 "initialize yaf dispatcher failed, not Yaf_Dispatcher instance");
         return;
@@ -610,7 +610,8 @@ static Variant HHVM_METHOD(Yaf_Application, bootstrap)
     }
 
     o = createObject("bootstrap", args);
-    if (o.isNull() || !o->o_instanceof("Yaf_Bootstrap_Abstract")) {
+    if (o.isNull() || 
+            !Yaf_Common_InstanceOf(o, String("Yaf_Bootstrap_Abstract"))) {
         yaf_trigger_error(YAF_ERR_STARTUP_FAILED, 
                 "can't found bootstrap in %s", bootstrap_path.c_str());
         return false;
