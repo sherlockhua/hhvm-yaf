@@ -7,7 +7,6 @@ PHP framework written in c and built as a HHVM extension.
 
 ## Install
 ### Install Yaf 
-```
 ### Compile Yaf in Linux
 ```
 $/path/to/hphpize
