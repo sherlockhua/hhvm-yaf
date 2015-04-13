@@ -9,9 +9,11 @@ PHP framework written in c and built as a HHVM extension. You can found php-yaf 
 ### Install Yaf 
 ### Compile Yaf in Linux
 ```
-$/path/to/hphpize
-$cmake .
-$make
+$ git clone https://github.com/sherlockhua/hhvm-yaf.git
+$ /path/to/hphpize
+$ cmake .
+$ make
+$ cp yaf.so /path/to/your/hhvm/ext/
 ```
 ## Document
 Yaf manual could be found at: http://www.php.net/manual/en/book.yaf.php
