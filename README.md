@@ -1,6 +1,6 @@
 # Yaf - Yet Another Framework  
 
-PHP framework written in c and built as a HHVM extension. php-yaf:https://github.com/laruence/php-yaf/
+PHP framework written in c and built as a HHVM extension. You can found php-yaf from:https://github.com/laruence/php-yaf/
 
 ## Requirement
 - HHVM 3.1 +
