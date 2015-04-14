@@ -48,7 +48,7 @@ Yaf_Request_Simple Object
     [module] => index
     [controller] => dummy
     [action] => index
-    [method] => Cli
+    [method] => CLI
     [params:protected] => Array
         (
         )
