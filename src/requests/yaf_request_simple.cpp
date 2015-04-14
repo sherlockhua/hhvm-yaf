@@ -173,18 +173,17 @@ static void HHVM_METHOD(Yaf_Request_Simple, __construct,
         if (php_global(S_SERVER).toArray().exists(String("HTTP_REQUEST_METHOD"))) {
             Variant request_method = php_global(S_SERVER).toArray()[String("HTTP_REQUEST_METHOD")];
             *ptr_method = request_method;
+        } else {
+            if (strncmp(RuntimeOption::ExecutionMode, "cli", 3) == 0) {
+                *ptr_method = String("CLI");
+            } else {
+                *ptr_method = String("Unknow");
+            }
         }
     } else {
         *ptr_method = method;
     }
 
-    ExecutionContext *context = g_context.getNoCheck();
-    Transport *transport = context->getTransport();
-    if (!transport) {
-        *ptr_method = String("Cli");
-    }
-
-    //TODO php client mode, the request method may be 'Cli'
     if (!module.isNull() || !controller.isNull() || !action.isNull()) {
         if (module.isNull() || !module.isString()) {
             *ptr_module = String(g_yaf_local_data.get()->default_module.c_str()); 

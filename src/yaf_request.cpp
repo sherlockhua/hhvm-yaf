@@ -40,8 +40,6 @@ int yaf_request_set_base_uri(const Object& request,
 
     if (!base_uri) {
         Variant script_filename = init_null_variant;
-        char    *file_name;
-        size_t  file_name_len;
 
         if (php_global(S_SERVER).toArray().exists(String("SCRIPT_FILENAME"))) {
             script_filename = php_global(S_SERVER).toArray()[String("SCRIPT_FILENAME")];

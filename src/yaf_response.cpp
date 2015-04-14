@@ -139,11 +139,7 @@ int yaf_response_clear_body(const Object& object, const Variant& name)
     return 0;
 }
 
-#ifdef HHVM_VERSION_3_2_NEW
-static Variant yaf_response_get_body(ObjectData* object, const Variant& name)
-#else
 static Variant yaf_response_get_body(const Object& object, const Variant& name)
-#endif
 {
 
     auto ptr_body = object->o_realProp(YAF_RESPONSE_PROPERTY_NAME_BODY, 
@@ -175,8 +171,7 @@ static void HHVM_METHOD(Yaf_Response_Abstract, __clone)
 
 static void HHVM_METHOD(Yaf_Response_Abstract, __construct)
 {
-    //TODO 需要判断是命令行还是web请求
-    yaf_response_instance(this_, "Http");
+    yaf_response_instance(this_, RuntimeOption::ExecutionMode);
 }
 
 static void HHVM_METHOD(Yaf_Response_Abstract, __destruct)

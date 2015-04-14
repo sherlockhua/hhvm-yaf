@@ -43,15 +43,12 @@ Variant yaf_request_http_instance(const Object& object,
     if (php_global(S_SERVER).toArray().exists(String("HTTP_REQUEST_METHOD"))) {
         Variant request_method = php_global(S_SERVER).toArray()[String("HTTP_REQUEST_METHOD")];
         *tmp = request_method;
-    }
-  
-    ExecutionContext *context = g_context.getNoCheck();
-    Transport *transport = context->getTransport();
-    if (!transport) {
+    } else if (strncmp(RuntimeOption::ExecutionMode, "cli", 3) == 0) {
         *tmp = String("Cli");
+    } else {
+        *tmp = String("Unknow");
     }
 
-    //TODO php client mode, the request method may be 'Cli'
     std::string uri;
     if (request_uri.isString()) {
         uri = request_uri.toString().toCppString();
@@ -104,17 +101,7 @@ done:
         auto ptr_uri = o->o_realProp(YAF_REQUEST_PROPERTY_NAME_URI, 
                 ObjectData::RealPropUnchecked, "Yaf_Request_Http");
 
-        //TODO hhvm和php有兼容问题，request_uri hhvm取的是头部的,php
-        //取的是fastcgi
-#if 0
-       p = uri.c_str();
-       p++;
-       while (*p != '/') p++;
-       uri = std::string(p);
-#endif
-
         *ptr_uri = String(uri);
-
         yaf_request_set_base_uri(o, base_uri, uri.c_str());
     }
 

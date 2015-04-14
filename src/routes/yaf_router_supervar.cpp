@@ -21,7 +21,7 @@ namespace HPHP {
 Variant yaf_route_supervar_instance(const Object& object, const Variant& name)
 {
     if (!name.isString() || 
-            name.isString() && name.toString().length() == 0) {
+            (name.isString() && name.toString().length()) == 0) {
         return init_null_variant;
     }
 

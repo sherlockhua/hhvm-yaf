@@ -111,8 +111,7 @@ static int yaf_application_parse_system(const Array& config)
         snprintf(name, sizeof(name), "yaf.%s", first.toString().c_str());
 
         String value = second.toString();
-        //TODO modify runtime ini config
-        // zend_alter_ini_entry(name, len + 1, Z_STRVAL_PP(value), Z_STRLEN_PP(value), PHP_INI_USER, PHP_INI_STAGE_RUNTIME);
+        //调用ini_set 在运行时改变ini配置
         HHVM_FN(ini_set)(name, value);
         iter.next();
     }

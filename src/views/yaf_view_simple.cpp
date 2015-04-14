@@ -146,8 +146,8 @@ static Variant yaf_view_simple_display(Object object,
         return false;
     }
 
-    auto ptr_tplvars = object->o_realProp(YAF_VIEW_PROPERTY_NAME_TPLVARS, 
-            ObjectData::RealPropUnchecked, "Yaf_View_Simple");
+    //auto ptr_tplvars = object->o_realProp(YAF_VIEW_PROPERTY_NAME_TPLVARS, 
+    //        ObjectData::RealPropUnchecked, "Yaf_View_Simple");
 
     std::string script_path;
     const String& str_tpl = tpl.toCStrRef();
@@ -188,8 +188,8 @@ static Variant yaf_view_simple_render(Object object,
         return false;
     }
 
-    auto ptr_tplvars = object->o_realProp(YAF_VIEW_PROPERTY_NAME_TPLVARS, 
-            ObjectData::RealPropUnchecked, "Yaf_View_Simple");
+    //auto ptr_tplvars = object->o_realProp(YAF_VIEW_PROPERTY_NAME_TPLVARS, 
+    //        ObjectData::RealPropUnchecked, "Yaf_View_Simple");
 
     std::string script_path;
     const String& str_tpl = tpl.toCStrRef();

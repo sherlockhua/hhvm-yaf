@@ -354,8 +354,8 @@ static int yaf_dispatcher_handle(const Object& object, const Object& request,
     auto ptr_dispatcher_module = object->o_realProp(YAF_DISPATCHER_PROPERTY_NAME_MODULE, 
             ObjectData::RealPropUnchecked, "Yaf_Dispatcher");
 
-    auto ptr_dispatcher_controller = object->o_realProp(YAF_DISPATCHER_PROPERTY_NAME_CONTROLLER, 
-            ObjectData::RealPropUnchecked, "Yaf_Dispatcher");
+    //auto ptr_dispatcher_controller = object->o_realProp(YAF_DISPATCHER_PROPERTY_NAME_CONTROLLER, 
+    //        ObjectData::RealPropUnchecked, "Yaf_Dispatcher");
 
     if (!ptr_module->isString() ||
             ptr_module->toString().length() == 0) {
@@ -783,7 +783,7 @@ Variant yaf_dispatcher_dispatch(const Object& object)
 {
     //TODO need modify sapi_name to support cli or http mode
     Object tmp_null(null_object);
-    Variant var_response = yaf_response_instance(tmp_null, "online");
+    Variant var_response = yaf_response_instance(tmp_null, RuntimeOption::ExecutionMode);
     auto ptr_request = object->o_realProp(YAF_DISPATCHER_PROPERTY_NAME_REQUEST, 
             ObjectData::RealPropUnchecked, "Yaf_Dispatcher");
 
@@ -809,12 +809,8 @@ Variant yaf_dispatcher_dispatch(const Object& object)
             yaf_dispatcher_call_router_hook(arr_plugin, request, response, 
                     String(YAF_PLUGIN_HOOK_ROUTESTARTUP));
 
-            //TODO need implement YAF_EXCEPTION_HANDLE
-            //YAF_EXCEPTION_HANDLE(dispatcher, request, response); 
             if (yaf_dispatcher_route(object, request) != HHVM_YAF_SUCCESS) {
                 yaf_trigger_error(YAF_ERR_ROUTE_FAILED, "Routing request failed");
-                //TODO need implement
-                //YAF_EXCEPTION_HANDLE_NORET
                 return init_null_variant;
             }
 
@@ -822,8 +818,6 @@ Variant yaf_dispatcher_dispatch(const Object& object)
             yaf_dispatcher_call_router_hook(arr_plugin, request, response, 
                     String(YAF_PLUGIN_HOOK_ROUTESHUTDOWN));
 
-            //TODO need implement YAF_EXCEPTION_HANDLE
-            //YAF_EXCEPTION_HANDLE(dispatcher, request, response); 
             yaf_request_set_routed(&request, 1);
         } else {
             yaf_dispatcher_fix_default(object, request);
@@ -832,9 +826,6 @@ Variant yaf_dispatcher_dispatch(const Object& object)
         yaf_dispatcher_call_router_hook(arr_plugin, request, response, 
                 String(YAF_PLUGIN_HOOK_LOOPSTARTUP));
 
-        //TODO need implement YAF_EXCEPTION_HANDLE
-        //YAF_EXCEPTION_HANDLE(dispatcher, request, response); 
-       
         Variant view = yaf_dispatcher_init_view(object, init_null_variant, init_null_variant);
         if (view.isNull()) {
             return init_null_variant;
@@ -853,16 +844,11 @@ Variant yaf_dispatcher_dispatch(const Object& object)
             yaf_dispatcher_fix_default(object, request);
             yaf_dispatcher_call_router_hook(arr_plugin, request, response, 
                     String(YAF_PLUGIN_HOOK_POSTDISPATCH));
-
-            //TODO need implement YAF_EXCEPTION_HANDLE
-            //YAF_EXCEPTION_HANDLE(dispatcher, request, response); 
         } while (--nesting > 0 && !yaf_request_is_dispatched(&request));
 
         yaf_dispatcher_call_router_hook(arr_plugin, request, response, 
                 String(YAF_PLUGIN_HOOK_LOOPSHUTDOWN));
 
-        //TODO need implement YAF_EXCEPTION_HANDLE
-        //YAF_EXCEPTION_HANDLE(dispatcher, request, response); 
         if (nesting == 0 && !yaf_request_is_dispatched(&request)) {
             yaf_trigger_error(YAF_ERR_DISPATCH_FAILED, 
                     "The max dispatch nesting %ld was reached",

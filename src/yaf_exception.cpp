@@ -81,7 +81,7 @@ void yaf_trigger_error(int level, char* format, ...)
     char msg_buf[8192];
     va_list va;
     va_start(va, format);
-    int ret = vsnprintf(msg_buf, sizeof(msg_buf), format, va);            
+    vsnprintf(msg_buf, sizeof(msg_buf), format, va);            
     va_end(va); 
 
     if (g_yaf_local_data.get()->throw_exception) {

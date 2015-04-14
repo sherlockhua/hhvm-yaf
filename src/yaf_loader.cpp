@@ -252,7 +252,7 @@ bool yaf_loader_is_local_namespace(const Object& loader, char *class_name, int l
 int yaf_internal_autoload(const char* ptr_file_name, 
         int ptr_file_name_len, std::string& directory)
 {
-    char *q, *p, *seg;
+    char *q, *p;
     unsigned int seg_len, directory_len;
     std::string buf;
 
