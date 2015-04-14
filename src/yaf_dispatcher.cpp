@@ -770,6 +770,7 @@ static void yaf_dispatcher_php_exception_handler(
     yaf_response_send(response);
 }
 
+/*
 static void yaf_dispatcher_cpp_exception_handler(
         const Object& dispatcher, const Object& request, 
         const Object& response, const Exception& e)
@@ -778,6 +779,7 @@ static void yaf_dispatcher_cpp_exception_handler(
         return;
     } 
 }
+*/
 
 Variant yaf_dispatcher_dispatch(const Object& object)
 {
