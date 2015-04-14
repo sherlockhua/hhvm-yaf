@@ -170,6 +170,7 @@ static int build_array(Array& arr, std::vector<std::string>& vec,
     return 0;
 }
 
+/*
 static int parse_field(char* field, Array& config, const char* cur_section, const char* filename)
 {
     if (field == NULL || filename == NULL || cur_section == NULL) {
@@ -228,7 +229,9 @@ static int parse_field(char* field, Array& config, const char* cur_section, cons
 
     return 0;
 }
+*/
 
+/*
 static int parse_section(char* line, Array& config, const char* filename, std::string& cur_section)
 {
     if (line == NULL || filename == NULL) {
@@ -241,10 +244,9 @@ static int parse_section(char* line, Array& config, const char* filename, std::s
     char* ptr = line;
     trim(ptr);
     if (strlen(ptr) == 0) {
-        /*yaf_trigger_error(YAF_ERR_TYPE_ERROR, 
+        yaf_trigger_error(YAF_ERR_TYPE_ERROR, 
                 "invalid section:%s file:%s", 
                 line, filename);
-                */
         return -1;
     }
 
@@ -252,9 +254,9 @@ static int parse_section(char* line, Array& config, const char* filename, std::s
     if (ptr_multi == NULL) {
         cur_section = std::string(ptr);
         if (config.exists(String(cur_section.c_str()))) {
-            /*yaf_trigger_error(YAF_ERR_TYPE_ERROR, 
+            yaf_trigger_error(YAF_ERR_TYPE_ERROR, 
                     "duplicate section:%s file:%s", 
-                    line, filename);*/
+                    line, filename);
             return -2;
         }
 
@@ -264,9 +266,9 @@ static int parse_section(char* line, Array& config, const char* filename, std::s
         //inherit
         std::vector<std::string> vec = split(ptr, ':');
         if (vec.size() == 0) {
-            /*yaf_trigger_error(YAF_ERR_TYPE_ERROR, 
+            yaf_trigger_error(YAF_ERR_TYPE_ERROR, 
                     "invalid section:%s file:%s", 
-                    line, filename);*/
+                    line, filename);
             return -3;
         }
 
@@ -276,9 +278,9 @@ static int parse_section(char* line, Array& config, const char* filename, std::s
 
         cur_section = std::string(buf);
         if (config.exists(String(cur_section.c_str()))) {
-            /*yaf_trigger_error(YAF_ERR_TYPE_ERROR, 
+            yaf_trigger_error(YAF_ERR_TYPE_ERROR, 
                     "duplicate section:%s file:%s", 
-                    line, filename);*/
+                    line, filename);
             return -4;
         }
 
@@ -288,9 +290,9 @@ static int parse_section(char* line, Array& config, const char* filename, std::s
             trim(buf);
 
             if(!config.exists(String(buf))) {
-                /*yaf_trigger_error(YAF_ERR_TYPE_WARN, 
+                yaf_trigger_error(YAF_ERR_TYPE_WARN, 
                         "section:%s file:%s  not exists", 
-                        line, filename);*/
+                        line, filename);
                 continue;
             }
 
@@ -312,6 +314,7 @@ static int parse_section(char* line, Array& config, const char* filename, std::s
 
     return 0;
 }
+*/
 
 static void format_ini_field(Variant& key, Variant& value, Array& dest)
 {
