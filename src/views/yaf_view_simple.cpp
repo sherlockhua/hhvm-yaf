@@ -113,12 +113,12 @@ static int yaf_view_simple_extract_eval(Variant& tpl_vars, const Variant& vars)
     return count;
 }
 
-
-
+/*
 static int yaf_view_simple_extract(const Variant& tpl_vars, const Variant& vars)
 {
     return yaf_view_simple_extract_array(tpl_vars) + yaf_view_simple_extract_array(vars);
 }
+*/
 
 static int yaf_view_simple_clear_assign(Object object, const Variant &name)
 {

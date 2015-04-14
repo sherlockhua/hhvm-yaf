@@ -485,6 +485,7 @@ static  int parse_ini_file_ex(const char* filename, Object* object)
     return HHVM_YAF_SUCCESS;
 }
 
+/*
 static  int parse_ini_file(const char* filename, Object* object)
 {
     if (filename == NULL || object == NULL) {
@@ -561,6 +562,7 @@ static  int parse_ini_file(const char* filename, Object* object)
     fclose(fp);
     return 0;
 }
+*/
 
 Variant yaf_config_ini_instance(const Object& object, 
         const Variant& filename, const Variant& section)
