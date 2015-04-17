@@ -15,7 +15,9 @@ install:
   - export HPHP_HOME=`pwd`/hhvm
 
 script:
-  - sh $HPHP_HOME/hphp/tools/hphpize/hphpize && cmake . && make
+  - cp "$HHVM_HOME/hphp/tools/hphpize/hphpize.cmake" CMakeLists.txt
+  - cmake .
+  - make
 
 notifications:
   email:
