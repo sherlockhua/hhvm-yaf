@@ -9,6 +9,7 @@ install:
     - /home/travis/.phpenv/versions/hhvm/bin/composer self-update
 
 script:
+  - whereis hphpize
   - /usr/local/bin/hphpize && cmake . && make
 
 notifications:
