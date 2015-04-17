@@ -6,10 +6,9 @@ php:
 before_script:
 
 install:
-  - /bin/bash ./tools/travis.sh
 
 script:
-  - sh $HPHP_HOME/hphp/tools/hphpize/hphpize && cmake . && make
+  - hphpize && cmake . && make
 
 notifications:
   email:
