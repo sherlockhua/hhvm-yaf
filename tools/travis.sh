@@ -1,8 +1,5 @@
 #!/bin/bash
 
-set -ev
-
-# install hhvm-dev tools
 sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
 sudo apt-get update -qq
 sudo mkdir /etc/hhvm -p
