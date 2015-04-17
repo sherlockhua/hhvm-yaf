@@ -6,9 +6,10 @@ php:
 before_script:
 
 install:
+    - /home/travis/.phpenv/versions/hhvm/bin/composer self-update
 
 script:
-  - hphpize && cmake . && make
+  - /usr/local/bin/hphpize && cmake . && make
 
 notifications:
   email:
