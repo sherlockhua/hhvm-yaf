@@ -3,8 +3,6 @@
 set -ev
 
 # install hhvm-dev tools
-echo "no mongo.so found, so build it"
-
 sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
 sudo apt-get update -qq
 sudo mkdir /etc/hhvm -p

@@ -4,17 +4,9 @@ php:
   - hhvm
 
 before_script:
-  - cd $HPHP_HOME && git submodule update --init --recursive && export CMAKE_PREFIX_PATH=`pwd`/.. 
-  - cmake .
-  - make
-  - cd ..
 
 install:
-  - sudo add-apt-repository ppa:ubuntu-toolchain-r/test
-  - sudo apt-get install cmake
-  - sudo apt-get install  g++-4.8
-  - git clone git://github.com/facebook/hhvm.git
-  - export HPHP_HOME=`pwd`/hhvm
+  - /bin/bash ./tools/travis.sh
 
 script:
   - sh $HPHP_HOME/hphp/tools/hphpize/hphpize && cmake . && make
