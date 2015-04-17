@@ -11,6 +11,7 @@ before_script:
 
 install:
   - sudo apt-get install cmake
+  - sudo apt-get install  g++-4.8
   - git clone git://github.com/facebook/hhvm.git
   - export HPHP_HOME=`pwd`/hhvm
 
