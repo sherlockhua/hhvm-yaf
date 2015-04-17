@@ -4,15 +4,18 @@ php:
   - hhvm
 
 before_script:
+  - cd $HPHP_HOME && git submodule update --init --recursive && export CMAKE_PREFIX_PATH=`pwd`/.. && time TRAVIS=1 ./configure_generic.sh
+  - cd hphp/system && make -j8 && cd -
+  - cd ..
+  - find . -name hphpize
 
 install:
-    - sudo: required
-    - /home/travis/.phpenv/versions/hhvm/bin/composer self-update
-    - /bin/bash ./tools/travis.sh
+  - sudo apt-get install cmake
+  - git clone git://github.com/facebook/hhvm.git
+  - export HPHP_HOME=`pwd`/hhvm
 
 script:
-  - whereis hhvm
-  - /usr/local/bin/hphpize && cmake . && make
+  - sh $HPHP_HOME/hphp/tools/hphpize/hphpize && cmake . && make
 
 notifications:
   email:
