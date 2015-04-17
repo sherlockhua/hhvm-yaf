@@ -5,7 +5,7 @@ php:
 
 before_script:
   - export CMAKE_PREFIX_PATH=`pwd`/..
-  - cd $HPHP_HOME && git submodule update --init --recursive && time TRAVIS=1 ./configure_generic.sh
+  - cd $HPHP_HOME && git submodule update --init --recursive && time TRAVIS=1 ./configure_generic.sh --prefix=$CMAKE_PREFIX_PATH
   - cd hphp/system && make -j 6 && sudo make install && cd -
   - cd ..
 
