@@ -6,10 +6,12 @@ php:
 before_script:
 
 install:
+    - sudo: required
     - /home/travis/.phpenv/versions/hhvm/bin/composer self-update
+    - /bin/bash ./tools/travis.sh
 
 script:
-  - whereis hphpize
+  - whereis hhvm
   - /usr/local/bin/hphpize && cmake . && make
 
 notifications:
