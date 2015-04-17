@@ -15,7 +15,7 @@ install:
   - export HPHP_HOME=`pwd`/hhvm
 
 script:
-  - cp "$HHVM_HOME/hphp/tools/hphpize/hphpize.cmake" CMakeLists.txt
+  - cp "$HPHP_HOME/hphp/tools/hphpize/hphpize.cmake" CMakeLists.txt
   - cmake .
   - make
 
