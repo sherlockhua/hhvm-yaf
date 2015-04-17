@@ -4,12 +4,17 @@ php:
   - hhvm
 
 before_script:
-  - /bin/bash tools/travis.sh
+  - cd $HPHP_HOME && git submodule update --init --recursive && export CMAKE_PREFIX_PATH=`pwd`/.. && time TRAVIS=1 ./configure_generic.sh
+  - cd hphp/system && make -j 6 && cd -
+  - cd ..
 
 install:
+  - sudo apt-get install cmake
+  - git clone git://github.com/facebook/hhvm.git
+  - export HPHP_HOME=`pwd`/hhvm
 
 script:
-  - hphpize && cmake . && make
+  - sh $HPHP_HOME/hphp/tools/hphpize/hphpize && cmake . && make
 
 notifications:
   email:
