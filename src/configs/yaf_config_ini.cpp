@@ -511,7 +511,6 @@ static int yaf_config_ini_serialize(const char* filename,  Variant var_configs,
         return ret;
     }
 
-    raise_warning("serialize succ, size:%d key:%s", cache_config.write_pos, key);
     g_yaf_local_data.get()->cache_config_map[std::string(key)] = cache_config;
     return HHVM_YAF_SUCCESS;
 }

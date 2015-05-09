@@ -132,19 +132,19 @@ public:
     std::string bootstrap;
     std::string name_separator;
     long        name_separator_len;
-    int   lowcase_path;
-    int   use_spl_autoload;
-    int   throw_exception;
-    int   cache_config;
-    int   action_prefer;
-    int   name_suffix;
-    int   autoload_started;
-    int   running;
-    int   in_exception;
-    int   catch_exception;
-    int   suppressing_warning;
+    bool   lowcase_path;
+    bool   use_spl_autoload;
+    bool   throw_exception;
+    bool   cache_config;
+    bool   action_prefer;
+    bool   name_suffix;
+    bool   autoload_started;
+    bool   running;
+    bool   in_exception;
+    bool   catch_exception;
+    bool   suppressing_warning;
     /* {{{ This only effects internally */
-    int   st_compatible;
+    bool   st_compatible;
     /* }}} */
     long        forward_limit;
     YafCacheMap cache_config_map;

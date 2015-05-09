@@ -87,7 +87,6 @@ int yaf_router_route (const Object& object, const Object& request)
 
         Variant ret = vm_call_user_func(func, params);
         if (!ret.isBoolean() || ret.toBoolean() == false) {
-            raise_warning("run yaf router route failed");
             iter.next();
             continue;
         }
