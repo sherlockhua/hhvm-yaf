@@ -103,6 +103,17 @@ private:
     void _initYafSessionClass();
 }; 
 
+typedef struct _YafCacheConfig {
+    int init;
+    char* data;
+    int write_pos;
+    int read_pos;
+    int data_size;
+    time_t modify_time;
+} YafCacheConfig;
+
+typedef std::map<std::string, YafCacheConfig> YafCacheMap;
+
 class YafRequestData: public RequestEventHandler {
 
 public: 
@@ -136,7 +147,7 @@ public:
     int   st_compatible;
     /* }}} */
     long        forward_limit;
-    Array       configs;
+    YafCacheMap cache_config_map;
     Variant     modules;
     Variant     default_route;
 /*#if ((PHP_MAJOR_VERSION == 5) && (PHP_MINOR_VERSION < 4))
@@ -189,7 +200,10 @@ public:
                 this->modules.toArrRef().clear();
             }
         }
-        virtual ~YafRequestData(){}
+
+        virtual ~YafRequestData(){
+        }
+
 };
 
 extern YafRequestData g_tmp_yaf_local_data;

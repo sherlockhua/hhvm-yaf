@@ -15,6 +15,7 @@
 
 namespace HPHP {
 
+
 #define YAF_EXTRACT_FUNC_NAME           "extract"
 #define YAF_CONFIG_PROPERT_NAME         "_config" 
 #define YAF_CONFIG_PROPERT_NAME_READONLY "_readonly"

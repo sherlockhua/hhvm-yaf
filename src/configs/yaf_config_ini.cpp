@@ -12,11 +12,85 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-//#include "ext_example.h"
 #include "hphp/runtime/base/base-includes.h"
 #include "hphp/runtime/ext/extension.h"
 #include "ext_yaf.h"
 #include "yaf_config.h"
+
+#define HHVM_YAF_BUF_NOT_ENOUGH 1005
+
+#define HHVM_YAF_ITEM_TYPE_ARRAY 1
+#define HHVM_YAF_ITEM_TYPE_ENTRY 2
+#define HHVM_YAF_ITEM_TYPE_STR   3
+
+#define HHVM_YAF_PACK_TYPE(config, type)                           \
+    do {                                                           \
+        if (config.write_pos + sizeof(type) > config.data_size){   \
+            return HHVM_YAF_BUF_NOT_ENOUGH;                        \
+        }                                                          \
+        ((config).data[(config).write_pos++]) = type;              \
+    } while(0)
+
+#define HHVM_YAF_PACK_INT(config, value)                           \
+    do {                                                           \
+        if (config.write_pos + sizeof(value)> config.data_size){   \
+            return HHVM_YAF_BUF_NOT_ENOUGH;                        \
+        }                                                          \
+                                                                   \
+        *((int*)&((config).data[(config).write_pos])) = value;     \
+        (config).write_pos += sizeof(int);                         \
+    } while(0)
+
+#define HHVM_YAF_PACK_STR(config, value)                               \
+    do {                                                               \
+        if (config.write_pos + strlen(value)> config.data_size){       \
+            return HHVM_YAF_BUF_NOT_ENOUGH;                            \
+        }                                                              \
+                                                                       \
+        *((int*)&((config).data[(config).write_pos])) = strlen(value); \
+        (config).write_pos += sizeof(int);                             \
+        memcpy((char*)&(config).data[(config).write_pos],              \
+                value, strlen(value));                                 \
+        (config).write_pos += strlen(value);                           \
+    } while(0)
+
+#define HHVM_YAF_UNPACK_TYPE(config, type)                             \
+    do {                                                               \
+        if (config.read_pos > config.data_size) {                      \
+            return HHVM_YAF_BUF_NOT_ENOUGH;                            \
+        }                                                              \
+                                                                       \
+        (type) = ((config).data[(config).read_pos]);                   \
+        (config).read_pos++;                                           \
+    } while(0)
+
+#define HHVM_YAF_UNPACK_INT(config, value)                             \
+    do {                                                               \
+        if (config.read_pos + sizeof(value)> config.data_size){        \
+            return HHVM_YAF_BUF_NOT_ENOUGH;                            \
+        }                                                              \
+                                                                       \
+        value = *((int*)&((config).data[(config).read_pos]));          \
+        (config).read_pos += sizeof(int);                              \
+    } while(0)
+
+#define HHVM_YAF_UNPACK_STR(config, value, size)                     \
+    do {                                                             \
+        if (config.write_pos + sizeof(int)> config.data_size){       \
+            return HHVM_YAF_BUF_NOT_ENOUGH;                          \
+        }                                                            \
+                                                                     \
+        int length = *((int*)&((config).data[(config).read_pos]));   \
+        (config).read_pos += sizeof(int);                            \
+        if (length >= size){                                         \
+            return HHVM_YAF_BUF_NOT_ENOUGH;                          \
+        }                                                            \
+        memcpy(value, (char*)&(config).data[(config).read_pos],      \
+                length);                                             \
+        value[length] = '\0';                                        \
+        (config).read_pos += length;                                 \
+    } while(0)
+
 
 namespace HPHP { 
 
@@ -170,152 +244,6 @@ static int build_array(Array& arr, std::vector<std::string>& vec,
     return 0;
 }
 
-/*
-static int parse_field(char* field, Array& config, const char* cur_section, const char* filename)
-{
-    if (field == NULL || filename == NULL || cur_section == NULL) {
-        yaf_trigger_error(YAF_ERR_TYPE_ERROR, 
-                "invalid parameter:%p file:%s", 
-                field, filename);
-        return -1;
-    }
-
-    Array* ptr_array = &config;
-    if (strlen(cur_section)) {
-        if (!config.exists(String(cur_section))) {
-            Array tmp = Array::Create();
-            config.set(String(cur_section), tmp);
-        } 
-
-        ptr_array = &(config.lvalAt(String(cur_section)).toArrRef());
-    }
-
-    char* ptr = field;
-    trim(ptr);
-    if (strlen(ptr) == 0) {
-        return 0;
-    }
-
-    std::vector<std::string> vec = split(ptr, '=');
-    if (vec.size() != 2) {
-        yaf_trigger_error(YAF_ERR_TYPE_WARN, 
-                "invalid parameter:%p file:%s", 
-                field, filename);
-        return 0;
-    }
-
-    char key[8192];
-    char value[8192];
-
-    snprintf(key, sizeof(key), "%s", vec[0].c_str());
-    snprintf(value, sizeof(value), "%s", vec[1].c_str());
-
-    trim(key);
-    trim(value);
-
-    if (strlen(key) == 0) {
-        yaf_trigger_error(YAF_ERR_TYPE_WARN, 
-                "invalid key:%p file:%s", 
-                field, filename);
-        return 0;
-    }
-
-    vec = split(key, '.');
-    if (vec.size() == 1) {
-        ptr_array->set(String(key), String(value));
-    } else {
-        build_array(*ptr_array, vec, std::string(value));
-    }
-
-    return 0;
-}
-*/
-
-/*
-static int parse_section(char* line, Array& config, const char* filename, std::string& cur_section)
-{
-    if (line == NULL || filename == NULL) {
-        yaf_trigger_error(YAF_ERR_TYPE_ERROR, 
-                "invalid parameter:%p file:%s", 
-                line, filename);
-        return -1;
-    }
-
-    char* ptr = line;
-    trim(ptr);
-    if (strlen(ptr) == 0) {
-        yaf_trigger_error(YAF_ERR_TYPE_ERROR, 
-                "invalid section:%s file:%s", 
-                line, filename);
-        return -1;
-    }
-
-    char* ptr_multi = strchr(ptr, ':');
-    if (ptr_multi == NULL) {
-        cur_section = std::string(ptr);
-        if (config.exists(String(cur_section.c_str()))) {
-            yaf_trigger_error(YAF_ERR_TYPE_ERROR, 
-                    "duplicate section:%s file:%s", 
-                    line, filename);
-            return -2;
-        }
-
-        Array tmp = Array::Create();
-        config.set(String(cur_section.c_str()), tmp);
-    } else {
-        //inherit
-        std::vector<std::string> vec = split(ptr, ':');
-        if (vec.size() == 0) {
-            yaf_trigger_error(YAF_ERR_TYPE_ERROR, 
-                    "invalid section:%s file:%s", 
-                    line, filename);
-            return -3;
-        }
-
-        char buf[8192];
-        snprintf(buf, sizeof(buf), "%s", vec[0].c_str());
-        trim(buf);
-
-        cur_section = std::string(buf);
-        if (config.exists(String(cur_section.c_str()))) {
-            yaf_trigger_error(YAF_ERR_TYPE_ERROR, 
-                    "duplicate section:%s file:%s", 
-                    line, filename);
-            return -4;
-        }
-
-        Array tmp = Array::Create();
-        for (int i = 1; i < vec.size(); i++) {
-            snprintf(buf, sizeof(buf), "%s", vec[1].c_str());
-            trim(buf);
-
-            if(!config.exists(String(buf))) {
-                yaf_trigger_error(YAF_ERR_TYPE_WARN, 
-                        "section:%s file:%s  not exists", 
-                        line, filename);
-                continue;
-            }
-
-            Variant base = config[String(buf)];
-            if (base.isArray()) {
-                ArrayIter iter = base.toArray().begin();
-                while (!iter.end()) {
-                    if (!tmp.exists(iter.first())) {
-                        tmp.set(iter.first(), iter.second());
-                    }
-                    iter.next();
-                }
-            } else {
-                tmp.append(base);
-            }
-        }
-        config.set(String(cur_section.c_str()), tmp);
-    }
-
-    return 0;
-}
-*/
-
 static void format_ini_field(Variant& key, Variant& value, Array& dest)
 {
     std::string str_key;
@@ -439,6 +367,155 @@ static Array filter_ini_array(Array& config)
     return arr;
 }
 
+static int yaf_unserialize_array(YafCacheConfig& cache_config, Array& config)
+{
+    int type = 0;
+
+    int size = 0;
+    HHVM_YAF_UNPACK_INT(cache_config, size);
+
+    for (int i = 0; i < size; i++) {
+        HHVM_YAF_UNPACK_TYPE(cache_config, type);
+        if (type != HHVM_YAF_ITEM_TYPE_ENTRY) {
+            return HHVM_YAF_FAILED;
+        }
+
+        HHVM_YAF_UNPACK_TYPE(cache_config, type);
+        if (type != HHVM_YAF_ITEM_TYPE_STR) {
+            return HHVM_YAF_FAILED;
+        }
+
+        char key[8192];
+        HHVM_YAF_UNPACK_STR(cache_config, key, sizeof(key));
+
+        HHVM_YAF_UNPACK_TYPE(cache_config, type);
+        if (type == HHVM_YAF_ITEM_TYPE_ARRAY) {
+            Array value = Array::Create();
+            yaf_unserialize_array(cache_config, value);
+
+            config.set(String(key), value);
+        } else if(type == HHVM_YAF_ITEM_TYPE_STR) {
+            char value[8192];
+            HHVM_YAF_UNPACK_STR(cache_config, value, sizeof(value));
+
+            config.set(String(key), String(value));
+        } else {
+            raise_warning("unknown item type:%d", type);
+            return HHVM_YAF_FAILED;
+        }
+    }
+
+    return HHVM_YAF_SUCCESS;
+}
+
+static int yaf_serialize_array(YafCacheConfig& cache_config, const Array& config)
+{
+    HHVM_YAF_PACK_TYPE(cache_config, HHVM_YAF_ITEM_TYPE_ARRAY);
+    HHVM_YAF_PACK_INT(cache_config, config.size());
+
+    ArrayIter iter = config.begin();
+    while (!iter.end()) {
+        Variant first = iter.first();
+        Variant second = iter.second();
+
+        HHVM_YAF_PACK_TYPE(cache_config, HHVM_YAF_ITEM_TYPE_ENTRY);
+        HHVM_YAF_PACK_TYPE(cache_config, HHVM_YAF_ITEM_TYPE_STR);
+        HHVM_YAF_PACK_STR(cache_config, first.toString().c_str());
+
+        if (second.isArray()) {
+            yaf_serialize_array(cache_config, second.toArray());
+        } else {
+            HHVM_YAF_PACK_TYPE(cache_config, HHVM_YAF_ITEM_TYPE_STR);
+            HHVM_YAF_PACK_STR(cache_config, second.toString().c_str());
+        }
+
+        iter.next();
+    }
+
+    return HHVM_YAF_SUCCESS;
+}
+
+
+static Variant yaf_config_ini_unserialize(const String& filename, const Variant& section)
+{
+    String str;
+    if (section.isString()) {
+        str = section.toString();
+    }
+
+    char key[8192];
+    snprintf(key, sizeof(key), "%s#%s", filename.c_str(), str.c_str());
+
+    YafCacheMap::iterator iter = g_yaf_local_data.get()->cache_config_map.find(std::string(key));
+    if (iter == g_yaf_local_data.get()->cache_config_map.end()) {
+        return init_null_variant;
+    }
+
+    YafCacheConfig config_data = iter->second;
+    struct stat buf;
+    int ret = stat(filename.c_str(), &buf);
+    if (ret != 0) {
+        return init_null_variant;
+    }
+
+    if (buf.st_mtime > config_data.modify_time) {
+        free(config_data.data);
+        g_yaf_local_data.get()->cache_config_map.erase(iter);
+        return init_null_variant;
+    }
+
+    Array cache_config = Array::Create();
+
+    int type = 0;
+    HHVM_YAF_UNPACK_TYPE(config_data, type); 
+    if (type != HHVM_YAF_ITEM_TYPE_ARRAY) {
+        return HHVM_YAF_FAILED;
+    }
+
+    ret = yaf_unserialize_array(config_data, cache_config);
+    if (ret != HHVM_YAF_SUCCESS) {
+        return init_null_variant;
+    }
+
+    return cache_config;
+}
+
+
+static int yaf_config_ini_serialize(const char* filename,  Variant var_configs, 
+        const char* section)
+{
+    if (!var_configs.isArray()) {
+        return HHVM_YAF_FAILED;
+    }
+
+    String str(section);
+    char key[8192];
+    snprintf(key, sizeof(key), "%s#%s", filename, str.c_str());
+
+    struct stat buf;
+    int ret = stat(filename, &buf);
+    if (ret != 0) {
+        return HHVM_YAF_FAILED;
+    }
+
+    YafCacheConfig cache_config;
+    cache_config.data_size = 16 * 1024;
+    cache_config.data = (char*) malloc(cache_config.data_size * sizeof(char));
+    cache_config.write_pos = 0;
+    cache_config.read_pos = 0;
+    cache_config.modify_time = buf.st_mtime;
+
+    Array configs = var_configs.toArray();
+    ret = yaf_serialize_array(cache_config, configs);
+    if (ret != HHVM_YAF_SUCCESS) {
+        return ret;
+    }
+
+    raise_warning("serialize succ, size:%d key:%s", cache_config.write_pos, key);
+    g_yaf_local_data.get()->cache_config_map[std::string(key)] = cache_config;
+    return HHVM_YAF_SUCCESS;
+}
+
 static  int parse_ini_file_ex(const char* filename, Object* object)
 {
     if (filename == NULL || object == NULL) {
@@ -485,87 +562,15 @@ static  int parse_ini_file_ex(const char* filename, Object* object)
     } else {
         *ptr_config = conf;
     }
+
+    bool cache = g_yaf_local_data.get()->cache_config;
+    if (cache) {
+        yaf_config_ini_serialize(filename, *ptr_config, 
+                g_yaf_local_data.get()->ini_wanted_section.c_str());
+    }
+
     return HHVM_YAF_SUCCESS;
 }
-
-/*
-static  int parse_ini_file(const char* filename, Object* object)
-{
-    if (filename == NULL || object == NULL) {
-        yaf_trigger_error(YAF_ERR_TYPE_ERROR, 
-                "invald file:%s object:%p", 
-                filename, object);
-        return -1;
-    }
-
-    auto ptr_config = (*object)->o_realProp(YAF_CONFIG_PROPERT_NAME, 
-            ObjectData::RealPropUnchecked, "Yaf_Config_Ini");
-    Array& config = ptr_config->toArrRef();
-
-    FILE* fp = fopen(filename, "r");
-    if (fp == NULL) {
-        yaf_trigger_error(YAF_ERR_TYPE_ERROR, 
-                "open file:%s failed, object:%p, err:%d", 
-                filename, object, errno);
-        return -2;
-    }
-
-    char line[8192];
-    int line_size = sizeof(line);
-    std::string cur_section;
-
-    while (fgets(line, line_size, fp)) {
-        trim(line);
-        int len = strlen(line);
-        if (len == 0) {
-            continue;
-        }
-
-        if (line [0] == '#' || line [0] == ';') {
-            continue;
-        }
-
-        if (line[0] == '[') {
-            if (len <= 2) {
-                yaf_trigger_error(YAF_ERR_TYPE_ERROR, 
-                        "invalid section:%s file:%s object:%p", 
-                        line, filename, object);
-                continue;
-            }
-            if (line[len - 1] != ']') {
-                yaf_trigger_error(YAF_ERR_TYPE_ERROR, 
-                        "invalid section:%s file:%s object:%p", 
-                        line, filename, object);
-                continue;
-            }
-
-            line[len - 1] = '\0';
-            char* ptr = line+1;
-            int ret = parse_section(ptr, config, filename, cur_section);
-            if (ret != 0) {
-                yaf_trigger_error(YAF_ERR_TYPE_ERROR, 
-                        "parse section:%s failed file:%s object:%p", 
-                        line, filename, object);
-                fclose(fp);
-                return ret;
-            }
-        } else {
-            //field parse
-            int ret = parse_field(line, config, cur_section.c_str(), filename);
-            if (ret != 0) {
-                yaf_trigger_error(YAF_ERR_TYPE_ERROR, 
-                        "parse field:%s failed, cur_sectioin:%s file:%s object:%p", 
-                        line, cur_section.c_str(), filename, object);
-                fclose(fp);
-                return ret;
-            }
-        }
-    }
-
-    fclose(fp);
-    return 0;
-}
-*/
 
 Variant yaf_config_ini_instance(const Object& object, 
         const Variant& filename, const Variant& section)
@@ -584,7 +589,6 @@ Variant yaf_config_ini_instance(const Object& object,
     auto ptr_config = o->o_realProp(YAF_CONFIG_PROPERT_NAME, 
             ObjectData::RealPropUnchecked, "Yaf_Config_Ini");
 
-
     if (filename.isArray()) {
         *ptr_config = filename;
         return o;
@@ -595,6 +599,16 @@ Variant yaf_config_ini_instance(const Object& object,
                 " expect a ini filename or array");
         return init_null_variant;
     } 
+
+    bool cache = g_yaf_local_data.get()->cache_config;
+    if (cache) {
+        //use cache configs
+        Variant configs = yaf_config_ini_unserialize(filename.toString(), section);
+        if (configs.isArray()) {
+            *ptr_config = configs;
+            return o;
+        }
+    }
 
     std::string str_filename = filename.toString().toCppString();
     struct stat buf;

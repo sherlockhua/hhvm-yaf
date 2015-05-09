@@ -131,8 +131,6 @@ void YafExtension::threadInit() {
     g_yaf_local_data.get()->default_action     = YAF_ROUTER_DEFAULT_ACTION;
     //g_yaf_local_data.get()->bootstrap          = YAF_DEFAULT_BOOTSTRAP;
 
-
-
     assert(ext);
     YafRequestData* data = g_yaf_local_data.get();
     IniSetting::Bind(ext, IniSetting::PHP_INI_ALL,
