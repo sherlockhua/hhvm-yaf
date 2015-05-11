@@ -76,7 +76,7 @@
 
 #define HHVM_YAF_UNPACK_STR(config, value, size)                     \
     do {                                                             \
-        if (config.write_pos + sizeof(int)> config.data_size){       \
+        if (config.read_pos + sizeof(int)> config.data_size){       \
             return HHVM_YAF_BUF_NOT_ENOUGH;                          \
         }                                                            \
                                                                      \
@@ -367,13 +367,13 @@ static Array filter_ini_array(Array& config)
     return arr;
 }
 
+
 static int yaf_unserialize_array(YafCacheConfig& cache_config, Array& config)
 {
     int type = 0;
-
     int size = 0;
-    HHVM_YAF_UNPACK_INT(cache_config, size);
 
+    HHVM_YAF_UNPACK_INT(cache_config, size);
     for (int i = 0; i < size; i++) {
         HHVM_YAF_UNPACK_TYPE(cache_config, type);
         if (type != HHVM_YAF_ITEM_TYPE_ENTRY) {
@@ -391,7 +391,10 @@ static int yaf_unserialize_array(YafCacheConfig& cache_config, Array& config)
         HHVM_YAF_UNPACK_TYPE(cache_config, type);
         if (type == HHVM_YAF_ITEM_TYPE_ARRAY) {
             Array value = Array::Create();
-            yaf_unserialize_array(cache_config, value);
+            int ret = yaf_unserialize_array(cache_config, value);
+            if (ret != HHVM_YAF_SUCCESS) {
+                return ret;
+            }
 
             config.set(String(key), value);
         } else if(type == HHVM_YAF_ITEM_TYPE_STR) {
@@ -469,11 +472,17 @@ static Variant yaf_config_ini_unserialize(const String& filename, const Variant&
     int type = 0;
     HHVM_YAF_UNPACK_TYPE(config_data, type); 
     if (type != HHVM_YAF_ITEM_TYPE_ARRAY) {
+        //清除序列化的缓存配置
+        free(config_data.data);
+        g_yaf_local_data.get()->cache_config_map.erase(iter);
         return HHVM_YAF_FAILED;
     }
 
     ret = yaf_unserialize_array(config_data, cache_config);
     if (ret != HHVM_YAF_SUCCESS) {
+        //清除序列化的缓存配置
+        free(config_data.data);
+        g_yaf_local_data.get()->cache_config_map.erase(iter);
         return init_null_variant;
     }
 
