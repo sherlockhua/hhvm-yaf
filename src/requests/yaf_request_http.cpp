@@ -40,13 +40,13 @@ Variant yaf_request_http_instance(const Object& object,
     auto tmp = o->o_realProp(YAF_REQUEST_PROPERTY_NAME_METHOD, 
         ObjectData::RealPropUnchecked, "Yaf_Request_Http");
 
-    if (php_global(S_SERVER).toArray().exists(String("HTTP_REQUEST_METHOD"))) {
-        Variant request_method = php_global(S_SERVER).toArray()[String("HTTP_REQUEST_METHOD")];
+    if (php_global(S_SERVER).toArray().exists(String("REQUEST_METHOD"))) {
+        Variant request_method = php_global(S_SERVER).toArray()[String("REQUEST_METHOD")];
         *tmp = request_method;
     } else if (strncmp(RuntimeOption::ExecutionMode, "cli", 3) == 0) {
         *tmp = String("Cli");
     } else {
-        *tmp = String("Unknow");
+        *tmp = String("Unknown");
     }
 
     std::string uri;
